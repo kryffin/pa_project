@@ -5,11 +5,14 @@ int main () {
   /* VARIABLES */
 
   //window
-  SDL_Surface *screen = NULL; //surface of the screen
+  SDL_Surface *screen = (SDL_Surface*)malloc(sizeof(SDL_Surface));
+  screen = NULL; //surface of the screen
 
   //img surfaces
-  SDL_Surface *player_l = NULL; //image representing the player looking left
-  SDL_Surface *player_r = NULL; //image representing the player looking right
+  SDL_Surface *player_l = (SDL_Surface*)malloc(sizeof(SDL_Surface));
+  player_l = NULL; //image representing the player looking left
+  SDL_Surface *player_r = (SDL_Surface*)malloc(sizeof(SDL_Surface));
+  player_r = NULL; //image representing the player looking right
 
   //font variables
   TTF_Font *font = NULL; //font used in the game
@@ -18,34 +21,37 @@ int main () {
   SDL_Color green = {0, 180, 0}; //green font color
 
   //message surfaces
-  SDL_Surface *msgState = NULL; //state indicator
-  SDL_Surface *msgJump = NULL; //double jump indicator
-  SDL_Surface *msgDash = NULL; //dash indicator
+  SDL_Surface *msgState = (SDL_Surface*)malloc(sizeof(SDL_Surface));
+  msgState = NULL; //state indicator
+  SDL_Surface *msgJump = (SDL_Surface*)malloc(sizeof(SDL_Surface));
+  msgJump = NULL; //double jump indicator
+  SDL_Surface *msgDash = (SDL_Surface*)malloc(sizeof(SDL_Surface));
+  msgDash = NULL; //dash indicator
 
   //text strings
-  char strState[25] = "";
-  char strJump[15] = "";
-  char strDash[15] = "";
+  char *strState = (char*)malloc(25 * sizeof(char));
+  char *strJump = (char*)malloc(25 * sizeof(char));
+  char *strDash = (char*)malloc(25 * sizeof(char));
 
   //texts positions
-  SDL_Rect posMsgState;
-  posMsgState.x = 10;
-  posMsgState.y = 10;
-  SDL_Rect posMsgJump;
-  posMsgJump.x = 10;
-  posMsgJump.y = 30;
-  SDL_Rect posMsgDash;
-  posMsgDash.x = 10;
-  posMsgDash.y = 50;
+  SDL_Rect *posMsgState = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  posMsgState->x = 10;
+  posMsgState->y = 10;
+  SDL_Rect *posMsgJump = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  posMsgJump->x = 10;
+  posMsgJump->y = 30;
+  SDL_Rect *posMsgDash = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  posMsgDash->x = 10;
+  posMsgDash->y = 50;
 
   //event running the controls
-  SDL_Event event;
+  SDL_Event *event = (SDL_Event*)malloc(sizeof(SDL_Event));
 
   //the main player
-  player p;
+  player *p = (player*)malloc(sizeof(player));
 
-  bool exit = false;
-
+  bool *quit = (bool*)malloc(sizeof(bool));
+  *quit = false;
   /*************/
 
   //SDL initialization
@@ -97,52 +103,52 @@ int main () {
     return EXIT_FAILURE;
   }
 
-  SDL_Rect acPos;
-  acPos.x = (SCREEN_WIDTH / 2) - (IMG_WIDTH / 2);
-  acPos.y = SCREEN_HEIGHT - IMG_HEIGHT;
+  SDL_Rect *acPos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  acPos->x = (SCREEN_WIDTH / 2) - (IMG_WIDTH / 2);
+  acPos->y = SCREEN_HEIGHT - IMG_HEIGHT;
 
-  SDL_Rect acVel;
-  acVel.x = 0;
-  acVel.y = 0;
+  SDL_Rect *acVel = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  acVel->x = 0;
+  acVel->y = 0;
 
-  p = set_player(10, 10, 0, true, false, acPos, acVel, player_r);
+  *p = set_player(10, 10, 0, true, false, *acPos, *acVel, player_r);
 
-  while (!exit) {
+  while (*quit == false) {
     //filling the screen with white
     SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format ,255, 255, 255));
 
-    player_blit(p, player_l, player_r, screen);
+    player_blit(*p, player_l, player_r, screen);
 
-    player_apply_velocity(&p);
+    player_apply_velocity(p);
 
-    player_dashing(&p);
+    player_dashing(p);
 
     //RAW vertical hyper space
-    if (p.pos.x + IMG_WIDTH > SCREEN_WIDTH) {
-      p.pos.x = 0;
+    if (p->pos.x + IMG_WIDTH > SCREEN_WIDTH) {
+      p->pos.x = 0;
     }
 
-    if (p.pos.x < 0) {
-      p.pos.x = SCREEN_WIDTH - IMG_WIDTH;
+    if (p->pos.x < 0) {
+      p->pos.x = SCREEN_WIDTH - IMG_WIDTH;
     }
 
-    player_jumping(&p);
+    player_jumping(p);
 
     //RAW gravity
-    if (p.state == 0) {
-      if (p.pos.y < SCREEN_HEIGHT - IMG_HEIGHT) {
+    if (p->state == 0) {
+      if (p->pos.y < SCREEN_HEIGHT - IMG_HEIGHT) {
         //currently in air
-        p.pos.y += 12; //12 works perfectly
-      } else if (p.pos.y > SCREEN_HEIGHT - IMG_HEIGHT){
+        p->pos.y += 12; //12 works perfectly
+      } else if (p->pos.y > SCREEN_HEIGHT - IMG_HEIGHT){
         //currently below wanted place
         printf("\nwrong place\n\n");
-        p.pos.y = SCREEN_HEIGHT - IMG_HEIGHT;
+        p->pos.y = SCREEN_HEIGHT - IMG_HEIGHT;
       }
     }
 
     //RAW re-enabling dash
-    if (p.dash == false && p.pos.y == SCREEN_HEIGHT - IMG_HEIGHT && p.dashState == 0) {
-      p.dash = true;
+    if (p->dash == false && p->pos.y == SCREEN_HEIGHT - IMG_HEIGHT && p->dashState == 0) {
+      p->dash = true;
     }
 
     //RAW re-enabling double jump
@@ -150,12 +156,12 @@ int main () {
       p.dJump = true;
     }*/
 
-    control(event, &p, &exit);
+    control(*event, p, quit);
 
     /* debug */
 
     //text rendering
-    switch (get_player_state(p)) {
+    switch (get_player_state(*p)) {
       case 0:
         sprintf(strState, "state : walking");
         break;
@@ -172,7 +178,7 @@ int main () {
         break;
     }
 
-    if (get_player_dJump(p)) {
+    if (get_player_dJump(*p)) {
       sprintf(strJump, "dJump : true");
       msgJump = TTF_RenderText_Solid(font, strJump, green);
     } else {
@@ -180,7 +186,7 @@ int main () {
       msgJump = TTF_RenderText_Solid(font, strJump, red);
     }
 
-    if (get_player_dash(p)) {
+    if (get_player_dash(*p)) {
       sprintf(strDash, "dash : true");
       msgDash = TTF_RenderText_Solid(font, strDash, green);
     } else {
@@ -191,9 +197,9 @@ int main () {
     msgState = TTF_RenderText_Solid(font, strState, black);
 
     //blitting the message on the screen
-    SDL_BlitSurface(msgState, NULL, screen, &posMsgState);
-    SDL_BlitSurface(msgJump, NULL, screen, &posMsgJump);
-    SDL_BlitSurface(msgDash, NULL, screen, &posMsgDash);
+    SDL_BlitSurface(msgState, NULL, screen, posMsgState);
+    SDL_BlitSurface(msgJump, NULL, screen, posMsgJump);
+    SDL_BlitSurface(msgDash, NULL, screen, posMsgDash);
 
     /* * * */
 
@@ -201,6 +207,25 @@ int main () {
 
     SDL_Delay(50);
   }
+
+  /* FREE */
+
+  free(screen);
+  free(player_l);
+  free(player_r);
+  free(msgState);
+  free(msgJump);
+  free(msgDash);
+  free(strState);
+  free(strJump);
+  free(strDash);
+  free(posMsgState);
+  free(posMsgJump);
+  free(posMsgDash);
+  free(event);
+  free(quit);
+  free(acPos);
+  free(acVel);
 
   return EXIT_SUCCESS;
 }
