@@ -18,26 +18,26 @@ void block_blit (block b, SDL_Surface *surface, SDL_Surface *screen) {
 
 //create a new block
 block set_block (unsigned int width, unsigned int height, short int type, SDL_Rect position, SDL_Color color) {
-  block b;
-  b.w = width;
-  b.h = height;
-  b.type = type;
-  b.pos = position;
-  b.col = color;
+  block *b = (block*)malloc(sizeof(block));
+  b->w = width;
+  b->h = height;
+  b->type = type;
+  b->pos = position;
+  b->col = color;
 
-  return b;
+  return *b;
 }
 
 //copy a target block b into block c
 block set_block_copy (block b) {
-  block c;
-  c.w = get_block_width(b);
-  c.h = get_block_height(b);
-  c.type = get_block_type(b);
-  c.pos = get_block_position(b);
-  c.col = b.col;
+  block *c = (block*)malloc(sizeof(block));
+  c->w = get_block_width(b);
+  c->h = get_block_height(b);
+  c->type = get_block_type(b);
+  c->pos = get_block_position(b);
+  c->col = b.col;
 
-  return c;
+  return *c;
 }
 
 /* GET */

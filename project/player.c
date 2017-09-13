@@ -55,37 +55,37 @@ void player_jumping (player *p) {
 
 //create a new player
 player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool dash, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Surface *image) {
-  player p;
-  set_player_maxhp(&p, maxHealthPoints);
-  set_player_hp(&p, healthPoints);
-  set_player_dir(&p, direction);
-  set_player_dash(&p, dash);
-  set_player_dashState(&p, 0);
-  set_player_dJump(&p, doubleJump);
-  set_player_jumpPoint(&p, 0);
-  set_player_highPoint(&p, 0);
-  set_player_state(&p, 0);
-  set_player_pos(&p, position.x, position.y);
-  set_player_vel_x(&p, velocity.x);
-  set_player_vel_y(&p, velocity.y);
-  set_player_img(&p, image);
+  player *p = (player*)malloc(sizeof(player));
+  set_player_maxhp(p, maxHealthPoints);
+  set_player_hp(p, healthPoints);
+  set_player_dir(p, direction);
+  set_player_dash(p, dash);
+  set_player_dashState(p, 0);
+  set_player_dJump(p, doubleJump);
+  set_player_jumpPoint(p, 0);
+  set_player_highPoint(p, 0);
+  set_player_state(p, 0);
+  set_player_pos(p, position.x, position.y);
+  set_player_vel_x(p, velocity.x);
+  set_player_vel_y(p, velocity.y);
+  set_player_img(p, image);
 
-  return p;
+  return *p;
 }
 
 //copy a target player p into player q
 player set_player_copy (player p) {
-  player q;
-  set_player_maxhp(&q, get_player_maxhp(p));
-  set_player_hp(&q, get_player_hp(p));
-  set_player_dir(&q, get_player_dir(p));
-  set_player_dash(&q, get_player_dash(p));
-  set_player_dJump(&q, get_player_dJump(p));
-  set_player_vel_x(&p, get_player_vel_x(p));
-  set_player_vel_y(&p, get_player_vel_y(p));
-  set_player_img(&q, get_player_img(p));
+  player *q = (player*)malloc(sizeof(player));
+  set_player_maxhp(q, get_player_maxhp(p));
+  set_player_hp(q, get_player_hp(p));
+  set_player_dir(q, get_player_dir(p));
+  set_player_dash(q, get_player_dash(p));
+  set_player_dJump(q, get_player_dJump(p));
+  set_player_vel_x(q, get_player_vel_x(p));
+  set_player_vel_y(q, get_player_vel_y(p));
+  set_player_img(q, get_player_img(p));
 
-  return q;
+  return *q;
 }
 
 //set the player's max health points

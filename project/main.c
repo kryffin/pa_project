@@ -15,10 +15,20 @@ int main () {
   player_r = NULL; //image representing the player looking right
 
   //font variables
-  TTF_Font *font = NULL; //font used in the game
-  SDL_Color black = {0, 0, 0}; //black font color
-  SDL_Color red = {255, 0, 0}; //red font color
-  SDL_Color green = {0, 180, 0}; //green font color
+  TTF_Font *font = (TTF_Font*)malloc(sizeof(font)); //font used in the game
+  font = NULL;
+  SDL_Color *black = (SDL_Color*)malloc(sizeof(SDL_Color)); //black font color
+  black->r = 0;
+  black->g = 0;
+  black->b = 0;
+  SDL_Color *red = (SDL_Color*)malloc(sizeof(SDL_Color)); //red font color
+  red->r = 255;
+  red->g = 0;
+  red->b = 0;
+  SDL_Color *green = (SDL_Color*)malloc(sizeof(SDL_Color)); //green font color
+  green->r = 0;
+  green->g = 180;
+  green->b = 0;
 
   //message surfaces
   SDL_Surface *msgState = (SDL_Surface*)malloc(sizeof(SDL_Surface));
@@ -111,7 +121,7 @@ int main () {
   acVel->x = 0;
   acVel->y = 0;
 
-  *p = set_player(10, 10, 0, true, false, *acPos, *acVel, player_r);
+  *p = set_player(10, 10, 0, true, true, *acPos, *acVel, player_r);
 
   while (*quit == false) {
     //filling the screen with white
@@ -152,9 +162,9 @@ int main () {
     }
 
     //RAW re-enabling double jump
-    /*if (p.dJump == false && p.pos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
-      p.dJump = true;
-    }*/
+    if (p->dJump == false && p->pos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
+      p->dJump = true;
+    }
 
     control(*event, p, quit);
 
@@ -180,21 +190,21 @@ int main () {
 
     if (get_player_dJump(*p)) {
       sprintf(strJump, "dJump : true");
-      msgJump = TTF_RenderText_Solid(font, strJump, green);
+      msgJump = TTF_RenderText_Solid(font, strJump, *green);
     } else {
       sprintf(strJump, "dJump : false");
-      msgJump = TTF_RenderText_Solid(font, strJump, red);
+      msgJump = TTF_RenderText_Solid(font, strJump, *red);
     }
 
     if (get_player_dash(*p)) {
       sprintf(strDash, "dash : true");
-      msgDash = TTF_RenderText_Solid(font, strDash, green);
+      msgDash = TTF_RenderText_Solid(font, strDash, *green);
     } else {
       sprintf(strDash, "dash : false");
-      msgDash = TTF_RenderText_Solid(font, strDash, red);
+      msgDash = TTF_RenderText_Solid(font, strDash, *red);
     }
 
-    msgState = TTF_RenderText_Solid(font, strState, black);
+    msgState = TTF_RenderText_Solid(font, strState, *black);
 
     //blitting the message on the screen
     SDL_BlitSurface(msgState, NULL, screen, posMsgState);
@@ -213,6 +223,10 @@ int main () {
   free(screen);
   free(player_l);
   free(player_r);
+  free(font);
+  free(black);
+  free(red);
+  free(green);
   free(msgState);
   free(msgJump);
   free(msgDash);
