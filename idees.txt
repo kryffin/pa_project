@@ -3,3 +3,32 @@ Idées :
 	Platformer Star Wars
 	Jeux d'aventure Rick&Morty
 	Roguelike complètement ZZZDDDDAAAA
+
+
+Trame principâle du jeu
+Main idee : critique des médias
+Idees du start :
+      - rentre du boulot et regarde la television se fait aspirer le jeu commence
+      - reve d'un jeu mario se reveille regarde la tele et se fait
+
+
+Denoncer :
+	 piscine de plusieurs hectars au lieu de nourrir les paysans
+	 en france les paysans galere a produire et la masse population achete du pas chere en super marché
+
+
+___ un fermier en a marre et se rebelle contre la société de grande consommation (SuperU, InterMarché, Match) et décide de changer le monde à sa façon...
+
+
+Debut : Le fermier reve la nuit; le reve metterai la trame en place : le fermier serait en civile sans aucune actions possible et il yra acheter ses courses comme M.tout le monde ;
+      suite à ça il se reveil et se décide à se rebeller contre cette pieuvre qu'est la
+
+      Le fermier ira sur son tracteur et partira pour la ville = 1 level
+
+
+
+
+liste level :
+
+lvl 1 :
+lvl 2 ; 
