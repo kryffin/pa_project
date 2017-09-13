@@ -1,4 +1,4 @@
-SRC=main.c blocks.c controls.c level.c player.c #source file
+SRC=main.c blocks.c controls.c level.c player.c menu.c #source file
 BIN=mvt #exe file
 INC=header.h #to check before each compile
 

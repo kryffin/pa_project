@@ -145,4 +145,8 @@ int get_player_vel_x (player p);
 int get_player_vel_y (player p);
 SDL_Surface* get_player_img (player p);
 
+//menu.c
+int menu_controls (SDL_Event *event, int *mousex, int *mousey);
+int menu_display (SDL_Surface *screen, TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red);
+
 #endif

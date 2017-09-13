@@ -168,6 +168,9 @@ int main () {
 
     control(*event, p, quit);
 
+    menu_display(screen, font, black, green, red);
+    *quit = true;
+
     /* debug */
 
     //text rendering
