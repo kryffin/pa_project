@@ -1,6 +1,6 @@
 #include "header.h"
 
-void control (SDL_Event event, player *p, bool *exit) {
+void control (SDL_Event event, player *p, bool *quit) {
 
   while (SDL_PollEvent(&event)) {
     switch(event.type) {
@@ -40,7 +40,7 @@ void control (SDL_Event event, player *p, bool *exit) {
 
           //'esc' to quit
           case SDLK_ESCAPE:
-            *exit = true;
+            *quit = true;
             break;
 
           default:
@@ -73,6 +73,10 @@ void control (SDL_Event event, player *p, bool *exit) {
           default:
             break;
         }
+        break;
+
+      case SDL_QUIT:
+        *quit = true;
         break;
 
       default:

@@ -2,7 +2,7 @@
 
 /* BLITTING */
 
-void player_blit (player p, SDL_Surface *img_l, SDL_Surface *img_r, SDL_Surface *screen) {
+void player_blit (player p, SDL_Texture *img_l, SDL_Texture *img_r, SDL_Renderer *renderer, SDL_Rect desRec) {
   if (get_player_dir(p) == 0) {
     //if the player is facing left
     set_player_img(&p, img_l);
@@ -11,7 +11,7 @@ void player_blit (player p, SDL_Surface *img_l, SDL_Surface *img_r, SDL_Surface 
     set_player_img(&p, img_r);
   }
 
-  SDL_BlitSurface(p.img, NULL, screen, &p.pos);
+  SDL_RenderCopy(renderer, p.img, NULL, &desRec);
 }
 
 /* BEHAVIOR */
@@ -54,7 +54,7 @@ void player_jumping (player *p) {
 /* SET */
 
 //create a new player
-player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool dash, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Surface *image) {
+player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool dash, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image) {
   player *p = (player*)malloc(sizeof(player));
   set_player_maxhp(p, maxHealthPoints);
   set_player_hp(p, healthPoints);
@@ -162,7 +162,7 @@ void set_player_vel_y (player *p, int vel_y) {
 }
 
 //set the player's image
-void set_player_img (player *p, SDL_Surface *img) {
+void set_player_img (player *p, SDL_Texture *img) {
   p->img = img;
   return;
 }
@@ -230,6 +230,6 @@ int get_player_vel_y (player p) {
 }
 
 //get the player's image
-SDL_Surface* get_player_img (player p) {
+SDL_Texture* get_player_img (player p) {
   return p.img;
 }

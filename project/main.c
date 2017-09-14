@@ -3,16 +3,20 @@
 int main () {
 
   /* VARIABLES */
+  SDL_Rect desRec;
+  desRec.x = 10;
+  desRec.y = 10;
+  desRec.w = 10;
+  desRec.h = 10;
 
   //window
-  SDL_Surface *screen = (SDL_Surface*)malloc(sizeof(SDL_Surface));
-  screen = NULL; //surface of the screen
+  SDL_Window *window = NULL;
+  SDL_Renderer *renderer = NULL;
 
   //img surfaces
-  SDL_Surface *player_l = (SDL_Surface*)malloc(sizeof(SDL_Surface));
-  player_l = NULL; //image representing the player looking left
-  SDL_Surface *player_r = (SDL_Surface*)malloc(sizeof(SDL_Surface));
-  player_r = NULL; //image representing the player looking right
+  SDL_Surface *temp = NULL;
+  SDL_Texture *player_l = NULL;
+  SDL_Texture *player_r = NULL;
 
   //font variables
   TTF_Font *font = (TTF_Font*)malloc(sizeof(font)); //font used in the game
@@ -76,36 +80,46 @@ int main () {
     return EXIT_FAILURE;
   }
 
-  SDL_WM_SetCaption("MetroidVania test", "MVt");
-
-  //screen initialization to 640x480
-  screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, 0);
-  if (screen == NULL) {
-    printf("Error during SetVideoMode : %s\n", SDL_GetError());
+  //window initialization to 640x480
+  window = SDL_CreateWindow("MVt", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_RESIZABLE);
+  if (window == NULL) {
+    printf("Error during window creating : %s\n", SDL_GetError());
     return EXIT_FAILURE;
   }
 
-  int colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
+  renderer = SDL_CreateRenderer(window, -1, 0);
+  if (renderer == NULL) {
+    printf("Error during renderer creating : %s\n", SDL_GetError());
+    return EXIT_FAILURE;
+  }
+
+  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+  SDL_RenderClear(renderer);
+  SDL_RenderPresent(renderer);
+
+  //int colorkey = SDL_MapRGB(window->format, 255, 0, 255);
 
   //left player image loading
-  player_l = SDL_LoadBMP(PATH_IMG_L);
+  temp = SDL_LoadBMP(PATH_IMG_L);
+  player_l = SDL_CreateTextureFromSurface(renderer, temp);
   if (player_l == NULL) {
     printf("Error during image (left) loading : %s\n", SDL_GetError());
     return EXIT_FAILURE;
   }
 
   /* applying the colorkey */
-  SDL_SetColorKey(player_l, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  //SDL_SetColorKey(player_l, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 
   //right player image loading
-  player_r = SDL_LoadBMP(PATH_IMG_R);
+  temp = SDL_LoadBMP(PATH_IMG_R);
+  player_r = SDL_CreateTextureFromSurface(renderer, temp);
   if (player_r == NULL) {
     printf("Error during image (right) loading : %s\n", SDL_GetError());
     return EXIT_FAILURE;
   }
 
   /* applying the colorkey */
-  SDL_SetColorKey(player_r, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  //SDL_SetColorKey(player_r, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 
   font = TTF_OpenFont(PATH_FONT, FONT_SIZE);
   if (font == NULL) {
@@ -124,10 +138,10 @@ int main () {
   *p = set_player(10, 10, 0, true, true, *acPos, *acVel, player_r);
 
   while (*quit == false) {
-    //filling the screen with white
-    SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format ,255, 255, 255));
+    //filling the window with white
+    SDL_RenderClear(renderer);
 
-    player_blit(*p, player_l, player_r, screen);
+    player_blit(*p, player_l, player_r, renderer, desRec);
 
     player_apply_velocity(p);
 
@@ -171,7 +185,7 @@ int main () {
     /* debug */
 
     //text rendering
-    switch (get_player_state(*p)) {
+    /*switch (get_player_state(*p)) {
       case 0:
         sprintf(strState, "state : walking");
         break;
@@ -206,21 +220,21 @@ int main () {
 
     msgState = TTF_RenderText_Solid(font, strState, *black);
 
-    //blitting the message on the screen
-    SDL_BlitSurface(msgState, NULL, screen, posMsgState);
-    SDL_BlitSurface(msgJump, NULL, screen, posMsgJump);
-    SDL_BlitSurface(msgDash, NULL, screen, posMsgDash);
+    //blitting the message on the window
+    SDL_BlitSurface(msgState, NULL, window, posMsgState);
+    SDL_BlitSurface(msgJump, NULL, window, posMsgJump);
+    SDL_BlitSurface(msgDash, NULL, window, posMsgDash);*/
 
     /* * * */
 
-    SDL_Flip(screen);
+    SDL_RenderPresent(renderer);
 
     SDL_Delay(50);
   }
 
   /* FREE */
 
-  free(screen);
+  free(window);
   free(player_l);
   free(player_r);
   free(font);

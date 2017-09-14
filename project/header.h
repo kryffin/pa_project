@@ -3,8 +3,8 @@
 
 /* INCLUDES */
 
-#include <SDL.h>
-#include <SDL/SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 
 /* CONSTANTS */
@@ -37,7 +37,7 @@ struct Player {
   short int state; //curent state of the player
   SDL_Rect pos; //position of the origin (top left)
   SDL_Rect vel; //velocity for the player's movement
-  SDL_Surface *img; //image used for displaying the player
+  SDL_Texture *img; //image used for displaying the player
 };
 
 typedef struct Player player;
@@ -87,7 +87,7 @@ int get_block_color_a (block b);
 
 /* controls.h */
 
-void control (SDL_Event event, player *p, bool *exit);
+void control (SDL_Event event, player *p, bool *quit);
 
 /* level.h */
 
@@ -112,11 +112,11 @@ void level_blit (level l, SDL_Surface *screen);
 
 /* player.h */
 
-void player_blit (player p, SDL_Surface *img_l, SDL_Surface *img_r, SDL_Surface *screen);
+void player_blit (player p, SDL_Texture *img_l, SDL_Texture *img_r, SDL_Renderer *renderer, SDL_Rect desRec);
 void player_apply_velocity (player *p);
 void player_dashing (player *p);
 void player_jumping (player *p);
-player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool dash, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Surface *image);
+player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool dash, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image);
 player set_player_copy (player p);
 void set_player_maxhp (player *p, short int maxhp);
 void set_player_hp (player *p, short int hp);
@@ -130,7 +130,7 @@ void set_player_state (player *p, short int state);
 void set_player_pos (player *p, int pos_x, int pos_y);
 void set_player_vel_x (player *p, int vel_x);
 void set_player_vel_y (player *p, int vel_y);
-void set_player_img (player *p, SDL_Surface *img);
+void set_player_img (player *p, SDL_Texture *img);
 short int get_player_maxhp (player p);
 short int get_player_hp (player p);
 short int get_player_dir (player p);
@@ -143,6 +143,6 @@ short int get_player_state (player p);
 SDL_Rect get_player_pos (player p);
 int get_player_vel_x (player p);
 int get_player_vel_y (player p);
-SDL_Surface* get_player_img (player p);
+SDL_Texture* get_player_img (player p);
 
 #endif
