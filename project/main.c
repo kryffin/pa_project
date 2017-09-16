@@ -28,6 +28,12 @@ int main () {
   SDL_Texture *player_l = NULL;
   SDL_Texture *player_r = NULL;
 
+  //mouse varables
+  int *mousex = NULL;
+  mousex = (int*)malloc(sizeof(int));
+  int *mousey = NULL;
+  mousey = (int*)malloc(sizeof(int));
+
   //array for the keys pressed
   SDL_Keycode key[SDL_NUM_SCANCODES] = {0};
 
@@ -89,6 +95,10 @@ int main () {
   //the main player
   player *p = NULL;
   p = (player*)malloc(sizeof(player));
+
+  //the title screen
+  menu *titleScreen = NULL;
+  titleScreen = (menu*)malloc(sizeof(menu));
 
   int *menuOption = NULL;
   menuOption = (int*)malloc(sizeof(int));
@@ -174,6 +184,17 @@ int main () {
 
   *p = set_player(10, 10, 0, true, *acPos, *acVel, player_r);
 
+  char strOptions[3][20];
+  strcpy(strOptions[0], "New Game");
+  strcpy(strOptions[1], "Options");
+  strcpy(strOptions[2], "Quit");
+
+  SDL_Surface surOptions[3];
+
+  SDL_Rect posOptions[3];
+
+  set_menu(titleScreen, 3, strOptions, surOptions, posOptions, 0);
+
   //initialization time
   printf("Init time : %u ms\n", SDL_GetTicks() - *initTimer);
 
@@ -184,7 +205,7 @@ int main () {
     SDL_RenderClear(renderer);
 
     if (*menuOption == 0) {
-      *menuOption = menu_display(font, black, green, red, renderer);
+      *menuOption = menu_display(titleScreen, font, black, green, red, renderer, mousex, mousey);
     }
 
     /*if (menuOption == 2) {
@@ -244,7 +265,6 @@ int main () {
         case 2:
           sprintf(strState, "state : double-jumping");
           break;
-        case 3:
         default:
           break;
       }
