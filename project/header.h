@@ -5,6 +5,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL2_framerate.h>
 #include <stdbool.h>
 
 /* CONSTANTS */
@@ -13,6 +14,7 @@
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 #define SCREEN_BPP 32
+#define SCREEN_FPS 30
 #define FONT_SIZE 15
 //img
 #define IMG_WIDTH 105 //160 original
@@ -127,7 +129,7 @@ void set_player_dJump (player *p, bool dJump);
 void set_player_jumpPoint (player *p, int jumpPoint);
 void set_player_highPoint (player *p, int highPoint);
 void set_player_state (player *p, short int state);
-void set_player_pos (player *p, int pos_x, int pos_y);
+void set_player_pos (player *p, int pos_x, int pos_y, int pos_w, int pos_h);
 void set_player_vel_x (player *p, int vel_x);
 void set_player_vel_y (player *p, int vel_y);
 void set_player_img (player *p, SDL_Texture *img);
@@ -144,5 +146,8 @@ SDL_Rect get_player_pos (player p);
 int get_player_vel_x (player p);
 int get_player_vel_y (player p);
 SDL_Texture* get_player_img (player p);
+
+int menu_controls(SDL_Event *event, int *mousex, int *mousey);
+int menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer);
 
 #endif

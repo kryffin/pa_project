@@ -11,13 +11,13 @@ void player_blit (player p, SDL_Texture *img_l, SDL_Texture *img_r, SDL_Renderer
     set_player_img(&p, img_r);
   }
 
-  SDL_RenderCopy(renderer, p.img, NULL, &desRec);
+  SDL_RenderCopy(renderer, p.img, NULL, &(p.pos));
 }
 
 /* BEHAVIOR */
 
 void player_apply_velocity (player *p) {
-  set_player_pos(p, get_player_pos(*p).x + get_player_vel_x(*p), get_player_pos(*p).y + get_player_vel_y(*p));
+  set_player_pos(p, get_player_pos(*p).x + get_player_vel_x(*p), get_player_pos(*p).y + get_player_vel_y(*p), get_player_pos(*p).w, get_player_pos(*p).h);
   return;
 }
 
@@ -29,9 +29,9 @@ void player_dashing (player *p) {
     } else {
       set_player_dashState(p, get_player_dashState(*p) + 1);
       if (get_player_dir(*p) == 0) {
-        set_player_pos(p, get_player_pos(*p).x - 60, get_player_pos(*p).y);
+        set_player_pos(p, get_player_pos(*p).x - 60, get_player_pos(*p).y, get_player_pos(*p).w, get_player_pos(*p).h);
       } else if (get_player_dir(*p) == 1) {
-        set_player_pos(p, get_player_pos(*p).x + 60, get_player_pos(*p).y);
+        set_player_pos(p, get_player_pos(*p).x + 60, get_player_pos(*p).y, get_player_pos(*p).w, get_player_pos(*p).h);
       }
     }
   }
@@ -42,7 +42,7 @@ void player_jumping (player *p) {
     if (get_player_pos(*p).y > get_player_jumpPoint(*p) - IMG_HEIGHT) {
       //currently jumping
       /*pos.y -= (pos.y - (jumpPoint - IMG_HEIGHT)) * 0.3;*/
-      set_player_pos(p, get_player_pos(*p).x, get_player_pos(*p).y - (get_player_jumpPoint(*p) - IMG_HEIGHT) * 0.3);
+      set_player_pos(p, get_player_pos(*p).x, get_player_pos(*p).y - (get_player_jumpPoint(*p) - IMG_HEIGHT) * 0.3, get_player_pos(*p).w, get_player_pos(*p).h);
     } else {
       //jumping ends
       set_player_highPoint(p, get_player_pos(*p).y);
@@ -55,22 +55,22 @@ void player_jumping (player *p) {
 
 //create a new player
 player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool dash, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image) {
-  player *p = (player*)malloc(sizeof(player));
-  set_player_maxhp(p, maxHealthPoints);
-  set_player_hp(p, healthPoints);
-  set_player_dir(p, direction);
-  set_player_dash(p, dash);
-  set_player_dashState(p, 0);
-  set_player_dJump(p, doubleJump);
-  set_player_jumpPoint(p, 0);
-  set_player_highPoint(p, 0);
-  set_player_state(p, 0);
-  set_player_pos(p, position.x, position.y);
-  set_player_vel_x(p, velocity.x);
-  set_player_vel_y(p, velocity.y);
-  set_player_img(p, image);
+  player p;
+  set_player_maxhp(&p, maxHealthPoints);
+  set_player_hp(&p, healthPoints);
+  set_player_dir(&p, direction);
+  set_player_dash(&p, dash);
+  set_player_dashState(&p, 0);
+  set_player_dJump(&p, doubleJump);
+  set_player_jumpPoint(&p, 0);
+  set_player_highPoint(&p, 0);
+  set_player_state(&p, 0);
+  set_player_pos(&p, position.x, position.y, position.w, position.h);
+  set_player_vel_x(&p, velocity.x);
+  set_player_vel_y(&p, velocity.y);
+  set_player_img(&p, image);
 
-  return *p;
+  return p;
 }
 
 //copy a target player p into player q
@@ -143,9 +143,11 @@ void set_player_state (player *p, short int state) {
 }
 
 //set the player's position
-void set_player_pos (player *p, int pos_x, int pos_y) {
+void set_player_pos (player *p, int pos_x, int pos_y, int pos_w, int pos_h) {
   p->pos.x = pos_x;
   p->pos.y = pos_y;
+  p->pos.w = pos_w;
+  p->pos.h = pos_h;
   return;
 }
 

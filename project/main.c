@@ -2,6 +2,16 @@
 
 int main () {
 
+  //fps manager
+  Uint32 *initTimer = NULL;
+  initTimer = (Uint32*)malloc(sizeof(Uint32));
+  *initTimer = SDL_GetTicks();
+
+  FPSmanager *manager = NULL;
+  manager = (FPSmanager*)malloc(sizeof(FPSmanager));
+  SDL_initFramerate(manager);
+  SDL_setFramerate(manager, SCREEN_FPS);
+
   /* VARIABLES */
   SDL_Rect desRec;
   desRec.x = 10;
@@ -19,52 +29,79 @@ int main () {
   SDL_Texture *player_r = NULL;
 
   //font variables
-  TTF_Font *font = (TTF_Font*)malloc(sizeof(font)); //font used in the game
-  font = NULL;
-  SDL_Color *black = (SDL_Color*)malloc(sizeof(SDL_Color)); //black font color
+  TTF_Font *font = NULL; //font used in the game
+  font = (TTF_Font*)malloc(sizeof(font));
+
+  SDL_Color *black = NULL;
+  black = (SDL_Color*)malloc(sizeof(SDL_Color)); //black font color
   black->r = 0;
   black->g = 0;
   black->b = 0;
-  SDL_Color *red = (SDL_Color*)malloc(sizeof(SDL_Color)); //red font color
+
+  SDL_Color *red = NULL;
+  red = (SDL_Color*)malloc(sizeof(SDL_Color)); //red font color
   red->r = 255;
   red->g = 0;
   red->b = 0;
-  SDL_Color *green = (SDL_Color*)malloc(sizeof(SDL_Color)); //green font color
+
+  SDL_Color *green = NULL;
+  green = (SDL_Color*)malloc(sizeof(SDL_Color)); //green font color
   green->r = 0;
   green->g = 180;
   green->b = 0;
 
   //message surfaces
-  SDL_Surface *msgState = (SDL_Surface*)malloc(sizeof(SDL_Surface));
-  msgState = NULL; //state indicator
-  SDL_Surface *msgJump = (SDL_Surface*)malloc(sizeof(SDL_Surface));
-  msgJump = NULL; //double jump indicator
-  SDL_Surface *msgDash = (SDL_Surface*)malloc(sizeof(SDL_Surface));
-  msgDash = NULL; //dash indicator
+  SDL_Surface *msgState = NULL;
+  msgState = (SDL_Surface*)malloc(sizeof(SDL_Surface)); //state indicator
+
+  SDL_Surface *msgJump = NULL;
+  msgJump = (SDL_Surface*)malloc(sizeof(SDL_Surface)); //double jump indicator
+
+  SDL_Surface *msgDash = NULL;
+  msgDash = (SDL_Surface*)malloc(sizeof(SDL_Surface)); //dash indicator
 
   //text strings
-  char *strState = (char*)malloc(25 * sizeof(char));
-  char *strJump = (char*)malloc(25 * sizeof(char));
-  char *strDash = (char*)malloc(25 * sizeof(char));
+  char *strState = NULL;
+  strState = (char*)malloc(25 * sizeof(char));
+
+  char *strJump = NULL;
+  strJump = (char*)malloc(25 * sizeof(char));
+
+  char *strDash = NULL;
+  strDash = (char*)malloc(25 * sizeof(char));
 
   //texts positions
-  SDL_Rect *posMsgState = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  SDL_Rect *posMsgState = NULL;
+  posMsgState = (SDL_Rect*)malloc(sizeof(SDL_Rect));
   posMsgState->x = 10;
   posMsgState->y = 10;
-  SDL_Rect *posMsgJump = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+
+  SDL_Rect *posMsgJump = NULL;
+  posMsgJump = (SDL_Rect*)malloc(sizeof(SDL_Rect));
   posMsgJump->x = 10;
   posMsgJump->y = 30;
-  SDL_Rect *posMsgDash = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+
+  SDL_Rect *posMsgDash = NULL;
+  posMsgDash = (SDL_Rect*)malloc(sizeof(SDL_Rect));
   posMsgDash->x = 10;
   posMsgDash->y = 50;
 
+  SDL_Texture *tempT = NULL;
+
   //event running the controls
-  SDL_Event *event = (SDL_Event*)malloc(sizeof(SDL_Event));
+  SDL_Event *event = NULL;
+  event = (SDL_Event*)malloc(sizeof(SDL_Event));
 
   //the main player
-  player *p = (player*)malloc(sizeof(player));
+  player *p = NULL;
+  p = (player*)malloc(sizeof(player));
 
-  bool *quit = (bool*)malloc(sizeof(bool));
+  int *menuOption = NULL;
+  menuOption = (int*)malloc(sizeof(int));
+  *menuOption = 0;
+
+  bool *quit = NULL;
+  quit = (bool*)malloc(sizeof(bool));
   *quit = false;
   /*************/
 
@@ -87,7 +124,7 @@ int main () {
     return EXIT_FAILURE;
   }
 
-  renderer = SDL_CreateRenderer(window, -1, 0);
+  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
   if (renderer == NULL) {
     printf("Error during renderer creating : %s\n", SDL_GetError());
     return EXIT_FAILURE;
@@ -118,6 +155,8 @@ int main () {
     return EXIT_FAILURE;
   }
 
+  SDL_FreeSurface(temp);
+
   /* applying the colorkey */
   //SDL_SetColorKey(player_r, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 
@@ -130,6 +169,8 @@ int main () {
   SDL_Rect *acPos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
   acPos->x = (SCREEN_WIDTH / 2) - (IMG_WIDTH / 2);
   acPos->y = SCREEN_HEIGHT - IMG_HEIGHT;
+  acPos->w = 105;
+  acPos->h = 130;
 
   SDL_Rect *acVel = (SDL_Rect*)malloc(sizeof(SDL_Rect));
   acVel->x = 0;
@@ -137,113 +178,148 @@ int main () {
 
   *p = set_player(10, 10, 0, true, true, *acPos, *acVel, player_r);
 
+  //initialization time
+  printf("Init time : %u ms\n", SDL_GetTicks() - *initTimer);
+
+  free(initTimer);
+
   while (*quit == false) {
     //filling the window with white
     SDL_RenderClear(renderer);
 
-    player_blit(*p, player_l, player_r, renderer, desRec);
-
-    player_apply_velocity(p);
-
-    player_dashing(p);
-
-    //RAW vertical hyper space
-    if (p->pos.x + IMG_WIDTH > SCREEN_WIDTH) {
-      p->pos.x = 0;
+    if (*menuOption == 0) {
+      *menuOption = menu_display(font, black, green, red, renderer);
     }
 
-    if (p->pos.x < 0) {
-      p->pos.x = SCREEN_WIDTH - IMG_WIDTH;
-    }
+    /*if (menuOption == 2) {
+      //menu des options
+    }*/
 
-    player_jumping(p);
+    if (*menuOption == 3) {
+      *quit = true;
+    } else if (*menuOption == 1) {
 
-    //RAW gravity
-    if (p->state == 0) {
-      if (p->pos.y < SCREEN_HEIGHT - IMG_HEIGHT) {
-        //currently in air
-        p->pos.y += 12; //12 works perfectly
-      } else if (p->pos.y > SCREEN_HEIGHT - IMG_HEIGHT){
-        //currently below wanted place
-        printf("\nwrong place\n\n");
-        p->pos.y = SCREEN_HEIGHT - IMG_HEIGHT;
+      player_blit(*p, player_l, player_r, renderer, desRec);
+
+      player_apply_velocity(p);
+
+      player_dashing(p);
+
+      //RAW vertical hyper space
+      if (p->pos.x + IMG_WIDTH > SCREEN_WIDTH) {
+        p->pos.x = 0;
       }
+
+      if (p->pos.x < 0) {
+        p->pos.x = SCREEN_WIDTH - IMG_WIDTH;
+      }
+
+      player_jumping(p);
+
+      //RAW gravity
+      if (p->state == 0) {
+        if (p->pos.y < SCREEN_HEIGHT - IMG_HEIGHT) {
+          //currently in air
+          p->pos.y += 12; //12 works perfectly
+        } else if (p->pos.y > SCREEN_HEIGHT - IMG_HEIGHT){
+          //currently below wanted place
+          printf("\nwrong place\n\n");
+          p->pos.y = SCREEN_HEIGHT - IMG_HEIGHT;
+        }
+      }
+
+      //RAW re-enabling dash
+      if (p->dash == false && p->pos.y == SCREEN_HEIGHT - IMG_HEIGHT && p->dashState == 0) {
+        p->dash = true;
+      }
+
+      //RAW re-enabling double jump
+      if (p->dJump == false && p->pos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
+        p->dJump = true;
+      }
+
+      control(*event, p, quit);
+
+      /* debug */
+
+      //text rendering
+      switch (get_player_state(*p)) {
+        case 0:
+          sprintf(strState, "state : walking");
+          break;
+        case 1:
+          sprintf(strState, "state : jumping");
+          break;
+        case 2:
+          sprintf(strState, "state : double-jumping");
+          break;
+        case 3:
+          sprintf(strState, "state : dashing");
+          break;
+        default:
+          break;
+      }
+
+      if (get_player_dJump(*p)) {
+        sprintf(strJump, "dJump : true");
+        msgJump = TTF_RenderText_Solid(font, strJump, *green);
+      } else {
+        sprintf(strJump, "dJump : false");
+        msgJump = TTF_RenderText_Solid(font, strJump, *red);
+      }
+
+      if (get_player_dash(*p)) {
+        sprintf(strDash, "dash : true");
+        msgDash = TTF_RenderText_Solid(font, strDash, *green);
+      } else {
+        sprintf(strDash, "dash : false");
+        msgDash = TTF_RenderText_Solid(font, strDash, *red);
+      }
+
+      msgState = TTF_RenderText_Solid(font, strState, *black);
+
+      //blitting the message on the window
+      tempT = SDL_CreateTextureFromSurface(renderer, msgState);
+      SDL_QueryTexture(tempT, NULL, NULL, &(posMsgState->w), &(posMsgState->h));
+      SDL_RenderCopy(renderer, tempT, NULL, posMsgState);
+
+      tempT = SDL_CreateTextureFromSurface(renderer, msgJump);
+      SDL_QueryTexture(tempT, NULL, NULL, &(posMsgJump->w), &(posMsgJump->h));
+      SDL_RenderCopy(renderer, tempT, NULL, posMsgJump);
+
+      tempT = SDL_CreateTextureFromSurface(renderer, msgDash);
+      SDL_QueryTexture(tempT, NULL, NULL, &(posMsgDash->w), &(posMsgDash->h));
+      SDL_RenderCopy(renderer, tempT, NULL, posMsgDash);
+
+      /* * * */
+
+      SDL_RenderPresent(renderer);
+
+      SDL_framerateDelay(manager);
     }
-
-    //RAW re-enabling dash
-    if (p->dash == false && p->pos.y == SCREEN_HEIGHT - IMG_HEIGHT && p->dashState == 0) {
-      p->dash = true;
-    }
-
-    //RAW re-enabling double jump
-    if (p->dJump == false && p->pos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
-      p->dJump = true;
-    }
-
-    control(*event, p, quit);
-
-    /* debug */
-
-    //text rendering
-    /*switch (get_player_state(*p)) {
-      case 0:
-        sprintf(strState, "state : walking");
-        break;
-      case 1:
-        sprintf(strState, "state : jumping");
-        break;
-      case 2:
-        sprintf(strState, "state : double-jumping");
-        break;
-      case 3:
-        sprintf(strState, "state : dashing");
-        break;
-      default:
-        break;
-    }
-
-    if (get_player_dJump(*p)) {
-      sprintf(strJump, "dJump : true");
-      msgJump = TTF_RenderText_Solid(font, strJump, *green);
-    } else {
-      sprintf(strJump, "dJump : false");
-      msgJump = TTF_RenderText_Solid(font, strJump, *red);
-    }
-
-    if (get_player_dash(*p)) {
-      sprintf(strDash, "dash : true");
-      msgDash = TTF_RenderText_Solid(font, strDash, *green);
-    } else {
-      sprintf(strDash, "dash : false");
-      msgDash = TTF_RenderText_Solid(font, strDash, *red);
-    }
-
-    msgState = TTF_RenderText_Solid(font, strState, *black);
-
-    //blitting the message on the window
-    SDL_BlitSurface(msgState, NULL, window, posMsgState);
-    SDL_BlitSurface(msgJump, NULL, window, posMsgJump);
-    SDL_BlitSurface(msgDash, NULL, window, posMsgDash);*/
-
-    /* * * */
-
-    SDL_RenderPresent(renderer);
-
-    SDL_Delay(50);
   }
 
   /* FREE */
 
-  free(window);
-  free(player_l);
-  free(player_r);
+  SDL_FreeSurface(msgState);
+  SDL_FreeSurface(msgJump);
+  SDL_FreeSurface(msgDash);
+  SDL_DestroyTexture(player_l);
+  SDL_DestroyTexture(player_r);
+  SDL_DestroyTexture(tempT);
+  SDL_DestroyRenderer(renderer);
+  SDL_DestroyWindow(window);
+  TTF_CloseFont(font);
+
+  TTF_Quit();
+  SDL_Quit();
+
+  free(p);
   free(font);
+  free(manager);
   free(black);
   free(red);
   free(green);
-  free(msgState);
-  free(msgJump);
-  free(msgDash);
   free(strState);
   free(strJump);
   free(strDash);
