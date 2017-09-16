@@ -24,17 +24,6 @@
 #define PATH_IMG_R "./res/sprite_r_2.bmp"
 #define PATH_FONT "./res/font.ttf"
 
-struct Menu {
-  short int nbOptions; //number of available options
-  SDL_Surface **surOptions; //surface for the messages
-  SDL_Rect *posOptions; //position of the options
-
-  short int control; //give the state of the title (1:hovered, 2:selected or 0:none)
-
-  char strOptions[][20]; //titles of every options
-};
-typedef struct Menu menu;
-
 struct Player {
   short int maxhp; //max health points
   short int hp; //current health points
@@ -151,15 +140,7 @@ int get_player_vel_y (player p);
 SDL_Texture* get_player_img (player p);
 
 int menu_controls(SDL_Event *event, int *mousex, int *mousey);
-int menu_display (menu *titleScreen, TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, int *mousex, int *mousey);
-void set_menu (menu *m, int nbOptions, char strOptions[nbOptions - 1][20], SDL_Surface surOptions[nbOptions-1], SDL_Rect posOptions[nbOptions - 1], short int control);
-void set_menu_nbOptions (menu *m, int nbOptions);
-void set_menu_strOptions (menu *m, int nbOptions, char strOptions[nbOptions - 1][20]);
-void set_menu_surOptions (menu *m, int nbOptions, SDL_Surface surOptions[nbOptions - 1]);
-void set_menu_posOptions (menu *m, int nbOptions, SDL_Rect posOptions[nbOptions - 1]);
-void set_menu_control (menu *m, short int control);
-int get_menu_nbOptions (menu m);
-short int get_menu_control (menu m);
+int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, int *mousex, int *mousey);
 bool mouse_hover_menu (int mousex, int mousey, int targetx, int targety, int width, int height);
 
 #endif
