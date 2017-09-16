@@ -28,9 +28,11 @@ int main () {
   SDL_Texture *player_l = NULL;
   SDL_Texture *player_r = NULL;
 
+  //array for the keys pressed
+  SDL_Keycode key[SDL_NUM_SCANCODES] = {0};
+
   //font variables
   TTF_Font *font = NULL; //font used in the game
-  font = (TTF_Font*)malloc(sizeof(font));
 
   SDL_Color *black = NULL;
   black = (SDL_Color*)malloc(sizeof(SDL_Color)); //black font color
@@ -50,15 +52,20 @@ int main () {
   green->g = 180;
   green->b = 0;
 
+  bool *jumped = NULL;
+  jumped = (bool*)malloc(sizeof(bool));
+  *jumped = false;
+
+  bool *dashed = NULL;
+  dashed = (bool*)malloc(sizeof(bool));
+  *dashed = false;
+
   //message surfaces
   SDL_Surface *msgState = NULL;
-  msgState = (SDL_Surface*)malloc(sizeof(SDL_Surface)); //state indicator
 
   SDL_Surface *msgJump = NULL;
-  msgJump = (SDL_Surface*)malloc(sizeof(SDL_Surface)); //double jump indicator
 
   SDL_Surface *msgDash = NULL;
-  msgDash = (SDL_Surface*)malloc(sizeof(SDL_Surface)); //dash indicator
 
   //text strings
   char *strState = NULL;
@@ -147,6 +154,8 @@ int main () {
   /* applying the colorkey */
   //SDL_SetColorKey(player_l, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 
+  SDL_FreeSurface(temp);
+
   //right player image loading
   temp = SDL_LoadBMP(PATH_IMG_R);
   player_r = SDL_CreateTextureFromSurface(renderer, temp);
@@ -199,6 +208,10 @@ int main () {
       *quit = true;
     } else if (*menuOption == 1) {
 
+      //controls
+      update_controls(event, key, quit);
+      control(p, key, jumped, dashed);
+
       player_blit(*p, player_l, player_r, renderer, desRec);
 
       player_apply_velocity(p);
@@ -238,8 +251,6 @@ int main () {
         p->dJump = true;
       }
 
-      control(*event, p, quit);
-
       /* debug */
 
       //text rendering
@@ -262,20 +273,25 @@ int main () {
 
       if (get_player_dJump(*p)) {
         sprintf(strJump, "dJump : true");
+        SDL_FreeSurface(msgJump);
         msgJump = TTF_RenderText_Solid(font, strJump, *green);
       } else {
         sprintf(strJump, "dJump : false");
+        SDL_FreeSurface(msgJump);
         msgJump = TTF_RenderText_Solid(font, strJump, *red);
       }
 
       if (get_player_dash(*p)) {
         sprintf(strDash, "dash : true");
+        SDL_FreeSurface(msgDash);
         msgDash = TTF_RenderText_Solid(font, strDash, *green);
       } else {
         sprintf(strDash, "dash : false");
+        SDL_FreeSurface(msgDash);
         msgDash = TTF_RenderText_Solid(font, strDash, *red);
       }
 
+      SDL_FreeSurface(msgState);
       msgState = TTF_RenderText_Solid(font, strState, *black);
 
       //blitting the message on the window
@@ -315,7 +331,6 @@ int main () {
   SDL_Quit();
 
   free(p);
-  free(font);
   free(manager);
   free(black);
   free(red);
@@ -330,6 +345,9 @@ int main () {
   free(quit);
   free(acPos);
   free(acVel);
+  free(menuOption);
+  free(jumped);
+  free(dashed);
 
   return EXIT_SUCCESS;
 }

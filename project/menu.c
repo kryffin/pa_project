@@ -48,11 +48,8 @@ int menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color 
 
   //message surfaces
   SDL_Surface *surContinue = NULL;
-  surContinue = (SDL_Surface*)malloc(sizeof(SDL_Surface)); //state indicator
   SDL_Surface *surOptions = NULL;
-  surOptions = (SDL_Surface*)malloc(sizeof(SDL_Surface)); //double jump indicator
   SDL_Surface *surQuit = NULL;
-  surQuit = (SDL_Surface*)malloc(sizeof(SDL_Surface)); //dash indicator
 
   SDL_Texture *tempT = NULL;
 
@@ -111,14 +108,17 @@ int menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color 
 
       if (*control == 0) {
 
+        SDL_FreeSurface(surContinue);
         surContinue = TTF_RenderText_Solid(font, strContinue, *green);
 
       } else if (*control == 1){
 
+        SDL_FreeSurface(surContinue);
         surContinue = TTF_RenderText_Solid(font, strContinue, *red);
 
       } else if (*control == 2) {
 
+        SDL_FreeSurface(surContinue);
         surContinue = TTF_RenderText_Solid(font, strContinue, *green);
         option = 1;
 
@@ -131,14 +131,17 @@ int menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color 
 
       if (*control == 0) {
 
+        SDL_FreeSurface(surOptions);
         surOptions = TTF_RenderText_Solid(font, strOptions, *green);
 
       } else if (*control == 1){
 
+        SDL_FreeSurface(surOptions);
         surOptions = TTF_RenderText_Solid(font, strOptions, *red);
 
       } else if (*control == 2) {
 
+        SDL_FreeSurface(surOptions);
         surOptions = TTF_RenderText_Solid(font, strOptions, *green);
         option = 2;
 
@@ -151,14 +154,17 @@ int menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color 
 
       if (*control == 0) {
 
+        SDL_FreeSurface(surQuit);
         surQuit = TTF_RenderText_Solid(font, strQuit, *green);
 
       } else if (*control == 1) {
 
+        SDL_FreeSurface(surQuit);
         surQuit = TTF_RenderText_Solid(font, strQuit, *red);
 
       } else if (*control == 2) {
 
+        SDL_FreeSurface(surContinue);
         surContinue = TTF_RenderText_Solid(font, strContinue, *green);
         option = 3;
 
@@ -166,8 +172,11 @@ int menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color 
 
     } else {
       //render the messages
+      SDL_FreeSurface(surContinue);
       surContinue = TTF_RenderText_Solid(font, strContinue, *black);
+      SDL_FreeSurface(surOptions);
       surOptions = TTF_RenderText_Solid(font, strOptions, *black);
+      SDL_FreeSurface(surQuit);
       surQuit = TTF_RenderText_Solid(font, strQuit, *black);
 
     }

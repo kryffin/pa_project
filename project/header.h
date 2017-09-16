@@ -88,8 +88,8 @@ int get_block_color_b (block b);
 int get_block_color_a (block b);
 
 /* controls.h */
-
-void control (SDL_Event event, player *p, bool *quit);
+void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit);
+void control (player *p, SDL_Keycode *key, bool *jumped, bool *dashed);
 
 /* level.h */
 
