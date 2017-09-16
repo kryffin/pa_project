@@ -56,16 +56,11 @@ int main () {
   jumped = (bool*)malloc(sizeof(bool));
   *jumped = false;
 
-  bool *dashed = NULL;
-  dashed = (bool*)malloc(sizeof(bool));
-  *dashed = false;
-
   //message surfaces
   SDL_Surface *msgState = NULL;
 
   SDL_Surface *msgJump = NULL;
 
-  SDL_Surface *msgDash = NULL;
 
   //text strings
   char *strState = NULL;
@@ -73,9 +68,6 @@ int main () {
 
   char *strJump = NULL;
   strJump = (char*)malloc(25 * sizeof(char));
-
-  char *strDash = NULL;
-  strDash = (char*)malloc(25 * sizeof(char));
 
   //texts positions
   SDL_Rect *posMsgState = NULL;
@@ -87,11 +79,6 @@ int main () {
   posMsgJump = (SDL_Rect*)malloc(sizeof(SDL_Rect));
   posMsgJump->x = 10;
   posMsgJump->y = 30;
-
-  SDL_Rect *posMsgDash = NULL;
-  posMsgDash = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  posMsgDash->x = 10;
-  posMsgDash->y = 50;
 
   SDL_Texture *tempT = NULL;
 
@@ -185,7 +172,7 @@ int main () {
   acVel->x = 0;
   acVel->y = 0;
 
-  *p = set_player(10, 10, 0, true, true, *acPos, *acVel, player_r);
+  *p = set_player(10, 10, 0, true, *acPos, *acVel, player_r);
 
   //initialization time
   printf("Init time : %u ms\n", SDL_GetTicks() - *initTimer);
@@ -210,13 +197,11 @@ int main () {
 
       //controls
       update_controls(event, key, quit);
-      control(p, key, jumped, dashed, renderer);
+      control(p, key, jumped, renderer);
 
       player_blit(*p, player_l, player_r, renderer, desRec);
 
       player_apply_velocity(p);
-
-      player_dashing(p);
 
       //RAW vertical hyper space
       if (p->pos.x + IMG_WIDTH > SCREEN_WIDTH) {
@@ -241,11 +226,6 @@ int main () {
         }
       }
 
-      //RAW re-enabling dash
-      if (p->dash == false && p->pos.y == SCREEN_HEIGHT - IMG_HEIGHT && p->dashState == 0) {
-        p->dash = true;
-      }
-
       //RAW re-enabling double jump
       if (p->dJump == false && p->pos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
         p->dJump = true;
@@ -265,8 +245,6 @@ int main () {
           sprintf(strState, "state : double-jumping");
           break;
         case 3:
-          sprintf(strState, "state : dashing");
-          break;
         default:
           break;
       }
@@ -281,16 +259,6 @@ int main () {
         msgJump = TTF_RenderText_Solid(font, strJump, *red);
       }
 
-      if (get_player_dash(*p)) {
-        sprintf(strDash, "dash : true");
-        SDL_FreeSurface(msgDash);
-        msgDash = TTF_RenderText_Solid(font, strDash, *green);
-      } else {
-        sprintf(strDash, "dash : false");
-        SDL_FreeSurface(msgDash);
-        msgDash = TTF_RenderText_Solid(font, strDash, *red);
-      }
-
       SDL_FreeSurface(msgState);
       msgState = TTF_RenderText_Solid(font, strState, *black);
 
@@ -302,10 +270,6 @@ int main () {
       tempT = SDL_CreateTextureFromSurface(renderer, msgJump);
       SDL_QueryTexture(tempT, NULL, NULL, &(posMsgJump->w), &(posMsgJump->h));
       SDL_RenderCopy(renderer, tempT, NULL, posMsgJump);
-
-      tempT = SDL_CreateTextureFromSurface(renderer, msgDash);
-      SDL_QueryTexture(tempT, NULL, NULL, &(posMsgDash->w), &(posMsgDash->h));
-      SDL_RenderCopy(renderer, tempT, NULL, posMsgDash);
 
       /* * * */
 
@@ -319,7 +283,6 @@ int main () {
 
   SDL_FreeSurface(msgState);
   SDL_FreeSurface(msgJump);
-  SDL_FreeSurface(msgDash);
   SDL_DestroyTexture(player_l);
   SDL_DestroyTexture(player_r);
   SDL_DestroyTexture(tempT);
@@ -337,17 +300,14 @@ int main () {
   free(green);
   free(strState);
   free(strJump);
-  free(strDash);
   free(posMsgState);
   free(posMsgJump);
-  free(posMsgDash);
   free(event);
   free(quit);
   free(acPos);
   free(acVel);
   free(menuOption);
   free(jumped);
-  free(dashed);
 
   return EXIT_SUCCESS;
 }

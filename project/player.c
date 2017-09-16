@@ -46,22 +46,6 @@ void player_apply_velocity (player *p) {
   return;
 }
 
-void player_dashing (player *p) {
-  if (get_player_state(*p) == 3) {
-    if (get_player_dashState(*p) >= 5) {
-      set_player_dashState(p, 0);
-      set_player_state(p, 0);
-    } else {
-      set_player_dashState(p, get_player_dashState(*p) + 1);
-      if (get_player_dir(*p) == 0) {
-        set_player_pos(p, get_player_pos(*p).x - 60, get_player_pos(*p).y, get_player_pos(*p).w, get_player_pos(*p).h);
-      } else if (get_player_dir(*p) == 1) {
-        set_player_pos(p, get_player_pos(*p).x + 60, get_player_pos(*p).y, get_player_pos(*p).w, get_player_pos(*p).h);
-      }
-    }
-  }
-}
-
 void player_jumping (player *p) {
   if (get_player_state(*p) == 1 || get_player_state(*p) == 2) {
     if (get_player_pos(*p).y > get_player_jumpPoint(*p) - IMG_HEIGHT) {
@@ -79,13 +63,11 @@ void player_jumping (player *p) {
 /* SET */
 
 //create a new player
-player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool dash, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image) {
+player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image) {
   player p;
   set_player_maxhp(&p, maxHealthPoints);
   set_player_hp(&p, healthPoints);
   set_player_dir(&p, direction);
-  set_player_dash(&p, dash);
-  set_player_dashState(&p, 0);
   set_player_dJump(&p, doubleJump);
   set_player_jumpPoint(&p, 0);
   set_player_highPoint(&p, 0);
@@ -104,7 +86,6 @@ player set_player_copy (player p) {
   set_player_maxhp(q, get_player_maxhp(p));
   set_player_hp(q, get_player_hp(p));
   set_player_dir(q, get_player_dir(p));
-  set_player_dash(q, get_player_dash(p));
   set_player_dJump(q, get_player_dJump(p));
   set_player_vel_x(q, get_player_vel_x(p));
   set_player_vel_y(q, get_player_vel_y(p));
@@ -128,18 +109,6 @@ void set_player_hp (player *p, short int hp) {
 //set the current direction
 void set_player_dir (player *p, short int dir) {
   p->dir = dir;
-  return;
-}
-
-//set the player's ability to dash
-void set_player_dash (player *p, bool dash) {
-  p->dash = dash;
-  return;
-}
-
-//set the player's dash state
-void set_player_dashState (player *p, short int dashState) {
-  p->dashState = dashState;
   return;
 }
 
@@ -209,16 +178,6 @@ short int get_player_hp (player p) {
 //get the current direction
 short int get_player_dir (player p) {
   return p.dir;
-}
-
-//get the player's ability to dash
-bool get_player_dash (player p) {
-  return p.dash;
-}
-
-//get the player's dash state
-short int get_player_dashState (player p) {
-  return p.dashState;
 }
 
 //get the player's ability to double jump

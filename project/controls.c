@@ -24,10 +24,10 @@ void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit) {
   }
 }
 
-void control (player *p, SDL_Keycode *keys, bool *jumped, bool *dashed, SDL_Renderer *renderer) {
+void control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer *renderer) {
 
-  //keys :: left, right, jump, dash, quit
-  SDL_Keycode keysTab[5] = {SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_SPACE, SDL_SCANCODE_LSHIFT, SDL_SCANCODE_F};
+  //keys :: left, right, jump, melee
+  SDL_Keycode keysTab[4] = {SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_SPACE, SDL_SCANCODE_F};
 
   /* KEYDOWN Controls */
 
@@ -56,16 +56,7 @@ void control (player *p, SDL_Keycode *keys, bool *jumped, bool *dashed, SDL_Rend
     *jumped = true;
   }
 
-  //'lshift' key
-  if (keys[keysTab[3]] == 1 && *dashed == false) {
-    if (get_player_dash(*p) && get_player_state(*p) != 3) {
-      set_player_state(p, 3);
-      set_player_dash(p, false);
-    }
-    *dashed = true;
-  }
-
-  if (keys[keysTab[4]] == 1) {
+  if (keys[keysTab[3]] == 1) {
     player_melee(*p, renderer);
   }
 
@@ -88,11 +79,6 @@ void control (player *p, SDL_Keycode *keys, bool *jumped, bool *dashed, SDL_Rend
   //'space' key
   if (keys[keysTab[2]] == 0) {
     *jumped = false;
-  }
-
-  //'lshift' key
-  if (keys[keysTab[3]] == 0) {
-    *dashed = false;
   }
 
 }

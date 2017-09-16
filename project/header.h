@@ -29,9 +29,6 @@ struct Player {
   short int hp; //current health points
   short int dir; //current direction
 
-  bool dash; //is dash available?
-  short int dashState; //current state of the dash (used to proceed through the dash)
-
   bool dJump; //is double jump available?
   int jumpPoint; //point from where you jumped
   int highPoint; //highest point of the jump (used for falling?)
@@ -53,7 +50,6 @@ typedef struct Player player;
   0 : walking / normal
   1 : jumping
   2 : double-jumping
-  3 : dashing
 */
 
 /* blocks.h */
@@ -89,7 +85,7 @@ int get_block_color_a (block b);
 
 /* controls.h */
 void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit);
-void control (player *p, SDL_Keycode *key, bool *jumped, bool *dashed, SDL_Renderer *renderer);
+void control (player *p, SDL_Keycode *key, bool *jumped, SDL_Renderer *renderer);
 
 /* level.h */
 
@@ -117,15 +113,12 @@ void level_blit (level l, SDL_Surface *screen);
 void player_blit (player p, SDL_Texture *img_l, SDL_Texture *img_r, SDL_Renderer *renderer, SDL_Rect desRec);
 void player_melee (player p, SDL_Renderer *renderer);
 void player_apply_velocity (player *p);
-void player_dashing (player *p);
 void player_jumping (player *p);
-player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool dash, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image);
+player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image);
 player set_player_copy (player p);
 void set_player_maxhp (player *p, short int maxhp);
 void set_player_hp (player *p, short int hp);
 void set_player_dir (player *p, short int dir);
-void set_player_dash (player *p, bool dash);
-void set_player_dashState (player *p, short int dashState);
 void set_player_dJump (player *p, bool dJump);
 void set_player_jumpPoint (player *p, int jumpPoint);
 void set_player_highPoint (player *p, int highPoint);
@@ -137,8 +130,6 @@ void set_player_img (player *p, SDL_Texture *img);
 short int get_player_maxhp (player p);
 short int get_player_hp (player p);
 short int get_player_dir (player p);
-bool get_player_dash (player p);
-short int get_player_dashState (player p);
 bool get_player_dJump (player p);
 int get_player_jumpPoint (player p);
 int get_player_highPoint (player p);
