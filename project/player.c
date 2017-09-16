@@ -16,6 +16,31 @@ void player_blit (player p, SDL_Texture *img_l, SDL_Texture *img_r, SDL_Renderer
 
 /* BEHAVIOR */
 
+void player_melee (player p, SDL_Renderer *renderer) {
+
+  SDL_Rect *target = NULL;
+  target = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  *target = get_player_pos(p);
+
+  SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+  if (get_player_dir(p) == 0) {
+    //facing left
+    target->x -= IMG_WIDTH;
+
+  } else {
+    //facing right
+    target->x += IMG_WIDTH;
+
+  }
+
+  SDL_RenderFillRect(renderer, target);
+  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+  free(target);
+
+}
+
 void player_apply_velocity (player *p) {
   set_player_pos(p, get_player_pos(*p).x + get_player_vel_x(*p), get_player_pos(*p).y + get_player_vel_y(*p), get_player_pos(*p).w, get_player_pos(*p).h);
   return;

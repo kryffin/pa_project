@@ -210,7 +210,7 @@ int main () {
 
       //controls
       update_controls(event, key, quit);
-      control(p, key, jumped, dashed);
+      control(p, key, jumped, dashed, renderer);
 
       player_blit(*p, player_l, player_r, renderer, desRec);
 

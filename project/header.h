@@ -89,7 +89,7 @@ int get_block_color_a (block b);
 
 /* controls.h */
 void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit);
-void control (player *p, SDL_Keycode *key, bool *jumped, bool *dashed);
+void control (player *p, SDL_Keycode *key, bool *jumped, bool *dashed, SDL_Renderer *renderer);
 
 /* level.h */
 
@@ -115,6 +115,7 @@ void level_blit (level l, SDL_Surface *screen);
 /* player.h */
 
 void player_blit (player p, SDL_Texture *img_l, SDL_Texture *img_r, SDL_Renderer *renderer, SDL_Rect desRec);
+void player_melee (player p, SDL_Renderer *renderer);
 void player_apply_velocity (player *p);
 void player_dashing (player *p);
 void player_jumping (player *p);
