@@ -313,6 +313,9 @@ int main () {
         case 3:
           sprintf(strState, "state : attacking");
           break;
+        case 4:
+          sprintf(strState, "state : crouching");
+          break;
         default:
           break;
       }

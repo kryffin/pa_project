@@ -33,13 +33,13 @@ void control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer *renderer
 
   //'q' or 'a' key
   if (keys[keysTab[0]] == 1) {
-    set_player_vel_x(p, -10); //set a left velocity
+    set_player_vel_x(p, -3); //set a left velocity
     set_player_dir(p, 0); //turn the player towards left
   }
 
   //'d' key
   if (keys[keysTab[1]] == 1) {
-    set_player_vel_x(p, 10); //set a left velocity
+    set_player_vel_x(p, 3); //set a left velocity
     set_player_dir(p, 1); //turn the player towards left
   }
 
