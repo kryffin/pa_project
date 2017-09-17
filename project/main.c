@@ -13,11 +13,20 @@ int main () {
   SDL_setFramerate(manager, SCREEN_FPS);
 
   /* VARIABLES */
-  SDL_Rect desRec;
-  desRec.x = 10;
-  desRec.y = 10;
-  desRec.w = 10;
-  desRec.h = 10;
+  SDL_Rect *desRec = NULL;
+  desRec = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  desRec->x = 0;
+  desRec->y = 0;
+  desRec->w = 32;
+  desRec->h = 64;
+
+  //game size
+  SDL_Rect *display = NULL;
+  display = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  display->x = 0;
+  display->y = 0;
+  display->w = 640;
+  display->h = 480;
 
   //window
   SDL_Window *window = NULL;
@@ -25,8 +34,7 @@ int main () {
 
   //img surfaces
   SDL_Surface *temp = NULL;
-  SDL_Texture *player_l = NULL;
-  SDL_Texture *player_r = NULL;
+  SDL_Texture *playerSprite = NULL;
 
   //mouse varables
   int *mousex = NULL;
@@ -99,6 +107,10 @@ int main () {
   menuOption = (int*)malloc(sizeof(int));
   *menuOption = 0;
 
+  int *menuRes = NULL;
+  menuRes = (int*)malloc(sizeof(int));
+  *menuRes = 0;
+
   bool *quit = NULL;
   quit = (bool*)malloc(sizeof(bool));
   *quit = false;
@@ -117,7 +129,7 @@ int main () {
   }
 
   //window initialization to 640x480
-  window = SDL_CreateWindow("MVt", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_RESIZABLE);
+  window = SDL_CreateWindow("MVt", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, display->w, display->h, SDL_WINDOW_RESIZABLE);
   if (window == NULL) {
     printf("Error during window creating : %s\n", SDL_GetError());
     return EXIT_FAILURE;
@@ -129,6 +141,13 @@ int main () {
     return EXIT_FAILURE;
   }
 
+  //get the computer size
+  SDL_DisplayMode dm;
+  if (SDL_GetDesktopDisplayMode(0, &dm) != 0) {
+    SDL_Log("SDL_GetDesktopDisplayMode failed: %s", SDL_GetError());
+    return EXIT_FAILURE;
+  }
+
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
   SDL_RenderClear(renderer);
   SDL_RenderPresent(renderer);
@@ -136,25 +155,15 @@ int main () {
   //int colorkey = SDL_MapRGB(window->format, 255, 0, 255);
 
   //left player image loading
-  temp = SDL_LoadBMP(PATH_IMG_L);
-  player_l = SDL_CreateTextureFromSurface(renderer, temp);
-  if (player_l == NULL) {
+  temp = SDL_LoadBMP(PATH_SPRITES);
+  playerSprite = SDL_CreateTextureFromSurface(renderer, temp);
+  if (playerSprite == NULL) {
     printf("Error during image (left) loading : %s\n", SDL_GetError());
     return EXIT_FAILURE;
   }
 
   /* applying the colorkey */
   //SDL_SetColorKey(player_l, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
-
-  SDL_FreeSurface(temp);
-
-  //right player image loading
-  temp = SDL_LoadBMP(PATH_IMG_R);
-  player_r = SDL_CreateTextureFromSurface(renderer, temp);
-  if (player_r == NULL) {
-    printf("Error during image (right) loading : %s\n", SDL_GetError());
-    return EXIT_FAILURE;
-  }
 
   SDL_FreeSurface(temp);
 
@@ -167,17 +176,23 @@ int main () {
     return EXIT_FAILURE;
   }
 
-  SDL_Rect *acPos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  acPos->x = (SCREEN_WIDTH / 2) - (IMG_WIDTH / 2);
-  acPos->y = SCREEN_HEIGHT - IMG_HEIGHT;
-  acPos->w = 105;
-  acPos->h = 130;
+  SDL_Rect *acPos = NULL;
+  acPos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  acPos->x = (display->w / 2) - (IMG_WIDTH / 2);
+  acPos->y = display->h - IMG_HEIGHT;
+  acPos->w = 32;
+  acPos->h = 64;
 
-  SDL_Rect *acVel = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  SDL_Rect *acVel = NULL;
+  acVel = (SDL_Rect*)malloc(sizeof(SDL_Rect));
   acVel->x = 0;
   acVel->y = 0;
 
-  *p = set_player(10, 10, 0, true, *acPos, *acVel, player_r);
+  *p = set_player(10, 10, 0, true, *acPos, *acVel, playerSprite, *desRec);
+
+  free(acPos);
+  free(acVel);
+  free(desRec);
 
   //initialization time
   printf("Init time : %u ms\n", SDL_GetTicks() - *initTimer);
@@ -188,51 +203,97 @@ int main () {
     //filling the window with white
     SDL_RenderClear(renderer);
 
-    if (*menuOption == 0) {
-      *menuOption = main_menu_display (font, black, green, red, renderer, mousex, mousey);
+    while (*menuOption == 0 || *menuOption == 2) {
+
+      *menuRes = 0;
+
+      *menuOption = main_menu_display (font, black, green, red, renderer, mousex, mousey, display);
+
+      if (*menuOption == 2) {
+        //option menu
+        while (*menuRes != 6) {
+          *menuRes = option_menu_display (font, black, green, red, renderer, mousex, mousey, display);
+
+          switch (*menuRes) {
+
+            case 1:
+              SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+              break;
+
+            case 2:
+              display->w = 640;
+              display->h = 480;
+              SDL_SetWindowSize(window, display->w, display->h);
+              break;
+
+            case 3:
+              display->w = 1440;
+              display->h = 900;
+              SDL_SetWindowSize(window, display->w, display->h);
+              break;
+
+            case 4:
+              display->w = 1920;
+              display->h = 1080;
+              SDL_SetWindowSize(window, display->w, display->h);
+              break;
+
+            case 5:
+              SDL_SetWindowSize(window, dm.w, dm.h);
+              break;
+
+            case 6:
+              *menuOption = 0;
+              *menuRes = 6;
+              break;
+
+          }
+
+        }
+      }
+
+      if (*menuOption == 3) {
+        //quitting the game
+        *quit = true;
+      }
+
     }
 
-    /*if (menuOption == 2) {
-      //menu des options
-    }*/
-
-    if (*menuOption == 3) {
-      *quit = true;
-    } else if (*menuOption == 1) {
+    if (*quit == false) {
 
       //controls
       update_controls(event, key, quit);
-      control(p, key, jumped, renderer);
+      control(p, key, jumped, renderer, display);
 
-      player_blit(*p, player_l, player_r, renderer, desRec);
+      player_blit(*p, playerSprite, renderer);
 
       player_apply_velocity(p);
 
       //RAW vertical hyper space
-      if (p->pos.x + IMG_WIDTH > SCREEN_WIDTH) {
+      if (p->pos.x + IMG_WIDTH > display->w) {
         p->pos.x = 0;
       }
 
       if (p->pos.x < 0) {
-        p->pos.x = SCREEN_WIDTH - IMG_WIDTH;
+        p->pos.x = display->w - IMG_WIDTH;
       }
 
       player_jumping(p);
 
       //RAW gravity
-      if (p->state == 0) {
-        if (p->pos.y < SCREEN_HEIGHT - IMG_HEIGHT) {
+      if (get_player_state(*p) == 0 || get_player_state(*p) == 3) {
+        if (p->pos.y < display->h - IMG_HEIGHT) {
           //currently in air
-          p->pos.y += 12; //12 works perfectly
-        } else if (p->pos.y > SCREEN_HEIGHT - IMG_HEIGHT){
+          p->pos.y += 5; //12 works perfectly
+        } else if (p->pos.y > display->h - IMG_HEIGHT){
           //currently below wanted place
           printf("\nwrong place\n\n");
-          p->pos.y = SCREEN_HEIGHT - IMG_HEIGHT;
+          p->pos.y = display->h - IMG_HEIGHT;
         }
       }
 
       //RAW re-enabling double jump
-      if (p->dJump == false && p->pos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
+      if (p->dJump == false && p->pos.y == display->h - IMG_HEIGHT) {
         p->dJump = true;
       }
 
@@ -248,6 +309,9 @@ int main () {
           break;
         case 2:
           sprintf(strState, "state : double-jumping");
+          break;
+        case 3:
+          sprintf(strState, "state : attacking");
           break;
         default:
           break;
@@ -287,8 +351,7 @@ int main () {
 
   SDL_FreeSurface(msgState);
   SDL_FreeSurface(msgJump);
-  SDL_DestroyTexture(player_l);
-  SDL_DestroyTexture(player_r);
+  SDL_DestroyTexture(playerSprite);
   SDL_DestroyTexture(tempT);
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
@@ -308,8 +371,6 @@ int main () {
   free(posMsgJump);
   free(event);
   free(quit);
-  free(acPos);
-  free(acVel);
   free(menuOption);
   free(jumped);
   free(mousex);
