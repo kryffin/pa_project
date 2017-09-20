@@ -27,9 +27,37 @@ void player_blit (player p, SDL_Texture *img, SDL_Renderer *renderer) {
         } else {
 
           //sprite moving
-          temp->x = 32;
-          temp->y = 0;
-          set_player_sprite_pos(&p, *temp);
+
+          switch (get_player_step(p)) {
+
+            case 0:
+              temp->x = 32;
+              temp->y = 0;
+              set_player_sprite_pos(&p, *temp);
+              break;
+
+            case 1:
+              temp->x = 0;
+              temp->y = 0;
+              set_player_sprite_pos(&p, *temp);
+              break;
+
+            case 2:
+              temp->x = 64;
+              temp->y = 0;
+              set_player_sprite_pos(&p, *temp);
+              break;
+
+            case 3:
+              temp->x = 0;
+              temp->y = 0;
+              set_player_sprite_pos(&p, *temp);
+              break;
+
+            default:
+              break;
+
+          }
 
         }
 
@@ -85,9 +113,37 @@ void player_blit (player p, SDL_Texture *img, SDL_Renderer *renderer) {
         } else {
 
           //sprite moving
-          temp->x = 32;
-          temp->y = 64;
-          set_player_sprite_pos(&p, *temp);
+
+          switch (get_player_step(p)) {
+
+            case 0:
+              temp->x = 32;
+              temp->y = 64;
+              set_player_sprite_pos(&p, *temp);
+              break;
+
+            case 1:
+              temp->x = 0;
+              temp->y = 64;
+              set_player_sprite_pos(&p, *temp);
+              break;
+
+            case 2:
+              temp->x = 64;
+              temp->y = 64;
+              set_player_sprite_pos(&p, *temp);
+              break;
+
+            case 3:
+              temp->x = 0;
+              temp->y = 64;
+              set_player_sprite_pos(&p, *temp);
+              break;
+
+            default:
+              break;
+
+          }
 
         }
 
@@ -165,6 +221,22 @@ void player_melee (player p, SDL_Renderer *renderer) {
 
 }
 
+void player_update_step (player *p) {
+
+  if(get_player_vel_x(*p) != 0) {
+
+    set_player_step(p, get_player_step(*p) + 1);
+
+    if(get_player_step(*p) == 4) {
+
+      set_player_step(p, 0);
+
+    }
+
+  }
+
+}
+
 void player_apply_velocity (player *p) {
   set_player_pos(p, get_player_pos(*p).x + get_player_vel_x(*p), get_player_pos(*p).y + get_player_vel_y(*p), get_player_pos(*p).w, get_player_pos(*p).h);
   return;
@@ -234,6 +306,12 @@ void set_player_hp (player *p, short int hp) {
 //set the current direction
 void set_player_dir (player *p, short int dir) {
   p->dir = dir;
+  return;
+}
+
+//set the step
+void set_player_step (player *p, short int step) {
+  p->step = step;
   return;
 }
 
@@ -309,6 +387,11 @@ short int get_player_hp (player p) {
 //get the current direction
 short int get_player_dir (player p) {
   return p.dir;
+}
+
+//get the step
+short int get_player_step (player p) {
+  return p.step;
 }
 
 //get the player's ability to double jump

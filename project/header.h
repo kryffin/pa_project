@@ -21,10 +21,13 @@
 #define PATH_SPRITES "./res/spritesheet.bmp"
 #define PATH_FONT "./res/font.ttf"
 
+#define DELAY_STEP 150 //delay for the step updating
+
 struct Player {
   short int maxhp; //max health points
   short int hp; //current health points
   short int dir; //current direction
+  short int step; //step for the surrent sprite to use
 
   bool dJump; //is double jump available?
   int jumpPoint; //point from where you jumped
@@ -112,6 +115,7 @@ void level_blit (level l, SDL_Surface *screen);
 
 void player_blit (player p, SDL_Texture *img, SDL_Renderer *renderer);
 void player_melee (player p, SDL_Renderer *renderer);
+void player_update_step(player *p);
 void player_apply_velocity (player *p);
 void player_jumping (player *p);
 player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image, SDL_Rect posSprite);
@@ -119,6 +123,7 @@ player set_player_copy (player p);
 void set_player_maxhp (player *p, short int maxhp);
 void set_player_hp (player *p, short int hp);
 void set_player_dir (player *p, short int dir);
+void set_player_step (player *p, short int step);
 void set_player_dJump (player *p, bool dJump);
 void set_player_jumpPoint (player *p, int jumpPoint);
 void set_player_highPoint (player *p, int highPoint);
@@ -131,6 +136,7 @@ void set_player_sprite_pos (player *p, SDL_Rect posSprite);
 short int get_player_maxhp (player p);
 short int get_player_hp (player p);
 short int get_player_dir (player p);
+short int get_player_step (player p);
 bool get_player_dJump (player p);
 int get_player_jumpPoint (player p);
 int get_player_highPoint (player p);

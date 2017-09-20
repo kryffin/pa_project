@@ -12,6 +12,10 @@ int main () {
   SDL_initFramerate(manager);
   SDL_setFramerate(manager, SCREEN_FPS);
 
+  int *stepDelay = NULL;
+  stepDelay = (int*)malloc(sizeof(int));
+  *stepDelay = 0;
+
   /* VARIABLES */
   SDL_Rect *desRec = NULL;
   desRec = (SDL_Rect*)malloc(sizeof(SDL_Rect));
@@ -266,6 +270,12 @@ int main () {
       control(p, key, jumped, renderer, display);
 
       player_blit(*p, playerSprite, renderer);
+
+      if (SDL_GetTicks() >= *stepDelay + DELAY_STEP) {
+        player_update_step(p);
+        *stepDelay = SDL_GetTicks();
+        printf("ici\n");
+      }
 
       player_apply_velocity(p);
 
