@@ -8,13 +8,13 @@
    2 : button up
    10 : quit
 */
-int menu_controls(SDL_Event *event, int *mousex, int *mousey) {
+int menu_controls(SDL_Event *event, SDL_Rect *mouse_pos) {
   //controls
   while (SDL_PollEvent(event)) {
     switch(event->type) {
       case SDL_MOUSEMOTION:
-        *mousex = event->motion.x;
-        *mousey = event->motion.y;
+        mouse_pos->x = event->motion.x;
+        mouse_pos->y = event->motion.y;
         break;
 
       case SDL_MOUSEBUTTONDOWN:
@@ -44,8 +44,8 @@ int menu_controls(SDL_Event *event, int *mousex, int *mousey) {
 }
 
 //returns true if the mouse is hovering the target
-bool mouse_hover_menu (int mousex, int mousey, int targetx, int targety, int width, int height) {
-  if(mousex >= targetx && mousex <= targetx + width && mousey >= targety && mousey <= targety + height) {
+bool mouse_hover_menu (SDL_Rect mouse_pos, int targetx, int targety, int width, int height) {
+  if(mouse_pos.x >= targetx && mouse_pos.x <= targetx + width && mouse_pos.y >= targety && mouse_pos.y <= targety + height) {
     return true;
   }
   return false;
@@ -57,7 +57,7 @@ bool mouse_hover_menu (int mousex, int mousey, int targetx, int targety, int wid
   3 : Quit
 */
 
-int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, int *mousex, int *mousey, SDL_Rect *display) {
+int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Rect *display, SDL_Texture *cursor) {
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
@@ -118,9 +118,10 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
     SDL_RenderClear(renderer);
 
     //controls
-    *control = menu_controls(event, mousex, mousey);
+    *control = menu_controls(event, mouse_pos);
+    mouse_print(cursor, renderer, *mouse_pos);
 
-    if (mouse_hover_menu(*mousex, *mousey, posContinue->x, posContinue->y, surContinue->clip_rect.w, surContinue->clip_rect.h)) {
+    if (mouse_hover_menu(*mouse_pos, posContinue->x, posContinue->y, surContinue->clip_rect.w, surContinue->clip_rect.h)) {
 
       if (*control == 0) {
 
@@ -140,7 +141,7 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
 
       }
 
-    } else if (mouse_hover_menu(*mousex, *mousey, posOptions->x, posOptions->y, surOptions->clip_rect.w, surOptions->clip_rect.h)) {
+    } else if (mouse_hover_menu(*mouse_pos, posOptions->x, posOptions->y, surOptions->clip_rect.w, surOptions->clip_rect.h)) {
 
       if (*control == 0) {
 
@@ -160,7 +161,7 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
 
       }
 
-    } else if (mouse_hover_menu(*mousex, *mousey, posQuit->x, posQuit->y, surQuit->clip_rect.w, surQuit->clip_rect.h)) {
+    } else if (mouse_hover_menu(*mouse_pos, posQuit->x, posQuit->y, surQuit->clip_rect.w, surQuit->clip_rect.h)) {
 
       if (*control == 0) {
 
@@ -233,7 +234,7 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
 /* resolution options menu */
 
 /* 1 : FullScreen | 2 : 4:3 | 3 : 16:10 | 4 : 16:9 | 5 : Ad | 6 : Back */
-int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, int *mousex, int *mousey, SDL_Rect *display) {
+int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Rect *display, SDL_Texture *cursor) {
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
@@ -333,9 +334,10 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
     SDL_RenderClear(renderer);
 
     //controls
-    *control = menu_controls(event, mousex, mousey);
+    *control = menu_controls(event, mouse_pos);
+    mouse_print(cursor, renderer, *mouse_pos);
 
-    if (mouse_hover_menu(*mousex, *mousey, posFull->x, posFull->y, surFull->clip_rect.w, surFull->clip_rect.h)) {
+    if (mouse_hover_menu(*mouse_pos, posFull->x, posFull->y, surFull->clip_rect.w, surFull->clip_rect.h)) {
 
       if (*control == 0) {
 
@@ -355,7 +357,7 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
 
       }
 
-    } else if (mouse_hover_menu(*mousex, *mousey, pos43->x, pos43->y, sur43->clip_rect.w, sur43->clip_rect.h)) {
+    } else if (mouse_hover_menu(*mouse_pos, pos43->x, pos43->y, sur43->clip_rect.w, sur43->clip_rect.h)) {
 
       if (*control == 0) {
 
@@ -375,7 +377,7 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
 
       }
 
-    } else if (mouse_hover_menu(*mousex, *mousey, pos1610->x, pos1610->y, sur1610->clip_rect.w, sur1610->clip_rect.h)) {
+    } else if (mouse_hover_menu(*mouse_pos, pos1610->x, pos1610->y, sur1610->clip_rect.w, sur1610->clip_rect.h)) {
 
       if (*control == 0) {
 
@@ -395,7 +397,7 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
 
       }
 
-    } else if (mouse_hover_menu(*mousex, *mousey, pos169->x, pos169->y, sur169->clip_rect.w, sur169->clip_rect.h)) {
+    } else if (mouse_hover_menu(*mouse_pos, pos169->x, pos169->y, sur169->clip_rect.w, sur169->clip_rect.h)) {
 
       if (*control == 0) {
 
@@ -415,7 +417,7 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
 
       }
 
-    } else if (mouse_hover_menu(*mousex, *mousey, posAd->x, posAd->y, surAd->clip_rect.w, surAd->clip_rect.h)) {
+    } else if (mouse_hover_menu(*mouse_pos, posAd->x, posAd->y, surAd->clip_rect.w, surAd->clip_rect.h)) {
 
       if (*control == 0) {
 
@@ -435,7 +437,7 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
 
       }
 
-    } else if (mouse_hover_menu(*mousex, *mousey, posBack->x, posBack->y, surBack->clip_rect.w, surBack->clip_rect.h)) {
+    } else if (mouse_hover_menu(*mouse_pos, posBack->x, posBack->y, surBack->clip_rect.w, surBack->clip_rect.h)) {
 
       if (*control == 0) {
 

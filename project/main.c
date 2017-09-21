@@ -39,12 +39,11 @@ int main () {
   //img surfaces
   SDL_Surface *temp = NULL;
   SDL_Texture *playerSprite = NULL;
+  SDL_Texture *cursor = NULL;
 
   //mouse varables
-  int *mousex = NULL;
-  mousex = (int*)malloc(sizeof(int));
-  int *mousey = NULL;
-  mousey = (int*)malloc(sizeof(int));
+  SDL_Rect *mouse_pos = NULL;
+  mouse_pos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
 
   //array for the keys pressed
   SDL_Keycode key[SDL_NUM_SCANCODES] = {0};
@@ -107,6 +106,10 @@ int main () {
   player *p = NULL;
   p = (player*)malloc(sizeof(player));
 
+  //the enemies
+  player *enemy = NULL;
+  enemy = (player*)malloc(sizeof(player));
+
   int *menuOption = NULL;
   menuOption = (int*)malloc(sizeof(int));
   *menuOption = 0;
@@ -118,6 +121,10 @@ int main () {
   bool *quit = NULL;
   quit = (bool*)malloc(sizeof(bool));
   *quit = false;
+
+  bool *mouse_btn = NULL;
+  mouse_btn = (bool*)malloc(sizeof(bool));
+  *mouse_btn = false;
   /*************/
 
   //SDL initialization
@@ -152,6 +159,8 @@ int main () {
     return EXIT_FAILURE;
   }
 
+  SDL_ShowCursor(SDL_DISABLE);
+
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
   SDL_RenderClear(renderer);
   SDL_RenderPresent(renderer);
@@ -162,7 +171,17 @@ int main () {
   temp = SDL_LoadBMP(PATH_SPRITES);
   playerSprite = SDL_CreateTextureFromSurface(renderer, temp);
   if (playerSprite == NULL) {
-    printf("Error during image (left) loading : %s\n", SDL_GetError());
+    printf("Error during sprite sheet image loading : %s\n", SDL_GetError());
+    return EXIT_FAILURE;
+  }
+
+  SDL_FreeSurface(temp);
+
+  //left player image loading
+  temp = SDL_LoadBMP(PATH_CURSOR);
+  cursor = SDL_CreateTextureFromSurface(renderer, temp);
+  if (cursor == NULL) {
+    printf("Error during cursor image loading : %s\n", SDL_GetError());
     return EXIT_FAILURE;
   }
 
@@ -194,6 +213,9 @@ int main () {
 
   *p = set_player(10, 10, 0, true, *acPos, *acVel, playerSprite, *desRec);
 
+  acPos->x = 10;
+  *enemy = set_player(10, 10, 0, true, *acPos, *acVel, playerSprite, *desRec);
+
   free(acPos);
   free(acVel);
   free(desRec);
@@ -211,12 +233,12 @@ int main () {
 
       *menuRes = 0;
 
-      *menuOption = main_menu_display (font, black, green, red, renderer, mousex, mousey, display);
+      *menuOption = main_menu_display (font, black, green, red, renderer, mouse_pos, display, cursor);
 
       if (*menuOption == 2) {
         //option menu
         while (*menuRes != 6) {
-          *menuRes = option_menu_display (font, black, green, red, renderer, mousex, mousey, display);
+          *menuRes = option_menu_display (font, black, green, red, renderer, mouse_pos, display, cursor);
 
           switch (*menuRes) {
 
@@ -267,17 +289,20 @@ int main () {
 
       //controls
       update_controls(event, key, quit);
-      control(p, key, jumped, renderer, display);
+      keyboard_control(p, key, jumped, renderer, display);
+      mouse_control(event, mouse_pos, mouse_btn);
+      mouse_print(cursor, renderer, *mouse_pos);
 
-      player_blit(*p, playerSprite, renderer);
+      player_blit(*enemy, playerSprite, renderer, *mouse_pos);
+      player_blit(*p, playerSprite, renderer, *mouse_pos);
 
       if (SDL_GetTicks() >= *stepDelay + DELAY_STEP) {
         player_update_step(p);
         *stepDelay = SDL_GetTicks();
-        printf("ici\n");
       }
 
       player_apply_velocity(p);
+      player_update_dir(p, *mouse_pos);
 
       //RAW vertical hyper space
       if (p->pos.x + IMG_WIDTH > display->w) {
@@ -374,6 +399,7 @@ int main () {
   SDL_Quit();
 
   free(p);
+  free(enemy);
   free(manager);
   free(black);
   free(red);
@@ -386,8 +412,7 @@ int main () {
   free(quit);
   free(menuOption);
   free(jumped);
-  free(mousex);
-  free(mousey);
+  free(mouse_pos);
 
   return EXIT_SUCCESS;
 }

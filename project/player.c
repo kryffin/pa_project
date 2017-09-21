@@ -2,7 +2,7 @@
 
 /* BLITTING */
 
-void player_blit (player p, SDL_Texture *img, SDL_Renderer *renderer) {
+void player_blit (player p, SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos) {
 
   SDL_Rect *temp = NULL;
   temp = (SDL_Rect*)malloc(sizeof(SDL_Rect));
@@ -27,7 +27,6 @@ void player_blit (player p, SDL_Texture *img, SDL_Renderer *renderer) {
         } else {
 
           //sprite moving
-
           switch (get_player_step(p)) {
 
             case 0:
@@ -113,7 +112,6 @@ void player_blit (player p, SDL_Texture *img, SDL_Renderer *renderer) {
         } else {
 
           //sprite moving
-
           switch (get_player_step(p)) {
 
             case 0:
@@ -233,6 +231,16 @@ void player_update_step (player *p) {
 
     }
 
+  }
+
+}
+
+void player_update_dir (player *p, SDL_Rect mouse_pos) {
+
+  if(get_player_pos(*p).x + (IMG_WIDTH / 2) < mouse_pos.x) {
+    set_player_dir(p, 1); //right
+  } else {
+    set_player_dir(p, 0); //left
   }
 
 }

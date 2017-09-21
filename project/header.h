@@ -17,9 +17,12 @@
 //img
 #define IMG_WIDTH 32
 #define IMG_HEIGHT 64
+#define CURSOR_WIDTH 15
+#define CURSOR_HEIGHT 15
 //paths
 #define PATH_SPRITES "./res/spritesheet.bmp"
 #define PATH_FONT "./res/font.ttf"
+#define PATH_CURSOR "./res/cursor.bmp"
 
 #define DELAY_STEP 150 //delay for the step updating
 
@@ -88,7 +91,9 @@ int get_block_color_a (block b);
 
 /* controls.h */
 void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit);
-void control (player *p, SDL_Keycode *key, bool *jumped, SDL_Renderer *renderer, SDL_Rect *display);
+void mouse_print (SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos);
+void mouse_control (SDL_Event *event, SDL_Rect *mouse_pos, bool *mouse_btn);
+void keyboard_control (player *p, SDL_Keycode *key, bool *jumped, SDL_Renderer *renderer, SDL_Rect *display);
 
 /* level.h */
 
@@ -113,9 +118,10 @@ void level_blit (level l, SDL_Surface *screen);
 
 /* player.h */
 
-void player_blit (player p, SDL_Texture *img, SDL_Renderer *renderer);
+void player_blit (player p, SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos);
 void player_melee (player p, SDL_Renderer *renderer);
 void player_update_step(player *p);
+void player_update_dir (player *p, SDL_Rect mouse_pos);
 void player_apply_velocity (player *p);
 void player_jumping (player *p);
 player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image, SDL_Rect posSprite);
@@ -147,9 +153,9 @@ int get_player_vel_y (player p);
 SDL_Texture* get_player_img (player p);
 SDL_Rect get_player_sprite_pos (player p);
 
-int menu_controls(SDL_Event *event, int *mousex, int *mousey);
-int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, int *mousex, int *mousey, SDL_Rect *display);
-bool mouse_hover_menu (int mousex, int mousey, int targetx, int targety, int width, int height);
-int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, int *mousex, int *mousey, SDL_Rect *display);
+int menu_controls(SDL_Event *event, SDL_Rect *mouse_pos);
+int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Rect *display, SDL_Texture *playerSprite);
+bool mouse_hover_menu (SDL_Rect mouse_pos, int targetx, int targety, int width, int height);
+int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Rect *display, SDL_Texture *playerSprite);
 
 #endif
