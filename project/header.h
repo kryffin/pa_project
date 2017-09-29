@@ -11,6 +11,8 @@
 /* CONSTANTS */
 
 //window
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
 #define SCREEN_BPP 32
 #define SCREEN_FPS 30
 #define FONT_SIZE 15
@@ -76,7 +78,7 @@ struct Block {
 
 typedef struct Block block;
 
-void block_blit (block b, SDL_Surface *surface, SDL_Surface *screen);
+void block_render (block b, SDL_Surface *surface, SDL_Surface *screen);
 block set_block (unsigned int width, unsigned int height, short int type, SDL_Rect position, SDL_Color color);
 block set_block_copy (block b);
 int get_block_width (block b);
@@ -90,10 +92,10 @@ int get_block_color_b (block b);
 int get_block_color_a (block b);
 
 /* controls.h */
-void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit);
-void mouse_print (SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos);
-void mouse_control (SDL_Event *event, SDL_Rect *mouse_pos, bool *mouse_btn);
-void keyboard_control (player *p, SDL_Keycode *key, bool *jumped, SDL_Renderer *renderer, SDL_Rect *display);
+void update_keyboard_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit);
+void cursor_render (SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos);
+void update_mouse_controls (SDL_Event *event, SDL_Rect *mouse_pos, bool *mouse_btn);
+void keyboard_control (player *p, SDL_Keycode *key, bool *jumped, SDL_Renderer *renderer);
 
 /* level.h */
 
@@ -114,11 +116,11 @@ struct Level {
 
 typedef struct Level level;
 
-void level_blit (level l, SDL_Surface *screen);
+void level_render (level l, SDL_Surface *screen);
 
 /* player.h */
 
-void player_blit (player p, SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos);
+void player_render (player p, SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos);
 void player_melee (player p, SDL_Renderer *renderer);
 void player_update_step(player *p);
 void player_update_dir (player *p, SDL_Rect mouse_pos);
@@ -154,8 +156,8 @@ SDL_Texture* get_player_img (player p);
 SDL_Rect get_player_sprite_pos (player p);
 
 int menu_controls(SDL_Event *event, SDL_Rect *mouse_pos);
-int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Rect *display, SDL_Texture *playerSprite);
+int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Texture *playerSprite);
 bool mouse_hover_menu (SDL_Rect mouse_pos, int targetx, int targety, int width, int height);
-int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Rect *display, SDL_Texture *playerSprite);
+int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Texture *playerSprite);
 
 #endif

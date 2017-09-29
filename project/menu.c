@@ -57,7 +57,7 @@ bool mouse_hover_menu (SDL_Rect mouse_pos, int targetx, int targety, int width, 
   3 : Quit
 */
 
-int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Rect *display, SDL_Texture *cursor) {
+int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Texture *cursor) {
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
@@ -105,12 +105,12 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
   surQuit = TTF_RenderText_Solid(font, str1610, *black);
 
   //message positions
-  posContinue->x = (display->w / 2) - (surContinue->clip_rect.w / 2);
-  posContinue->y = (display->h / 2) - (surContinue->clip_rect.h / 2) - (display->h / 3);
-  posOptions->x = (display->w / 2) - (surOptions->clip_rect.w / 2);
-  posOptions->y = (display->h / 2) - (surOptions->clip_rect.h / 2);
-  posQuit->x = (display->w / 2) - (surQuit->clip_rect.w / 2);
-  posQuit->y = (display->h / 2) - (surQuit->clip_rect.h / 2) + (display->h / 3);
+  posContinue->x = (SCREEN_WIDTH / 2) - (surContinue->clip_rect.w / 2);
+  posContinue->y = (SCREEN_HEIGHT / 2) - (surContinue->clip_rect.h / 2) - (SCREEN_HEIGHT / 3);
+  posOptions->x = (SCREEN_WIDTH / 2) - (surOptions->clip_rect.w / 2);
+  posOptions->y = (SCREEN_HEIGHT / 2) - (surOptions->clip_rect.h / 2);
+  posQuit->x = (SCREEN_WIDTH / 2) - (surQuit->clip_rect.w / 2);
+  posQuit->y = (SCREEN_HEIGHT / 2) - (surQuit->clip_rect.h / 2) + (SCREEN_HEIGHT / 3);
 
   while (1) {
 
@@ -119,7 +119,7 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
 
     //controls
     *control = menu_controls(event, mouse_pos);
-    mouse_print(cursor, renderer, *mouse_pos);
+    cursor_render(cursor, renderer, *mouse_pos);
 
     if (mouse_hover_menu(*mouse_pos, posContinue->x, posContinue->y, surContinue->clip_rect.w, surContinue->clip_rect.h)) {
 
@@ -234,7 +234,7 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
 /* resolution options menu */
 
 /* 1 : FullScreen | 2 : 4:3 | 3 : 16:10 | 4 : 16:9 | 5 : Ad | 6 : Back */
-int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Rect *display, SDL_Texture *cursor) {
+int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Texture *cursor) {
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
@@ -310,20 +310,20 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
 
   int *span = NULL;
   span = (int*)malloc(sizeof(int));
-  *span = (display->h / 6);
+  *span = (SCREEN_HEIGHT / 6);
 
   //message positions
-  posFull->x = (display->w / 2) - (surFull->clip_rect.w / 2);
+  posFull->x = (SCREEN_WIDTH / 2) - (surFull->clip_rect.w / 2);
   posFull->y = 0;
-  pos43->x = (display->w / 2) - (sur43->clip_rect.w / 2);
+  pos43->x = (SCREEN_WIDTH / 2) - (sur43->clip_rect.w / 2);
   pos43->y = (*span * 1);
-  pos1610->x = (display->w / 2) - (sur1610->clip_rect.w / 2);
+  pos1610->x = (SCREEN_WIDTH / 2) - (sur1610->clip_rect.w / 2);
   pos1610->y = (*span * 2);
-  pos169->x = (display->w / 2) - (sur169->clip_rect.w / 2);
+  pos169->x = (SCREEN_WIDTH / 2) - (sur169->clip_rect.w / 2);
   pos169->y = (*span * 3);
-  posAd->x = (display->w / 2) - (surAd->clip_rect.w / 2);
+  posAd->x = (SCREEN_WIDTH / 2) - (surAd->clip_rect.w / 2);
   posAd->y = (*span * 4);
-  posBack->x = (display->w / 2) - (surBack->clip_rect.w / 2);
+  posBack->x = (SCREEN_WIDTH / 2) - (surBack->clip_rect.w / 2);
   posBack->y = (*span * 5);
 
   free(span);
@@ -335,7 +335,7 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
 
     //controls
     *control = menu_controls(event, mouse_pos);
-    mouse_print(cursor, renderer, *mouse_pos);
+    cursor_render(cursor, renderer, *mouse_pos);
 
     if (mouse_hover_menu(*mouse_pos, posFull->x, posFull->y, surFull->clip_rect.w, surFull->clip_rect.h)) {
 

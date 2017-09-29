@@ -1,8 +1,8 @@
 #include "header.h"
 
-/* BLITTING */
+/* renderTING */
 
-void player_blit (player p, SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos) {
+void player_render (player p, SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos) {
 
   SDL_Rect *temp = NULL;
   temp = (SDL_Rect*)malloc(sizeof(SDL_Rect));
