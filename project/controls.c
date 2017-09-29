@@ -33,25 +33,25 @@ void control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer *renderer
 
   //'q' or 'a' key
   if (keys[keysTab[0]] == 1) {
-    set_player_vel_x(p, -3); //set a left velocity
+    set_player_vel_x(p, C_VEL_L); //set a left velocity
     set_player_dir(p, 0); //turn the player towards left
   }
 
   //'d' key
   if (keys[keysTab[1]] == 1) {
-    set_player_vel_x(p, 3); //set a left velocity
+    set_player_vel_x(p, C_VEL_R); //set a right velocity
     set_player_dir(p, 1); //turn the player towards left
   }
 
   //'space' key
   if (keys[keysTab[2]] == 1 && *jumped == false) {
-    if (get_player_pos(*p).y == display->h - display->w) {
+    if (get_player_posAbs(*p).y == display->h - display->w) {
       set_player_state(p, 1);
-      set_player_jumpPoint(p, get_player_pos(*p).y);
+      set_player_jumpPoint(p, get_player_posAbs(*p).y);
     } else if (get_player_dJump(*p)) {
       set_player_dJump(p, false);
       set_player_state(p, 2);
-      set_player_jumpPoint(p, get_player_pos(*p).y);
+      //set_player_jumpPoint(p, get_player_posAbs(*p).y);
     }
     *jumped = true;
   }

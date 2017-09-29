@@ -7,6 +7,13 @@ int main () {
   initTimer = (Uint32*)malloc(sizeof(Uint32));
   *initTimer = SDL_GetTicks();
 
+  //time for newton
+  Uint32 *timeN_A = NULL;
+  Uint32 *timeN_B = NULL;
+  timeN_A = (Uint32*)malloc(sizeof(Uint32));
+  timeN_B = (Uint32*)malloc(sizeof(Uint32));
+  //no initialisation of timeN because the player doesnt move yet
+  
   FPSmanager *manager = NULL;
   manager = (FPSmanager*)malloc(sizeof(FPSmanager));
   SDL_initFramerate(manager);
@@ -199,6 +206,8 @@ int main () {
 
   free(initTimer);
 
+  //start the time
+  *timeN_A = SDL_GetTicks();
   while (*quit == false) {
     //filling the window with white
     SDL_RenderClear(renderer);
@@ -267,33 +276,41 @@ int main () {
 
       player_blit(*p, playerSprite, renderer);
 
-      player_apply_velocity(p);
+      //newton
+      *timeN_B = *timeN_A + 1000;
+      if (*timeN_A >= *timeN_B){
+	printf("1s s'est écoulée lundi mardi mercredi jeudi vendredi\n");
+	*timeN_A = SDL_GetTicks();
+	*timeN_B = *timeN_A + 1000;
+      }
+      player_apply_velocity(p, timeN_A, timeN_B);
+    
 
-      //RAW vertical hyper space
-      if (p->pos.x + IMG_WIDTH > display->w) {
-        p->pos.x = 0;
+      //RAW vertical hyper space in function of the absolute position 
+      if (p->posAbs.x + IMG_WIDTH > display->w) {
+        p->posAbs.x = 0;
       }
 
-      if (p->pos.x < 0) {
-        p->pos.x = display->w - IMG_WIDTH;
+      if (p->posAbs.x < 0) {
+        p->posAbs.x = display->w - IMG_WIDTH;
       }
 
-      player_jumping(p);
+      player_jumping(p, timeN_A, timeN_B);
 
       //RAW gravity
       if (get_player_state(*p) == 0 || get_player_state(*p) == 3) {
-        if (p->pos.y < display->h - IMG_HEIGHT) {
+        if (p->posAbs.y < display->h - IMG_HEIGHT) {
           //currently in air
-          p->pos.y += 5; //12 works perfectly
-        } else if (p->pos.y > display->h - IMG_HEIGHT){
+          p->posAbs.y += 12; //12 works perfectly
+        } else if (p->posAbs.y > display->h - IMG_HEIGHT){
           //currently below wanted place
           printf("\nwrong place\n\n");
-          p->pos.y = display->h - IMG_HEIGHT;
+          p->posAbs.y = display->h - IMG_HEIGHT;
         }
       }
 
       //RAW re-enabling double jump
-      if (p->dJump == false && p->pos.y == display->h - IMG_HEIGHT) {
+      if (p->dJump == false && p->posAbs.y == display->h - IMG_HEIGHT) {
         p->dJump = true;
       }
 

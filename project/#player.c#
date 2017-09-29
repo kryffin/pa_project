@@ -181,7 +181,7 @@ void player_jumping (player *p, Uint32* timeN_A, Uint32* timeN_B) {
       //______________position Reel  du joueur au depart
       //creation du repaire fictif a l'origine du saut 
       set_player_posRel (p, 0, 0);
-  
+      
       //______________position du joueur à l'arrivée
   
       //______________position du point culminant  
