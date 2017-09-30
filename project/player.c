@@ -172,49 +172,93 @@ void player_apply_velocity (player *p, Uint32* timeN_A, Uint32* timeN_B) {
 }
 
 void player_jumping (player *p, Uint32* timeN_A, Uint32* timeN_B) {
-  SDL_Rect* pos = NULL;
- 
-  if (true)
+  //SDL_Rect* prevPos = NULL;
+  //prevPos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  // *prevPos = get_player_posAbs(*p); //enregistrement de la derniere position
+  set_player_posRel (p, 0, 0); //on init le repere
+  /* l'entité est en train de sauté */
+  if (get_player_state(*p) == 1 || get_player_state(*p) == 2)
     {
-      
-      //printf("%d\n",timout);
-      //______________position Reel  du joueur au depart
-      //creation du repaire fictif a l'origine du saut 
-      set_player_posRel (p, 0, 0);
-  
-      //______________position du joueur à l'arrivée
-  
-      //______________position du point culminant  
+      //premiere phase du saut (500ms)
+      if (*timeN_A +500 < *timeN_B){
+	printf("premiere demi seconde\n");
+	//premier cas le joueur va vers la droite
+	if (get_player_dir(*p) == 1)
+	  {  
+	    set_player_posRel (p, get_player_posRel(*p).x +1, (COEF_A*(pow(get_player_posRel(*p).x, 2)+COEF_C)));
+	  }
+	else
+	  {
+	    set_player_posRel (p, get_player_posRel(*p).x -1, (COEF_A*(pow(get_player_posRel(*p).x, 2)+COEF_C)));
+	  }
+	//TODO FONCTION COLISION EADGES SCREEN
+	/*..
+	  ..
+	  ..
+	*/
 
-      
-      //si le point culminant est pair on divise par deux
-  
-  
- 
-  
-      //if the entity is jumping or double jumping then
-
-      //___________________________________________________________
-      //***********l'entité est en train de sauter******
-      if (get_player_state(*p) == 1 || get_player_state(*p) == 2) {
-  
-    
+	// pos.x = x+1, pos.y = posAbs + posRel
+    	set_player_posAbs(p, get_player_posAbs(*p).x + get_player_posRel(*p).x, get_player_posAbs(*p).y + get_player_posRel(*p).y, 32, 32); 
+	return;
       }
-    }
-  free (pos);
+      
+      else if (*timeN_A < *timeN_B)// timeN_A + 500 >= timeN_B
+	{
+	  //deuxieme phase du saut (+500ms)
+	  printf("deuxieme demi seconde\n");
+	  if (get_player_dir(*p) == 1) //direction droite
+	    {
+	      set_player_posRel (p, get_player_posRel(*p).x +1, (COEF_A*(pow(get_player_posRel(*p).x, 2)+COEF_C)));
+	    }
+	  else
+	    {
+	    set_player_posRel (p, get_player_posRel(*p).x -1, (COEF_A*(pow(get_player_posRel(*p).x, 2)+COEF_C)));
+	    }
+	  
+	  //TODO FONCTION COLISION EADGES SCREEN
+	  /*..
+	    ..
+	    ..
+	  */
+	  
+	  // pos.x = x+1, pos.y = posAbs - posRel
+	  set_player_posAbs(p, get_player_posAbs(*p).x + get_player_posRel(*p).x, get_player_posAbs(*p).y - get_player_posRel(*p).y, 32, 32);
+	  return;
+	}
+      else//timeN_A > timeN_B
+	{// fin de la seconde de saut
+	  set_player_state(p, 0);
+	  *timeN_A = *timeN_B;
+	  *timeN_B = SDL_GetTicks();
+	  set_player_posRel (p, 0, 0);
+	  return;
+	}
+      
+     
+    }//l'entitée ne saute pas
+  printf("doesnt jump\n");
+  //free (prevPos);
+  //set_player_state (p, 0);
+  return;
 }
+
 
 /* SET */
 
 //create a new player
 player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image, SDL_Rect posSprite) {
   player p;
+  vector* tempVector;
+  tempVector = (vector*)malloc(sizeof(vector));
+  tempVector->x = 0;
+  tempVector->y = 0;
+  
   set_player_maxhp(&p, maxHealthPoints);
   set_player_hp(&p, healthPoints);
   set_player_dir(&p, direction);
   set_player_dJump(&p, doubleJump);
-  set_player_jumpPoint(&p, 0);
-  set_player_highPoint(&p, 0);
+  set_player_jumpPoint(&p, *tempVector);
+  set_player_highPoint(&p, *tempVector);
   set_player_state(&p, 0);
   set_player_posAbs(&p, position.x, position.y, position.w, position.h);
   set_player_vel_x(&p, velocity.x);
@@ -222,6 +266,7 @@ player set_player (short int maxHealthPoints, short int healthPoints, short int 
   set_player_img(&p, image);
   set_player_sprite_pos(&p, posSprite);
 
+  free(tempVector);
   return p;
 }
 
@@ -264,13 +309,13 @@ void set_player_dJump (player *p, bool dJump) {
 }
 
 //set the player's jump point
-void set_player_jumpPoint (player *p, int jumpPoint) {
+void set_player_jumpPoint (player *p, vector jumpPoint) {
   p->jumpPoint = jumpPoint;
   return;
 }
 
 //set the player's high point
-void set_player_highPoint (player *p, int highPoint) {
+void set_player_highPoint (player *p, vector highPoint) {
   p->highPoint = highPoint;
   return;
 }
@@ -341,12 +386,12 @@ bool get_player_dJump (player p) {
 }
 
 //get the player's jump point
-int get_player_jumpPoint (player p) {
+vector get_player_jumpPoint (player p) {
   return p.jumpPoint;
 }
 
 //get the player's high point
-int get_player_highPoint (player p) {
+vector get_player_highPoint (player p) {
   return p.highPoint;
 }
 
@@ -374,6 +419,7 @@ int get_player_vel_x (player p) {
 int get_player_vel_y (player p) {
   return p.vel.y;
 }
+
 
 //get the player's image
 SDL_Texture* get_player_img (player p) {

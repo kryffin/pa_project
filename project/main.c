@@ -275,14 +275,13 @@ int main () {
       control(p, key, jumped, renderer, display);
 
       player_blit(*p, playerSprite, renderer);
-
-      //newton
-      *timeN_B = *timeN_A + 1000;
-      if (*timeN_A >= *timeN_B){
+      
+      //newton time
+      *timeN_B = SDL_GetTicks();
+      if (*timeN_B >= *timeN_A + 1000){
 	printf("1s s'est écoulée lundi mardi mercredi jeudi vendredi\n");
-	*timeN_A = SDL_GetTicks();
-	*timeN_B = *timeN_A + 1000;
-      }
+	*timeN_A = *timeN_B;
+	}
       player_apply_velocity(p, timeN_A, timeN_B);
     
 

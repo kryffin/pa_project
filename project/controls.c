@@ -47,7 +47,12 @@ void control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer *renderer
   if (keys[keysTab[2]] == 1 && *jumped == false) {
     if (get_player_posAbs(*p).y == display->h - display->w) {
       set_player_state(p, 1);
-      set_player_jumpPoint(p, get_player_posAbs(*p).y);
+      vector* temp_posAbs;
+      temp_posAbs = (vector*)malloc(sizeof(vector));
+      temp_posAbs->x = get_player_posAbs(*p).x;
+      temp_posAbs->y = get_player_posAbs(*p).y;
+      set_player_jumpPoint(p, *temp_posAbs);
+      free(temp_posAbs);
     } else if (get_player_dJump(*p)) {
       set_player_dJump(p, false);
       set_player_state(p, 2);

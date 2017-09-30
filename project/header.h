@@ -22,16 +22,16 @@
 #define PATH_SPRITES "./res/spritesheet.bmp"
 #define PATH_FONT "./res/font.ttf"
 //physics
-#define COEF_A -0.04
+#define COEF_A -0.05
 #define COEF_B 0
-#define COEF_C 64
+#define COEF_C 100
 #define C_VEL_L -5
 #define C_VEL_R 5
 #define G 9.8 //m.s^-2
 
 struct Vector {
-  float x;
-  float y;
+  int x;
+  int y;
 };
 
 typedef struct Vector vector;
@@ -42,8 +42,7 @@ struct Player {
   short int dir; //current direction
 
   bool dJump; //is double jump available?
-  int jumpPoint; //point from where you jumped
-  int highPoint; //highest point of the jump (used for falling?)
+
 
   short int state; //curent state of the player
   //newton
@@ -51,7 +50,9 @@ struct Player {
   vector posRel; //position of the sprite in the new repere
   vector vel; //velocity for the player's movement
   vector centreMass; //centre de la masse du l'entité
-  
+  vector jumpPoint; //point from where you jumped
+  vector highPoint; //highest point of the jump (used for falling?)
+
   SDL_Texture *img; //image used for displaying the player
   SDL_Rect spritePos; //sprite position in the sprite in the sheet
 };
@@ -139,8 +140,8 @@ void set_player_maxhp (player *p, short int maxhp);
 void set_player_hp (player *p, short int hp);
 void set_player_dir (player *p, short int dir);
 void set_player_dJump (player *p, bool dJump);
-void set_player_jumpPoint (player *p, int jumpPoint);
-void set_player_highPoint (player *p, int highPoint);
+void set_player_jumpPoint (player *p, vector jumpPoint);
+void set_player_highPoint (player *p, vector highPoint);
 void set_player_state (player *p, short int state);
 void set_player_posAbs (player *p, int posA_x, int posA_y, int posA_w, int posA_h);
 void set_player_posRel (player *p, int posR_x, int posR_y);
@@ -153,8 +154,8 @@ short int get_player_maxhp (player p);
 short int get_player_hp (player p);
 short int get_player_dir (player p);
 bool get_player_dJump (player p);
-int get_player_jumpPoint (player p);
-int get_player_highPoint (player p);
+vector get_player_jumpPoint (player p);
+vector get_player_highPoint (player p);
 short int get_player_state (player p);
 SDL_Rect get_player_posAbs (player p);
 vector get_player_posRel (player p);
