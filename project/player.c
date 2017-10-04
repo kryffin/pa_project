@@ -166,80 +166,138 @@ void player_melee (player p, SDL_Renderer *renderer) {
 }
 
 void player_apply_velocity (player *p, Uint32* timeN_A, Uint32* timeN_B) {
-  
+
   set_player_posAbs(p, get_player_posAbs(*p).x + get_player_vel_x(*p), get_player_posAbs(*p).y + get_player_vel_y(*p), get_player_posAbs(*p).w, get_player_posAbs(*p).h);
   return;
 }
 
-void player_jumping (player *p, Uint32* timeN_A, Uint32* timeN_B) {
-  //SDL_Rect* prevPos = NULL;
-  //prevPos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  // *prevPos = get_player_posAbs(*p); //enregistrement de la derniere position
-  set_player_posRel (p, 0, 0); //on init le repere
-  /* l'entité est en train de sauté */
+int player_jumping_v2_x (player p, Uint32 timeN_A)
+{
+
+  /*definition des variables :
+   * X : position de l'objet suivant l'axe X a n'importe quel instant t 
+   * a : acceleration de l'objet
+   * v : vitesse de l'objet
+   * t : l'instant t (un peu de temps)
+   * x0: position initale en x de l'objet 
+
+   X = 0.5 * a * t * t + v * t + x0
+  */
+  int a, t, x0, v;
+  x0 = get_player_posAbs(p).x;
+  t = timeN_A;
+  v = get_player_vel_x (p);
+  a = 1; //valeur a determiner
+  return COEF_A*(a*t*t)+(v*t)+(x0);
+  
+}
+
+int player_jumping_v2_y (player p, Uint32 timeN_A, Uint32 timeN_B)
+{
+
+  /*definition des variables
+   * Y : position de l'objet suivant l'axe Y a nimporte quel instant t
+   * a ; acceleration 
+   * v : vitesse
+   * y : temps
+   * y0 : position initiale en y de l'objet
+   *
+   * Y = y0 + v*t - 0.5*a*t*t
+   */
+  int a;
+  int v;
+  int t;
+  int y0;
+  y0 = get_player_posAbs(p).y;
+  t = timeN_B-timeN_A;
+  v = get_player_vel_y (p);
+  a = 1; //valeur a determiner
+  // printf("%d :\n", y0 + (v*t) - (COEF_A*a*t*t));
+  return y0 + (v*t) - (COEF_A*a*t*t);
+  }
+
+void player_gravity (player *p)
+{
+  //check if currently jumping
   if (get_player_state(*p) == 1 || get_player_state(*p) == 2)
     {
-      //premiere phase du saut (500ms)
-      if (*timeN_A +500 < *timeN_B){
-	printf("premiere demi seconde\n");
-	//premier cas le joueur va vers la droite
-	if (get_player_dir(*p) == 1)
-	  {  
-	    set_player_posRel (p, get_player_posRel(*p).x +1, (COEF_A*(pow(get_player_posRel(*p).x, 2)+COEF_C)));
-	  }
-	else
-	  {
-	    set_player_posRel (p, get_player_posRel(*p).x -1, (COEF_A*(pow(get_player_posRel(*p).x, 2)+COEF_C)));
-	  }
-	//TODO FONCTION COLISION EADGES SCREEN
-	/*..
-	  ..
-	  ..
-	*/
+      printf("gravity mdfq\n");
+      set_player_posAbs(p, 0, get_player_posAbs(*p).y + GRAVITY, IMG_WIDTH, IMG_HEIGHT);
+    }
 
-	// pos.x = x+1, pos.y = posAbs + posRel
-    	set_player_posAbs(p, get_player_posAbs(*p).x + get_player_posRel(*p).x, get_player_posAbs(*p).y + get_player_posRel(*p).y, 32, 32); 
-	return;
-      }
+}
+
+void player_colision (player *p)
+{
+  //RAW
+  //colision avec les edges de l'écran
+  //fait pour une resolution de 640x480
+  if (get_player_posAbs(*p).y > 480 - IMG_HEIGHT)
+    {
+      printf("DUO 0");
+      set_player_posAbs(p, get_player_posAbs(*p).x, 480 - IMG_HEIGHT - 5, IMG_WIDTH, IMG_HEIGHT);
+    }
+  else if (get_player_posAbs(*p).y < 0)
+    {
+      printf("UNO 0");
+      set_player_posAbs(p, get_player_posAbs(*p).x, 0, IMG_WIDTH, IMG_HEIGHT);
+    }
+
+}
+
+void player_jumping_v2 (player *p, Uint32 timeN_A, Uint32 timeN_B)
+{
+  Uint32 *time = (Uint32*)malloc(sizeof(Uint32));
+  *time = timeN_B - timeN_A;
+  
+  
+  if (get_player_state(*p) == 1 || get_player_state(*p) == 2)
+    {
+      vector *next_pos = (vector*)malloc(sizeof(vector));
+      vector *pos = (vector*)malloc(sizeof(vector));
+ 
+      pos->x = get_player_posAbs(*p).x;
+      pos->y = get_player_posAbs(*p).y;
       
-      else if (*timeN_A < *timeN_B)// timeN_A + 500 >= timeN_B
+      *next_pos = calcul_position(*p, get_player_vel_x(*p), *pos, ANGLE_SAUT, *time);
+
+      set_player_posAbs(p, next_pos->x, next_pos->y, IMG_WIDTH, IMG_HEIGHT);
+      player_colision(p);
+      printf("time:%d\t nx : %f \t|| ny : %f \n", *time, next_pos->x, next_pos->y);
+      free (next_pos);
+      free (pos);
+      
+    }
+  if (*time >= 950)
+    {
+      set_player_state(p, 0);
+    }
+}
+
+vector calcul_position (player p, float v_init, vector pos_init, float angle, unsigned short int time)
+{
+  vector position_finale;
+  printf("\n\t******* %f ********\n", v_init);
+  if (v_init == 0.)//saut sur place
+    {
+      //printf("HELLO ITS ME");
+      position_finale.y = (pos_init.y) - 3;
+  
+      if (get_player_dir(p) == 0)
 	{
-	  //deuxieme phase du saut (+500ms)
-	  printf("deuxieme demi seconde\n");
-	  if (get_player_dir(*p) == 1) //direction droite
-	    {
-	      set_player_posRel (p, get_player_posRel(*p).x +1, (COEF_A*(pow(get_player_posRel(*p).x, 2)+COEF_C)));
-	    }
-	  else
-	    {
-	    set_player_posRel (p, get_player_posRel(*p).x -1, (COEF_A*(pow(get_player_posRel(*p).x, 2)+COEF_C)));
-	    }
-	  
-	  //TODO FONCTION COLISION EADGES SCREEN
-	  /*..
-	    ..
-	    ..
-	  */
-	  
-	  // pos.x = x+1, pos.y = posAbs - posRel
-	  set_player_posAbs(p, get_player_posAbs(*p).x + get_player_posRel(*p).x, get_player_posAbs(*p).y - get_player_posRel(*p).y, 32, 32);
-	  return;
+	  position_finale.x = fmod((C_VEL_L * (0.05*time) * cos(angle) + pos_init.x), 600);
 	}
-      else//timeN_A > timeN_B
-	{// fin de la seconde de saut
-	  set_player_state(p, 0);
-	  *timeN_A = *timeN_B;
-	  *timeN_B = SDL_GetTicks();
-	  set_player_posRel (p, 0, 0);
-	  return;
+      else
+	{
+	  position_finale.x = fmod((C_VEL_R * (0.05*time) * cos(angle) + pos_init.x), 600);
 	}
-      
-     
-    }//l'entitée ne saute pas
-  printf("doesnt jump\n");
-  //free (prevPos);
-  //set_player_state (p, 0);
-  return;
+      return position_finale;
+    }//vinit != 0
+  
+  position_finale.y = ((v_init * sin(angle)) + pos_init.y);
+  position_finale.x = (v_init * time * cos(angle) + pos_init.x);
+  return position_finale;
+  
 }
 
 
@@ -336,8 +394,8 @@ void set_player_posAbs (player *p, int pos_x, int pos_y, int pos_w, int pos_h) {
 }
 
 void set_player_posRel (player *p, int pos_x, int pos_y){
-  p->posRel.x = pos_x;
-  p->posRel.y = pos_y;
+  p->posRel.x += pos_x;
+  p->posRel.y += pos_y;
 }
 //set the player's x velocity
 void set_player_vel_x (player *p, int vel_x) {

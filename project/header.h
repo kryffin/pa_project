@@ -22,16 +22,18 @@
 #define PATH_SPRITES "./res/spritesheet.bmp"
 #define PATH_FONT "./res/font.ttf"
 //physics
-#define COEF_A -0.05
-#define COEF_B 0
-#define COEF_C 100
-#define C_VEL_L -5
-#define C_VEL_R 5
-#define G 9.8 //m.s^-2
+#define COEF_A -0.0025
+#define COEF_B 0.
+#define COEF_C 100.
+#define C_VEL_L -3
+#define C_VEL_R 3
+#define G 0.008 //m.s^-2
+#define GRAVITY 5
+#define ANGLE_SAUT 45
 
 struct Vector {
-  int x;
-  int y;
+  float x;
+  float y;
 };
 
 typedef struct Vector vector;
@@ -49,7 +51,7 @@ struct Player {
   SDL_Rect posAbs; //position of the origin (top left) (absolute)
   vector posRel; //position of the sprite in the new repere
   vector vel; //velocity for the player's movement
-  vector centreMass; //centre de la masse du l'entité
+  // vector centreMass; //centre de la masse du l'entité
   vector jumpPoint; //point from where you jumped
   vector highPoint; //highest point of the jump (used for falling?)
 
@@ -133,7 +135,9 @@ void level_blit (level l, SDL_Surface *screen);
 void player_blit (player p, SDL_Texture *img, SDL_Renderer *renderer);
 void player_melee (player p, SDL_Renderer *renderer);
 void player_apply_velocity (player *p, Uint32* timeN_A, Uint32* timeN_B);
-void player_jumping (player *p, Uint32* timeN_A, Uint32* timeN_B);
+void player_jumping_v2 (player *p, Uint32 timeN_A, Uint32 timeN_B);
+void player_gravity (player* p);
+void player_colision (player *p);
 player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image, SDL_Rect posSprite);
 player set_player_copy (player p);
 void set_player_maxhp (player *p, short int maxhp);
@@ -159,6 +163,7 @@ vector get_player_highPoint (player p);
 short int get_player_state (player p);
 SDL_Rect get_player_posAbs (player p);
 vector get_player_posRel (player p);
+vector calcul_position (player p, float v_init, vector pos_init, float angle, unsigned short int time);
 int get_player_vel_x (player p);
 int get_player_vel_y (player p);
 SDL_Texture* get_player_img (player p);

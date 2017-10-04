@@ -279,9 +279,10 @@ int main () {
       //newton time
       *timeN_B = SDL_GetTicks();
       if (*timeN_B >= *timeN_A + 1000){
-	printf("1s s'est écoulée lundi mardi mercredi jeudi vendredi\n");
+	printf("1s s'est écoulée dans le main\n");
 	*timeN_A = *timeN_B;
 	}
+      player_jumping_v2(p, *timeN_A, *timeN_B);
       player_apply_velocity(p, timeN_A, timeN_B);
     
 
@@ -293,26 +294,28 @@ int main () {
       if (p->posAbs.x < 0) {
         p->posAbs.x = display->w - IMG_WIDTH;
       }
+      
+    
 
-      player_jumping(p, timeN_A, timeN_B);
-
+      player_gravity(p);
+      
       //RAW gravity
       if (get_player_state(*p) == 0 || get_player_state(*p) == 3) {
-        if (p->posAbs.y < display->h - IMG_HEIGHT) {
+        /*if (p->posAbs.y < display->h - IMG_HEIGHT) {
           //currently in air
-          p->posAbs.y += 12; //12 works perfectly
+          p->posAbs.y += G; //12 works perfectly
         } else if (p->posAbs.y > display->h - IMG_HEIGHT){
           //currently below wanted place
           printf("\nwrong place\n\n");
-          p->posAbs.y = display->h - IMG_HEIGHT;
-        }
-      }
+          p->posAbs.y -= G;
+	  }*/
+	}
 
       //RAW re-enabling double jump
       if (p->dJump == false && p->posAbs.y == display->h - IMG_HEIGHT) {
         p->dJump = true;
       }
-
+      
       /* debug */
 
       //text rendering
@@ -394,6 +397,8 @@ int main () {
   free(jumped);
   free(mousex);
   free(mousey);
+  free(timeN_A);
+  free(timeN_B);
 
   return EXIT_SUCCESS;
 }
