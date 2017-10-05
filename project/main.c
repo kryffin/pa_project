@@ -9,7 +9,17 @@ int main () {
   initTimer = (Uint32*)malloc(sizeof(Uint32));
   *initTimer = SDL_GetTicks(); //init the timer to the current time
 
+<<<<<<< HEAD
   //the manager managing the fps
+=======
+  //time for newton
+  Uint32 *timeN_A = NULL;
+  Uint32 *timeN_B = NULL;
+  timeN_A = (Uint32*)malloc(sizeof(Uint32));
+  timeN_B = (Uint32*)malloc(sizeof(Uint32));
+  //no initialisation of timeN because the player doesnt move yet
+  
+>>>>>>> eba995aefb9eb8f82a0ff18a152229f4a54d2be4
   FPSmanager *manager = NULL;
   manager = (FPSmanager*)malloc(sizeof(FPSmanager));
   SDL_initFramerate(manager);
@@ -262,9 +272,14 @@ int main () {
   //only used once
   free(initTimer);
 
+<<<<<<< HEAD
   /* * * * * * main game loop * * * * * */
 
   //while we are not quitting the game
+=======
+  //start the time
+  *timeN_A = SDL_GetTicks();
+>>>>>>> eba995aefb9eb8f82a0ff18a152229f4a54d2be4
   while (*quit == false) {
 
     //clearing the render to the draw color
@@ -336,6 +351,7 @@ int main () {
 
       /* * * * * * player controls * * * * * */
 
+<<<<<<< HEAD
       //update the keyboard controls
       update_keyboard_controls(event, key, quit);
 
@@ -369,12 +385,36 @@ int main () {
 
       if (p->pos.x < 0) {
         p->pos.x = SCREEN_WIDTH - IMG_WIDTH;
+=======
+      player_blit(*p, playerSprite, renderer);
+      
+      //newton time
+      *timeN_B = SDL_GetTicks();
+      if (*timeN_B >= *timeN_A + 1000){
+	printf("1s s'est écoulée dans le main\n");
+	*timeN_A = *timeN_B;
+	}
+      player_jumping_v2(p, *timeN_A, *timeN_B);
+      player_apply_velocity(p, timeN_A, timeN_B);
+    
+
+      //RAW vertical hyper space in function of the absolute position 
+      if (p->posAbs.x + IMG_WIDTH > display->w) {
+        p->posAbs.x = 0;
       }
 
-      player_jumping(p);
+      if (p->posAbs.x < 0) {
+        p->posAbs.x = display->w - IMG_WIDTH;
+>>>>>>> eba995aefb9eb8f82a0ff18a152229f4a54d2be4
+      }
+      
+    
 
+      player_gravity(p);
+      
       //RAW gravity
       if (get_player_state(*p) == 0 || get_player_state(*p) == 3) {
+<<<<<<< HEAD
         if (p->pos.y < SCREEN_HEIGHT - IMG_HEIGHT) {
           //currently in air
           p->pos.y += 5; //12 works perfectly
@@ -387,9 +427,23 @@ int main () {
 
       //RAW re-enabling double jump
       if (p->dJump == false && p->pos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
+=======
+        /*if (p->posAbs.y < display->h - IMG_HEIGHT) {
+          //currently in air
+          p->posAbs.y += G; //12 works perfectly
+        } else if (p->posAbs.y > display->h - IMG_HEIGHT){
+          //currently below wanted place
+          printf("\nwrong place\n\n");
+          p->posAbs.y -= G;
+	  }*/
+	}
+
+      //RAW re-enabling double jump
+      if (p->dJump == false && p->posAbs.y == display->h - IMG_HEIGHT) {
+>>>>>>> eba995aefb9eb8f82a0ff18a152229f4a54d2be4
         p->dJump = true;
       }
-
+      
       /* debug */
 
       //text rendering
@@ -470,7 +524,14 @@ int main () {
   free(quit);
   free(mainMenuOption);
   free(jumped);
+<<<<<<< HEAD
   free(mouse_pos);
+=======
+  free(mousex);
+  free(mousey);
+  free(timeN_A);
+  free(timeN_B);
+>>>>>>> eba995aefb9eb8f82a0ff18a152229f4a54d2be4
 
   return EXIT_SUCCESS;
 }
