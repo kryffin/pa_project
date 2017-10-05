@@ -18,6 +18,7 @@ void player_render (player p, SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect
       case 0:
 
         if (get_player_vel_x(p) == 0 && get_player_vel_y(p) == 0) {
+
           //stand by sprite
           temp->x = 0;
           temp->y = 0;
@@ -106,7 +107,6 @@ void player_render (player p, SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect
           //stand by sprite
           temp->x = 0;
           temp->y = 64;
-	  
           set_player_sprite_pos(&p, *temp);
 
         } else {
@@ -181,7 +181,7 @@ void player_render (player p, SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect
 
   }
 
-  SDL_RenderCopy(renderer, p.img, &(p.spritePos), &(p.posAbs));
+  SDL_RenderCopy(renderer, p.img, &(p.spritePos), &(p.pos));
 
   free(temp);
 }
@@ -192,7 +192,7 @@ void player_melee (player p, SDL_Renderer *renderer) {
 
   SDL_Rect *target = NULL;
   target = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  *target = get_player_posAbs(p);
+  *target = get_player_pos(p);
 
   SDL_Rect *effect = NULL;
   effect = (SDL_Rect*)malloc(sizeof(SDL_Rect));
@@ -219,7 +219,6 @@ void player_melee (player p, SDL_Renderer *renderer) {
 
 }
 
-<<<<<<< HEAD
 void player_update_step (player *p) {
 
   if(get_player_vel_x(*p) != 0) {
@@ -248,168 +247,41 @@ void player_update_dir (player *p, SDL_Rect mouse_pos) {
 
 void player_apply_velocity (player *p) {
   set_player_pos(p, get_player_pos(*p).x + get_player_vel_x(*p), get_player_pos(*p).y + get_player_vel_y(*p), get_player_pos(*p).w, get_player_pos(*p).h);
-=======
-void player_apply_velocity (player *p, Uint32* timeN_A, Uint32* timeN_B) {
-
-  set_player_posAbs(p, get_player_posAbs(*p).x + get_player_vel_x(*p), get_player_posAbs(*p).y + get_player_vel_y(*p), get_player_posAbs(*p).w, get_player_posAbs(*p).h);
->>>>>>> eba995aefb9eb8f82a0ff18a152229f4a54d2be4
   return;
 }
 
-int player_jumping_v2_x (player p, Uint32 timeN_A)
-{
-
-  /*definition des variables :
-   * X : position de l'objet suivant l'axe X a n'importe quel instant t 
-   * a : acceleration de l'objet
-   * v : vitesse de l'objet
-   * t : l'instant t (un peu de temps)
-   * x0: position initale en x de l'objet 
-
-   X = 0.5 * a * t * t + v * t + x0
-  */
-  int a, t, x0, v;
-  x0 = get_player_posAbs(p).x;
-  t = timeN_A;
-  v = get_player_vel_x (p);
-  a = 1; //valeur a determiner
-  return COEF_A*(a*t*t)+(v*t)+(x0);
-  
-}
-
-int player_jumping_v2_y (player p, Uint32 timeN_A, Uint32 timeN_B)
-{
-
-  /*definition des variables
-   * Y : position de l'objet suivant l'axe Y a nimporte quel instant t
-   * a ; acceleration 
-   * v : vitesse
-   * y : temps
-   * y0 : position initiale en y de l'objet
-   *
-   * Y = y0 + v*t - 0.5*a*t*t
-   */
-  int a;
-  int v;
-  int t;
-  int y0;
-  y0 = get_player_posAbs(p).y;
-  t = timeN_B-timeN_A;
-  v = get_player_vel_y (p);
-  a = 1; //valeur a determiner
-  // printf("%d :\n", y0 + (v*t) - (COEF_A*a*t*t));
-  return y0 + (v*t) - (COEF_A*a*t*t);
-  }
-
-void player_gravity (player *p)
-{
-  //check if currently jumping
-  if (get_player_state(*p) == 1 || get_player_state(*p) == 2)
-    {
-      printf("gravity mdfq\n");
-      set_player_posAbs(p, 0, get_player_posAbs(*p).y + GRAVITY, IMG_WIDTH, IMG_HEIGHT);
-    }
-
-}
-
-void player_colision (player *p)
-{
-  //RAW
-  //colision avec les edges de l'écran
-  //fait pour une resolution de 640x480
-  if (get_player_posAbs(*p).y > 480 - IMG_HEIGHT)
-    {
-      printf("DUO 0");
-      set_player_posAbs(p, get_player_posAbs(*p).x, 480 - IMG_HEIGHT - 5, IMG_WIDTH, IMG_HEIGHT);
-    }
-  else if (get_player_posAbs(*p).y < 0)
-    {
-      printf("UNO 0");
-      set_player_posAbs(p, get_player_posAbs(*p).x, 0, IMG_WIDTH, IMG_HEIGHT);
-    }
-
-}
-
-void player_jumping_v2 (player *p, Uint32 timeN_A, Uint32 timeN_B)
-{
-  Uint32 *time = (Uint32*)malloc(sizeof(Uint32));
-  *time = timeN_B - timeN_A;
-  
-  
-  if (get_player_state(*p) == 1 || get_player_state(*p) == 2)
-    {
-      vector *next_pos = (vector*)malloc(sizeof(vector));
-      vector *pos = (vector*)malloc(sizeof(vector));
- 
-      pos->x = get_player_posAbs(*p).x;
-      pos->y = get_player_posAbs(*p).y;
-      
-      *next_pos = calcul_position(*p, get_player_vel_x(*p), *pos, ANGLE_SAUT, *time);
-
-      set_player_posAbs(p, next_pos->x, next_pos->y, IMG_WIDTH, IMG_HEIGHT);
-      player_colision(p);
-      printf("time:%d\t nx : %f \t|| ny : %f \n", *time, next_pos->x, next_pos->y);
-      free (next_pos);
-      free (pos);
-      
-    }
-  if (*time >= 950)
-    {
+void player_jumping (player *p) {
+  if (get_player_state(*p) == 1 || get_player_state(*p) == 2) {
+    if (get_player_pos(*p).y > get_player_jumpPoint(*p) - IMG_HEIGHT) {
+      //currently jumping
+      /*pos.y -= (pos.y - (jumpPoint - IMG_HEIGHT)) * 0.3;*/
+      set_player_pos(p, get_player_pos(*p).x, get_player_pos(*p).y - (get_player_jumpPoint(*p) - IMG_HEIGHT) * 1, get_player_pos(*p).w, get_player_pos(*p).h);
+    } else {
+      //jumping ends
+      set_player_highPoint(p, get_player_pos(*p).y);
       set_player_state(p, 0);
     }
+  }
 }
-
-vector calcul_position (player p, float v_init, vector pos_init, float angle, unsigned short int time)
-{
-  vector position_finale;
-  printf("\n\t******* %f ********\n", v_init);
-  if (v_init == 0.)//saut sur place
-    {
-      //printf("HELLO ITS ME");
-      position_finale.y = (pos_init.y) - 3;
-  
-      if (get_player_dir(p) == 0)
-	{
-	  position_finale.x = fmod((C_VEL_L * (0.05*time) * cos(angle) + pos_init.x), 600);
-	}
-      else
-	{
-	  position_finale.x = fmod((C_VEL_R * (0.05*time) * cos(angle) + pos_init.x), 600);
-	}
-      return position_finale;
-    }//vinit != 0
-  
-  position_finale.y = ((v_init * sin(angle)) + pos_init.y);
-  position_finale.x = (v_init * time * cos(angle) + pos_init.x);
-  return position_finale;
-  
-}
-
 
 /* SET */
 
 //create a new player
 player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image, SDL_Rect posSprite) {
   player p;
-  vector* tempVector;
-  tempVector = (vector*)malloc(sizeof(vector));
-  tempVector->x = 0;
-  tempVector->y = 0;
-  
   set_player_maxhp(&p, maxHealthPoints);
   set_player_hp(&p, healthPoints);
   set_player_dir(&p, direction);
   set_player_dJump(&p, doubleJump);
-  set_player_jumpPoint(&p, *tempVector);
-  set_player_highPoint(&p, *tempVector);
+  set_player_jumpPoint(&p, 0);
+  set_player_highPoint(&p, 0);
   set_player_state(&p, 0);
-  set_player_posAbs(&p, position.x, position.y, position.w, position.h);
+  set_player_pos(&p, position.x, position.y, position.w, position.h);
   set_player_vel_x(&p, velocity.x);
   set_player_vel_y(&p, velocity.y);
   set_player_img(&p, image);
   set_player_sprite_pos(&p, posSprite);
 
-  free(tempVector);
   return p;
 }
 
@@ -458,13 +330,13 @@ void set_player_dJump (player *p, bool dJump) {
 }
 
 //set the player's jump point
-void set_player_jumpPoint (player *p, vector jumpPoint) {
+void set_player_jumpPoint (player *p, int jumpPoint) {
   p->jumpPoint = jumpPoint;
   return;
 }
 
 //set the player's high point
-void set_player_highPoint (player *p, vector highPoint) {
+void set_player_highPoint (player *p, int highPoint) {
   p->highPoint = highPoint;
   return;
 }
@@ -476,18 +348,14 @@ void set_player_state (player *p, short int state) {
 }
 
 //set the player's position
-void set_player_posAbs (player *p, int pos_x, int pos_y, int pos_w, int pos_h) {
-  p->posAbs.x = pos_x;
-  p->posAbs.y = pos_y;
-  p->posAbs.w = pos_w;
-  p->posAbs.h = pos_h;
+void set_player_pos (player *p, int pos_x, int pos_y, int pos_w, int pos_h) {
+  p->pos.x = pos_x;
+  p->pos.y = pos_y;
+  p->pos.w = pos_w;
+  p->pos.h = pos_h;
   return;
 }
 
-void set_player_posRel (player *p, int pos_x, int pos_y){
-  p->posRel.x += pos_x;
-  p->posRel.y += pos_y;
-}
 //set the player's x velocity
 void set_player_vel_x (player *p, int vel_x) {
   p->vel.x = vel_x;
@@ -540,12 +408,12 @@ bool get_player_dJump (player p) {
 }
 
 //get the player's jump point
-vector get_player_jumpPoint (player p) {
+int get_player_jumpPoint (player p) {
   return p.jumpPoint;
 }
 
 //get the player's high point
-vector get_player_highPoint (player p) {
+int get_player_highPoint (player p) {
   return p.highPoint;
 }
 
@@ -555,13 +423,8 @@ short int get_player_state (player p) {
 }
 
 //get the player's position
-SDL_Rect get_player_posAbs (player p) {
-  return p.posAbs;
-}
-
-//get the player's real postion
-vector get_player_posRel (player p) {
-  return p.posRel;
+SDL_Rect get_player_pos (player p) {
+  return p.pos;
 }
 
 //get the player's x velocity
@@ -573,7 +436,6 @@ int get_player_vel_x (player p) {
 int get_player_vel_y (player p) {
   return p.vel.y;
 }
-
 
 //get the player's image
 SDL_Texture* get_player_img (player p) {
