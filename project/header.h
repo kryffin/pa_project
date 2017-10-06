@@ -28,6 +28,8 @@
 
 #define DELAY_STEP 150 //delay for the step updating
 
+/* * * * * * Player Structure * * * * * */
+
 struct Player {
   short int maxhp; //max health points
   short int hp; //current health points
@@ -46,6 +48,20 @@ struct Player {
 };
 
 typedef struct Player player;
+
+/* * * * * * Projectile Structure * * * * * */
+
+struct Projectile {
+  float realPosX; //real x position
+  float realPosY; //real y position
+
+  SDL_Rect dir; //direction (vector)
+  SDL_Rect pos; //screen position
+
+  SDL_Texture *img; //img used
+};
+
+typedef struct Projectile projectile;
 
 /* DIR
   0 : left
@@ -93,7 +109,7 @@ int get_block_color_a (block b);
 
 /* controls.h */
 void update_keyboard_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit);
-void cursor_render (SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos);
+void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos);
 void update_mouse_controls (SDL_Event *event, SDL_Rect *mouse_pos, bool *mouse_btn);
 void keyboard_control (player *p, SDL_Keycode *key, bool *jumped, SDL_Renderer *renderer);
 
@@ -118,9 +134,25 @@ typedef struct Level level;
 
 void level_render (level l, SDL_Surface *screen);
 
+/* projectile.c */
+
+void init_projectile (bool mouse_btn, player p, SDL_Texture *spriteSheet, projectile proj[100], SDL_Rect mouse_pos);
+void render_projectile (projectile p[100], SDL_Renderer *renderer);
+projectile set_projectile (float realPosX, float realPosY, SDL_Rect dir, SDL_Rect pos, SDL_Texture *img);
+void set_projectile_real_position_x (projectile *p, float realPosX);
+void set_projectile_real_position_y (projectile *p, float realPosY);
+void set_projectile_direction (projectile *p, SDL_Rect dir);
+void set_projectile_position (projectile *p, SDL_Rect pos);
+void set_projectile_image (projectile *p, SDL_Texture *img);
+float get_projectile_real_position_x (projectile p);
+float get_projectile_real_position_y (projectile p);
+SDL_Rect get_projectile_direction (projectile p);
+SDL_Rect get_projectile_position (projectile p);
+SDL_Texture* get_projectile_image (projectile p);
+
 /* player.h */
 
-void player_render (player p, SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos);
+void render_player (player p, SDL_Renderer *renderer, SDL_Rect mouse_pos);
 void player_melee (player p, SDL_Renderer *renderer);
 void player_update_step(player *p);
 void player_update_dir (player *p, SDL_Rect mouse_pos);

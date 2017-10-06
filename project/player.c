@@ -2,7 +2,7 @@
 
 /* renderTING */
 
-void player_render (player p, SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos) {
+void render_player (player p, SDL_Renderer *renderer, SDL_Rect mouse_pos) {
 
   SDL_Rect *temp = NULL;
   temp = (SDL_Rect*)malloc(sizeof(SDL_Rect));
@@ -184,6 +184,8 @@ void player_render (player p, SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect
   SDL_RenderCopy(renderer, p.img, &(p.spritePos), &(p.pos));
 
   free(temp);
+
+  return;
 }
 
 /* BEHAVIOR */

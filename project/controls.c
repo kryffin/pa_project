@@ -24,7 +24,7 @@ void update_keyboard_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit) 
   }
 }
 
-void cursor_render (SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos) {
+void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos) {
   mouse_pos.x -= CURSOR_WIDTH / 2;
   mouse_pos.y -= CURSOR_HEIGHT / 2;
   mouse_pos.w = CURSOR_WIDTH;

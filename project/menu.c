@@ -119,7 +119,7 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
 
     //controls
     *control = menu_controls(event, mouse_pos);
-    cursor_render(cursor, renderer, *mouse_pos);
+    render_cursor(cursor, renderer, *mouse_pos);
 
     if (mouse_hover_menu(*mouse_pos, posContinue->x, posContinue->y, surContinue->clip_rect.w, surContinue->clip_rect.h)) {
 
@@ -335,7 +335,7 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
 
     //controls
     *control = menu_controls(event, mouse_pos);
-    cursor_render(cursor, renderer, *mouse_pos);
+    render_cursor(cursor, renderer, *mouse_pos);
 
     if (mouse_hover_menu(*mouse_pos, posFull->x, posFull->y, surFull->clip_rect.w, surFull->clip_rect.h)) {
 

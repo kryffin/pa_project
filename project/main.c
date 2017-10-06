@@ -56,6 +56,9 @@ int main () {
   mouse_btn = (bool*)malloc(sizeof(bool));
   *mouse_btn = false;
 
+  int *i = NULL;
+  i = (int*)malloc(sizeof(int));
+
   /* * * * * * font & colors * * * * * */
 
   //font used in the game
@@ -116,6 +119,10 @@ int main () {
   //the main player
   player *p = NULL;
   p = (player*)malloc(sizeof(player));
+
+  //projectiles of the player : array of 100
+  projectile *projectiles = NULL;
+  projectiles = (projectile*)malloc(100 * sizeof(projectile));
 
   //PLACEHOLDER for the enemies
   player *enemy = NULL;
@@ -241,9 +248,15 @@ int main () {
   baseVelocity = (SDL_Rect*)malloc(sizeof(SDL_Rect));
   baseVelocity->x = 0;
   baseVelocity->y = 0;
+  baseVelocity->w = 16;
+  baseVelocity->h = 16;
 
   //creating the player
   *p = set_player(10, 10, 0, true, *basePosition, *baseVelocity, playerSprite, *desRec);
+
+  for (*i = 0; *i < 100; *i += 1) {
+    projectiles[*i] = set_projectile(0.0, 0.0, *baseVelocity, *baseVelocity, playerSprite);
+  }
 
   //updating the base position for the enemy
   basePosition->x = 10;
@@ -346,13 +359,19 @@ int main () {
       update_mouse_controls(event, mouse_pos, mouse_btn);
 
       //render the cursor
-      cursor_render(cursor, renderer, *mouse_pos);
+      render_cursor(cursor, renderer, *mouse_pos);
 
       //render the player
-      player_render(*enemy, playerSprite, renderer, *mouse_pos);
+      render_player(*enemy, renderer, *mouse_pos);
 
       //PLACEHOLDER to render the enemy
-      player_render(*p, playerSprite, renderer, *mouse_pos);
+      render_player(*p, renderer, *mouse_pos);
+
+      //init a projectile if shooting
+      init_projectile(*mouse_btn, *p, playerSprite, projectiles, *mouse_pos);
+
+      //render the projectile
+      render_projectile(projectiles, renderer);
 
       if (SDL_GetTicks() >= *stepDelay + DELAY_STEP) {
         player_update_step(p);
@@ -456,6 +475,8 @@ int main () {
   TTF_Quit();
   SDL_Quit();
 
+  free(i);
+  free(projectiles);
   free(p);
   free(enemy);
   free(manager);
