@@ -54,7 +54,7 @@ int main () {
   }
 
   //window initialization to 640x480
-  window = SDL_CreateWindow("proto", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_FULLSCREEN);
+  window = SDL_CreateWindow("proto", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
   if (window == NULL) {
     printf("Error during window creating : %s\n", SDL_GetError());
     return EXIT_FAILURE;

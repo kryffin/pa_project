@@ -1,4 +1,4 @@
-Idées : 
+Idées :
 
 	Platformer Star Wars
 	Jeux d'aventure Rick&Morty
@@ -31,4 +31,18 @@ Debut : Le fermier reve la nuit; le reve metterai la trame en place : le fermier
 liste level :
 
 lvl 1 :
-lvl 2 ; 
+lvl 2 ;
+
+
+Liste blocks :
+
+0 : rien
+1 : 
+2 :
+3 :
+4 :
+5 :
+6 :
+7 :
+8 :
+9 :
