@@ -8,7 +8,7 @@
    2 : button up
    10 : quit
 */
-int menu_controls(SDL_Event *event, SDL_Rect *mouse_pos) {
+int menu_controls(SDL_Event *event, intpoint *mouse_pos) {
   //controls
   while (SDL_PollEvent(event)) {
     switch(event->type) {
@@ -44,7 +44,7 @@ int menu_controls(SDL_Event *event, SDL_Rect *mouse_pos) {
 }
 
 //returns true if the mouse is hovering the target
-bool mouse_hover_menu (SDL_Rect mouse_pos, int targetx, int targety, int width, int height) {
+bool mouse_hover_menu (intpoint mouse_pos, int targetx, int targety, int width, int height) {
   if(mouse_pos.x >= targetx && mouse_pos.x <= targetx + width && mouse_pos.y >= targety && mouse_pos.y <= targety + height) {
     return true;
   }
@@ -57,7 +57,7 @@ bool mouse_hover_menu (SDL_Rect mouse_pos, int targetx, int targety, int width, 
   3 : Quit
 */
 
-int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Texture *cursor) {
+int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint *mouse_pos, SDL_Texture *cursor) {
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
@@ -100,7 +100,6 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
   event = (SDL_Event*)malloc(sizeof(SDL_Event));
 
   //render the messages
-  printf("%d\n", palette[0].r);
   surContinue = TTF_RenderText_Solid(font, strFull, palette[14]);
   surOptions = TTF_RenderText_Solid(font, str43, palette[0]);
   surQuit = TTF_RenderText_Solid(font, str1610, palette[0]);
@@ -235,7 +234,7 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
 /* resolution options menu */
 
 /* 1 : FullScreen | 2 : 4:3 | 3 : 16:10 | 4 : 16:9 | 5 : Ad | 6 : Back */
-int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Texture *cursor) {
+int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint *mouse_pos, SDL_Texture *cursor) {
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
@@ -536,7 +535,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
   }
 }
 
-int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Texture *cursor) {
+int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint *mouse_pos, SDL_Texture *cursor) {
 
   //keeps the option in the main menu
   int *mainMenuOption = NULL;

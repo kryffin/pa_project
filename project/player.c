@@ -2,7 +2,23 @@
 
 /* renderTING */
 
-void render_player (player p, SDL_Renderer *renderer, SDL_Rect mouse_pos) {
+void update_player (player *p) {
+
+  set_player_screen_position(p, (int)get_player_real_position(*p).x, (int)get_player_real_position(*p).y);
+
+  SDL_Rect temp;
+  temp.x = get_player_screen_position(*p).x;
+  temp.y = get_player_screen_position(*p).y;
+  temp.w = get_player_hitbox(*p).w;
+  temp.h = get_player_hitbox(*p).h;
+
+  set_player_hitbox(p, temp);
+
+  return;
+
+}
+
+void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos) {
 
   SDL_Rect *temp = NULL;
   temp = (SDL_Rect*)malloc(sizeof(SDL_Rect));
@@ -17,7 +33,7 @@ void render_player (player p, SDL_Renderer *renderer, SDL_Rect mouse_pos) {
       //stand-by/walking
       case 0:
 
-        if (get_player_vel_x(p) == 0 && get_player_vel_y(p) == 0) {
+        if (get_player_velocity(p).x == 0 && get_player_velocity(p).y == 0) {
 
           //stand by sprite
           temp->x = 0;
@@ -102,7 +118,7 @@ void render_player (player p, SDL_Renderer *renderer, SDL_Rect mouse_pos) {
       //stand-by/walking
       case 0:
 
-        if (get_player_vel_x(p) == 0 && get_player_vel_y(p) == 0) {
+        if (get_player_velocity(p).x == 0 && get_player_velocity(p).y == 0) {
 
           //stand by sprite
           temp->x = 0;
@@ -181,7 +197,10 @@ void render_player (player p, SDL_Renderer *renderer, SDL_Rect mouse_pos) {
 
   }
 
-  SDL_RenderCopy(renderer, p.img, &(p.spritePos), &(p.pos));
+  SDL_Rect tempSpritePos = get_player_sprite_pos(p);
+  SDL_Rect tempPos = get_player_hitbox(p);
+
+  SDL_RenderCopy(renderer, get_player_img(p), &tempSpritePos, &tempPos);
 
   free(temp);
 
@@ -194,7 +213,10 @@ void player_melee (player p, SDL_Renderer *renderer) {
 
   SDL_Rect *target = NULL;
   target = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  *target = get_player_pos(p);
+  target->x = get_player_screen_position(p).x;
+  target->y = get_player_screen_position(p).y;
+  target->w = get_player_hitbox(p).w;
+  target->h = get_player_hitbox(p).h;
 
   SDL_Rect *effect = NULL;
   effect = (SDL_Rect*)malloc(sizeof(SDL_Rect));
@@ -214,16 +236,18 @@ void player_melee (player p, SDL_Renderer *renderer) {
 
   }
 
-  SDL_RenderCopy(renderer, p.img, effect, target);
+  SDL_RenderCopy(renderer, get_player_img(p), effect, target);
 
   free(target);
   free(effect);
+
+  return;
 
 }
 
 void player_update_step (player *p) {
 
-  if(get_player_vel_x(*p) != 0) {
+  if(get_player_velocity(*p).x != 0) {
 
     set_player_step(p, get_player_step(*p) + 1);
 
@@ -237,9 +261,9 @@ void player_update_step (player *p) {
 
 }
 
-void player_update_dir (player *p, SDL_Rect mouse_pos) {
+void player_update_dir (player *p, intpoint mouse_pos) {
 
-  if(get_player_pos(*p).x + (IMG_WIDTH / 2) < mouse_pos.x) {
+  if(get_player_real_position(*p).x + (IMG_WIDTH / 2) < mouse_pos.x) {
     set_player_dir(p, 1); //right
   } else {
     set_player_dir(p, 0); //left
@@ -248,57 +272,37 @@ void player_update_dir (player *p, SDL_Rect mouse_pos) {
 }
 
 void player_apply_velocity (player *p) {
-  set_player_pos(p, get_player_pos(*p).x + get_player_vel_x(*p), get_player_pos(*p).y + get_player_vel_y(*p), get_player_pos(*p).w, get_player_pos(*p).h);
+  set_player_real_position(p, get_player_real_position(*p).x + get_player_velocity(*p).x, get_player_real_position(*p).y + get_player_velocity(*p).y);
   return;
 }
 
 void player_jumping (player *p) {
-  if (get_player_state(*p) == 1 || get_player_state(*p) == 2) {
-    if (get_player_pos(*p).y > get_player_jumpPoint(*p) - IMG_HEIGHT) {
-      //currently jumping
-      /*pos.y -= (pos.y - (jumpPoint - IMG_HEIGHT)) * 0.3;*/
-      set_player_pos(p, get_player_pos(*p).x, get_player_pos(*p).y - (get_player_jumpPoint(*p) - IMG_HEIGHT) * 1, get_player_pos(*p).w, get_player_pos(*p).h);
-    } else {
-      //jumping ends
-      set_player_highPoint(p, get_player_pos(*p).y);
-      set_player_state(p, 0);
-    }
-  }
+  //TO DO
+  return;
 }
 
 /* SET */
 
 //create a new player
-player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image, SDL_Rect posSprite) {
+player set_player (short int maxHealthPoints, floatpoint position, vector velocity, SDL_Texture *image, SDL_Rect posSprite, SDL_Rect hitbox) {
+
   player p;
   set_player_maxhp(&p, maxHealthPoints);
-  set_player_hp(&p, healthPoints);
-  set_player_dir(&p, direction);
-  set_player_dJump(&p, doubleJump);
+  set_player_hp(&p, maxHealthPoints);
+  set_player_dir(&p, 0);
+  set_player_dJump(&p, true);
   set_player_jumpPoint(&p, 0);
   set_player_highPoint(&p, 0);
   set_player_state(&p, 0);
-  set_player_pos(&p, position.x, position.y, position.w, position.h);
-  set_player_vel_x(&p, velocity.x);
-  set_player_vel_y(&p, velocity.y);
+  set_player_real_position(&p, get_floatpoint_x(position), get_floatpoint_y(position));
+  set_player_screen_position(&p, (int)get_floatpoint_x(position), (int)get_floatpoint_y(position));
+  set_player_vel_x(&p, get_vector_x(velocity));
+  set_player_vel_y(&p, get_vector_y(velocity));
   set_player_img(&p, image);
   set_player_sprite_pos(&p, posSprite);
+  set_player_hitbox(&p, hitbox);
 
   return p;
-}
-
-//copy a target player p into player q
-player set_player_copy (player p) {
-  player *q = (player*)malloc(sizeof(player));
-  set_player_maxhp(q, get_player_maxhp(p));
-  set_player_hp(q, get_player_hp(p));
-  set_player_dir(q, get_player_dir(p));
-  set_player_dJump(q, get_player_dJump(p));
-  set_player_vel_x(q, get_player_vel_x(p));
-  set_player_vel_y(q, get_player_vel_y(p));
-  set_player_img(q, get_player_img(p));
-
-  return *q;
 }
 
 //set the player's max health points
@@ -349,24 +353,29 @@ void set_player_state (player *p, short int state) {
   return;
 }
 
+//set the player's real position
+void set_player_real_position (player *p, float x, float y) {
+  p->realPos.x = x;
+  p->realPos.y = y;
+  return;
+}
+
 //set the player's position
-void set_player_pos (player *p, int pos_x, int pos_y, int pos_w, int pos_h) {
-  p->pos.x = pos_x;
-  p->pos.y = pos_y;
-  p->pos.w = pos_w;
-  p->pos.h = pos_h;
+void set_player_screen_position (player *p, int x, int y) {
+  p->screenPos.x = x;
+  p->screenPos.y = y;
   return;
 }
 
 //set the player's x velocity
-void set_player_vel_x (player *p, int vel_x) {
-  p->vel.x = vel_x;
+void set_player_vel_x (player *p, float x) {
+  p->vel.x = x;
   return;
 }
 
 //set the player's y velocity
-void set_player_vel_y (player *p, int vel_y) {
-  p->vel.y = vel_y;
+void set_player_vel_y (player *p, float y) {
+  p->vel.y = y;
   return;
 }
 
@@ -379,6 +388,12 @@ void set_player_img (player *p, SDL_Texture *img) {
 //set the player sprite position on the spritesheet
 void set_player_sprite_pos (player *p, SDL_Rect posSprite) {
   p->spritePos = posSprite;
+  return;
+}
+
+//set the player hitbox
+void set_player_hitbox (player *p, SDL_Rect hitbox) {
+  p->hitbox = hitbox;
   return;
 }
 
@@ -424,19 +439,19 @@ short int get_player_state (player p) {
   return p.state;
 }
 
+//get the player's real position
+floatpoint get_player_real_position (player p) {
+  return p.realPos;
+}
+
 //get the player's position
-SDL_Rect get_player_pos (player p) {
-  return p.pos;
+intpoint get_player_screen_position (player p) {
+  return p.screenPos;
 }
 
 //get the player's x velocity
-int get_player_vel_x (player p) {
-  return p.vel.x;
-}
-
-//get the player's y velocity
-int get_player_vel_y (player p) {
-  return p.vel.y;
+vector get_player_velocity (player p) {
+  return p.vel;
 }
 
 //get the player's image
@@ -447,4 +462,9 @@ SDL_Texture* get_player_img (player p) {
 //get the player's sprite position on the sprite sheet
 SDL_Rect get_player_sprite_pos (player p) {
   return p.spritePos;
+}
+
+//get the player's hitbox
+SDL_Rect get_player_hitbox (player p) {
+  return p.hitbox;
 }

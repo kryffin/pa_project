@@ -184,7 +184,47 @@ int init_images (SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **c
 
 }
 
-int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, SDL_Rect **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor) {
+int init_projectiles (projectile *projectiles[100], SDL_Texture *img) {
+
+  //main projectiles
+  *projectiles = (projectile*)malloc(100 * sizeof(projectile));
+  if (*projectiles == NULL) {
+    printf("Error allocating memory for the projectiles\n");
+    return 0;
+  }
+
+  vector *dir = NULL;
+  dir = (vector*)malloc(sizeof(vector));
+  *dir = set_vector(0.0, 0.0);
+
+  SDL_Rect *hitbox = NULL;
+  hitbox = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  hitbox->w = BULLET_WIDTH;
+  hitbox->h = BULLET_HEIGHT;
+
+  SDL_Rect *spritePos = NULL;
+  spritePos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  spritePos->x = 128;
+  spritePos->y = 128;
+  spritePos->w = 16;
+  spritePos->h = 16;
+
+  int *i = NULL;
+  i = (int*)malloc(sizeof(int));
+
+  for (*i = 0; *i < 100; *i += 1) {
+    (*projectiles)[*i] = set_projectile(0.0, 0.0, *dir, *hitbox, *spritePos, img);
+  }
+
+  free(dir);
+  free(hitbox);
+  free(spritePos);
+  free(i);
+
+  return 1;
+}
+
+int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor) {
 
   //used to print the initialization time
   *initTimer = (Uint32*)malloc(sizeof(Uint32));
@@ -209,7 +249,7 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
   }
 
   //mouse position
-  *mouse_pos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  *mouse_pos = (intpoint*)malloc(sizeof(intpoint));
   if (*mouse_pos == NULL) {
     printf("Error allocating memory for the mouse_pos\n");
     return 0;
@@ -263,13 +303,6 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
     return 0;
   }
 
-  //main projectiles
-  *projectiles = (projectile*)malloc(100 * sizeof(projectile));
-  if (*projectiles == NULL) {
-    printf("Error allocating memory for the projectiles\n");
-    return 0;
-  }
-
   //delay between each sprite step
   *stepDelay = (int*)malloc(sizeof(int));
   if (*stepDelay == NULL) {
@@ -291,11 +324,15 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
     return 0;
   }
 
+  if (init_projectiles(projectiles, *playerSprite) == 0) {
+    return 0;
+  }
+
   return 1;
 
 }
 
-void free_variables (SDL_Surface *msgState, SDL_Surface *msgJump, SDL_Texture *playerSprite, SDL_Texture *tempTxt, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player *p, FPSmanager *manager, SDL_Color *colorPalette, char *strState, char *strJump, SDL_Rect *posMsgState, SDL_Rect *posMsgJump, SDL_Event *event, bool *quit, bool *jumped, SDL_Rect *mouse_pos, bool *mouse_btn) {
+void free_variables (SDL_Surface *msgState, SDL_Surface *msgJump, SDL_Texture *playerSprite, SDL_Texture *tempTxt, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player *p, FPSmanager *manager, SDL_Color *colorPalette, char *strState, char *strJump, SDL_Rect *posMsgState, SDL_Rect *posMsgJump, SDL_Event *event, bool *quit, bool *jumped, intpoint *mouse_pos, bool *mouse_btn) {
 
   SDL_FreeSurface(msgState);
   SDL_FreeSurface(msgJump);

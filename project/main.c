@@ -30,7 +30,7 @@ int main () {
   /* * * * * * keyboard & mouse * * * * * */
 
   //mouse position
-  SDL_Rect *mouse_pos = NULL;
+  intpoint *mouse_pos = NULL;
 
   //array for the keys pressed
   SDL_Keycode key[SDL_NUM_SCANCODES] = {0};
@@ -95,14 +95,6 @@ int main () {
   //delay used between each step in the character animation
   int *stepDelay = NULL;
 
-  //the destination rectangle used to load the characters size
-  SDL_Rect *desRec = NULL;
-  desRec = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  desRec->x = 0;
-  desRec->y = 0;
-  desRec->w = 32;
-  desRec->h = 64;
-
   /* * * * * * game loop * * * * * */
 
   //variable running the main loop and quitting the game if desired
@@ -124,27 +116,31 @@ int main () {
   /* * * * * * player initialization * * * * * */
 
   //base position of the player
-  SDL_Rect *basePosition = NULL;
-  basePosition = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  basePosition->x = (SCREEN_WIDTH / 2) - (IMG_WIDTH / 2);
-  basePosition->y = SCREEN_HEIGHT - IMG_HEIGHT;
-  basePosition->w = 32;
-  basePosition->h = 64;
+  floatpoint *basePosition = NULL;
+  basePosition = (floatpoint*)malloc(sizeof(floatpoint));
+  *basePosition = set_floatpoint((SCREEN_WIDTH / 2) - (IMG_WIDTH / 2), SCREEN_HEIGHT - IMG_HEIGHT);
 
   //base velocity of the player
-  SDL_Rect *baseVelocity = NULL;
-  baseVelocity = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  baseVelocity->x = 0;
-  baseVelocity->y = 0;
-  baseVelocity->w = 16;
-  baseVelocity->h = 16;
+  vector *baseVelocity = NULL;
+  baseVelocity = (vector*)malloc(sizeof(vector));
+  *baseVelocity = set_vector(0.0, 0.0);
+
+  //base hitbox
+  SDL_Rect *hitbox = NULL;
+  hitbox = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  hitbox->w = IMG_WIDTH;
+  hitbox->h = IMG_HEIGHT;
+
+  //the destination rectangle used to load the characters size
+  SDL_Rect *desRec = NULL;
+  desRec = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  desRec->x = 0;
+  desRec->y = 0;
+  desRec->w = 32;
+  desRec->h = 64;
 
   //creating the player
-  *p = set_player(10, 10, 0, true, *basePosition, *baseVelocity, playerSprite, *desRec);
-
-  for (*i = 0; *i < 100; *i += 1) {
-    projectiles[*i] = set_projectile(0.0, 0.0, *baseVelocity, *baseVelocity, playerSprite);
-  }
+  *p = set_player(10, *basePosition, *baseVelocity, playerSprite, *desRec, *hitbox);
 
   //PLACEHOLDER for these won't be used again
   free(basePosition);
@@ -175,11 +171,15 @@ int main () {
 
     controls(event, quit, p, jumped, renderer, mouse_pos, mouse_btn, cursor, key);
 
+    update_player(p);
+
     //PLACEHOLDER to render the enemy
     render_player(*p, renderer, *mouse_pos);
 
     //init a projectile if shooting
-    init_projectile(*mouse_btn, *p, playerSprite, projectiles, *mouse_pos);
+    shooting(*mouse_btn, *p, projectiles, *mouse_pos);
+
+    update_projectiles(&projectiles);
 
     //render the projectile
     render_projectile(projectiles, renderer);
@@ -193,30 +193,18 @@ int main () {
     player_update_dir(p, *mouse_pos);
 
     //RAW vertical hyper space
-    if (p->pos.x + IMG_WIDTH > SCREEN_HEIGHT) {
-      p->pos.x = 0;
+    if (p->realPos.x + IMG_WIDTH > SCREEN_HEIGHT) {
+      p->realPos.x = 0;
     }
 
-    if (p->pos.x < 0) {
-      p->pos.x = SCREEN_WIDTH - IMG_WIDTH;
+    if (p->realPos.x < 0) {
+      p->realPos.x = SCREEN_WIDTH - IMG_WIDTH;
     }
 
     player_jumping(p);
 
-    //RAW gravity
-    if (get_player_state(*p) == 0 || get_player_state(*p) == 3) {
-      if (p->pos.y < SCREEN_HEIGHT - IMG_HEIGHT) {
-        //currently in air
-        p->pos.y += 5; //12 works perfectly
-      } else if (p->pos.y > SCREEN_HEIGHT - IMG_HEIGHT){
-        //currently below wanted place
-        printf("\nwrong place\n\n");
-        p->pos.y = SCREEN_HEIGHT - IMG_HEIGHT;
-      }
-    }
-
     //RAW re-enabling double jump
-    if (p->dJump == false && p->pos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
+    if (p->dJump == false && p->realPos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
       p->dJump = true;
     }
 

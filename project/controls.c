@@ -24,20 +24,25 @@ void update_keyboard_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit) 
   }
 }
 
-void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, SDL_Rect mouse_pos) {
-  mouse_pos.x -= CURSOR_WIDTH / 2;
-  mouse_pos.y -= CURSOR_HEIGHT / 2;
-  mouse_pos.w = CURSOR_WIDTH;
-  mouse_pos.h = CURSOR_HEIGHT;
-  SDL_RenderCopy(renderer, img, NULL, &mouse_pos);
+void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, intpoint mouse_pos) {
+
+  SDL_Rect temp;
+  temp.x = get_intpoint_x(mouse_pos) - (CURSOR_WIDTH/2);
+  temp.y = get_intpoint_y(mouse_pos) - (CURSOR_HEIGHT/2);
+  temp.w = CURSOR_WIDTH;
+  temp.h = CURSOR_HEIGHT;
+
+  SDL_RenderCopy(renderer, img, NULL, &temp);
+
+  return;
 }
 
 //gestion du click de la souris et de sa position
-void update_mouse_controls (SDL_Event *event, SDL_Rect *mouse_pos, bool *mouse_btn) {
+void update_mouse_controls (SDL_Event *event, intpoint *mouse_pos, bool *mouse_btn) {
 
   if (event->type == SDL_MOUSEMOTION) {
-    mouse_pos->x = event->motion.x;
-    mouse_pos->y = event->motion.y;
+    set_intpoint_x(mouse_pos, event->motion.x);
+    set_intpoint_y(mouse_pos, event->motion.y);
   }
   if (event->type == SDL_MOUSEBUTTONUP) {
     *mouse_btn = false;
@@ -73,13 +78,13 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer 
 
   //'space' key
   if (keys[keysTab[2]] == 1 && *jumped == false) {
-    if (get_player_pos(*p).y == SCREEN_HEIGHT - SCREEN_WIDTH) {
+    if (get_player_real_position(*p).y == SCREEN_HEIGHT - SCREEN_WIDTH) {
       set_player_state(p, 1);
-      set_player_jumpPoint(p, get_player_pos(*p).y);
+      set_player_jumpPoint(p, get_player_real_position(*p).y);
     } else if (get_player_dJump(*p)) {
       set_player_dJump(p, false);
       set_player_state(p, 2);
-      set_player_jumpPoint(p, get_player_pos(*p).y);
+      set_player_jumpPoint(p, get_player_real_position(*p).y);
     }
     *jumped = true;
   }
@@ -100,14 +105,14 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer 
 
   //'q' or 'a' key
   if (keys[keysTab[0]] == 0) {
-    if (get_player_vel_x(*p) < 0) {
+    if (get_player_velocity(*p).x < 0) {
       set_player_vel_x(p, 0);
     }
   }
 
   //'d' key
   if (keys[keysTab[1]] == 0) {
-    if (get_player_vel_x(*p) > 0) {
+    if (get_player_velocity(*p).x > 0) {
       set_player_vel_x(p, 0);
     }
   }
@@ -133,7 +138,7 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer 
 
 }
 
-void controls (SDL_Event *event, bool *quit, player *p, bool *jumped, SDL_Renderer *renderer, SDL_Rect *mouse_pos, bool *mouse_btn, SDL_Texture *cursor, SDL_Keycode *key) {
+void controls (SDL_Event *event, bool *quit, player *p, bool *jumped, SDL_Renderer *renderer, intpoint *mouse_pos, bool *mouse_btn, SDL_Texture *cursor, SDL_Keycode *key) {
 
   //update the keyboard controls
   update_keyboard_controls(event, key, quit);

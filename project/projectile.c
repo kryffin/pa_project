@@ -1,25 +1,52 @@
 #include "header.h"
 
-void init_projectile (bool mouse_btn, player p, SDL_Texture *spriteSheet, projectile proj[100], SDL_Rect mouse_pos) {
+void shooting (bool mouse_btn, player p, projectile proj[100], intpoint mouse_pos) {
 
-  SDL_Rect *tempPos = NULL;
-  tempPos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  tempPos->x = get_player_pos(p).x;
-  tempPos->y = get_player_pos(p).y;
-  tempPos->w = 16;
-  tempPos->h = 16;
+  vector dir = set_vector(1.0, 0.0);
 
-  SDL_Rect *tempDir = NULL;
-  tempDir = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  tempDir->x = mouse_pos.x - tempPos->x; //something to get the direction
-  tempDir->y = mouse_pos.y - tempPos->y; //something to get the direction
+  int i;
 
   if (mouse_btn) {
-    proj[0] = set_projectile(get_player_pos(p).x, get_player_pos(p).y, *tempDir, *tempPos, spriteSheet);
+
+    //if clicking we shoot
+    for (i = 0; i < 100; i += 1) {
+
+      //if a projectile has no direction it doesn't exists
+      if (get_projectile_direction(proj[i]).x == 0 && get_projectile_direction(proj[i]).y == 0) {
+        printf("%d\n", i);
+        set_projectile_direction(&proj[i], dir);
+        return;
+      }
+
+    }
+
   }
 
-  free(tempDir);
-  free(tempPos);
+  //security check
+  return;
+
+}
+
+void update_projectiles (projectile *p[100]) {
+
+  int i;
+
+  for (i = 0; i < 100; i += 1) {
+
+    //if the projectile exists
+    if (get_projectile_direction((*p)[i]).x != 0.0 || get_projectile_direction((*p)[i]).y != 0.0) {
+      set_projectile_screen_position(p[i], (int)get_projectile_real_position((*p)[i]).x, (int)get_projectile_real_position((*p)[i]).y);
+
+      SDL_Rect temp;
+      temp.x = get_projectile_screen_position((*p)[i]).x;
+      temp.y = get_projectile_screen_position((*p)[i]).y;
+      temp.w = get_projectile_hitbox((*p)[i]).w;
+      temp.h = get_projectile_hitbox((*p)[i]).h;
+
+      set_projectile_hitbox(p[i], temp);
+    }
+
+  }
 
   return;
 
@@ -27,24 +54,33 @@ void init_projectile (bool mouse_btn, player p, SDL_Texture *spriteSheet, projec
 
 void render_projectile (projectile p[100], SDL_Renderer *renderer) {
 
-  //temp rect used to define the area in the spritesheet
-  SDL_Rect *temp = NULL;
-  temp = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  temp->x = 128;
-  temp->y = 128;
-  temp->w = 16;
-  temp->h = 16;
+  SDL_Rect *tempSpritePos = NULL;
+  tempSpritePos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+
+  SDL_Rect *tempPos = NULL;
+  tempPos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
 
   int *i = NULL;
   i = (int*)malloc(sizeof(int));
 
   for (*i = 0; *i < 100; *i += 1) {
-    if (get_projectile_position(p[*i]).x != 0) {
-      SDL_RenderCopy(renderer, get_projectile_image(p[*i]), temp, &(p[*i].pos));
+    if (get_projectile_direction(p[*i]).x != 0.0 || get_projectile_direction(p[*i]).y != 0.0) {
+
+      tempSpritePos->x = get_projectile_sprite_pos(p[*i]).x;
+      tempSpritePos->y = get_projectile_sprite_pos(p[*i]).y;
+      tempSpritePos->w = get_projectile_sprite_pos(p[*i]).w;
+      tempSpritePos->h = get_projectile_sprite_pos(p[*i]).h;
+
+      *tempPos = get_projectile_hitbox(p[*i]);
+
+      SDL_RenderCopy(renderer, get_projectile_image(p[*i]), tempSpritePos, tempPos);
+
     }
   }
 
-  free(temp);
+  free(tempSpritePos);
+  free(tempPos);
+  free(i);
 
   return;
 
@@ -52,41 +88,48 @@ void render_projectile (projectile p[100], SDL_Renderer *renderer) {
 
 /* * * * * * Set * * * * * */
 
-projectile set_projectile (float realPosX, float realPosY, SDL_Rect dir, SDL_Rect pos, SDL_Texture *img) {
+projectile set_projectile (float x, float y, vector dir, SDL_Rect hitbox, SDL_Rect spritePos, SDL_Texture *img) {
 
   projectile p;
 
-  set_projectile_real_position_x(&p, realPosX);
-  set_projectile_real_position_y(&p, realPosY);
+  set_projectile_real_position(&p, x, y);
+  set_projectile_screen_position(&p, (int)x, (int)y);
   set_projectile_direction(&p, dir);
-  set_projectile_position(&p, pos);
+  set_projectile_hitbox(&p, hitbox);
+  set_projectile_sprite_pos(&p, spritePos);
   set_projectile_image(&p, img);
 
   return p;
 
 }
 
-void set_projectile_real_position_x (projectile *p, float realPosX) {
-  p->realPosX = realPosX;
+void set_projectile_screen_position (projectile *p, int x, int y) {
+  p->screenPos.x = x;
+  p->screenPos.y = y;
   return;
 }
 
-void set_projectile_real_position_y (projectile *p, float realPosY) {
-  p->realPosY = realPosY;
+void set_projectile_real_position (projectile *p, float x, float y) {
+  p->realPos.x = x;
+  p->realPos.y = y;
   return;
 }
 
-void set_projectile_direction (projectile *p, SDL_Rect dir) {
+void set_projectile_direction (projectile *p, vector dir) {
   p->dir.x = dir.x;
   p->dir.y = dir.y;
   return;
 }
 
-void set_projectile_position (projectile *p, SDL_Rect pos) {
-  p->pos.x = pos.x;
-  p->pos.y = pos.y;
-  p->pos.w = pos.w;
-  p->pos.h = pos.h;
+void set_projectile_hitbox (projectile *p, SDL_Rect hitbox) {
+  p->hitbox.x = hitbox.x;
+  p->hitbox.y = hitbox.y;
+  return;
+}
+
+void set_projectile_sprite_pos (projectile *p, SDL_Rect spritePos) {
+  p->spritePos.x = spritePos.x;
+  p->spritePos.y = spritePos.y;
   return;
 }
 
@@ -97,20 +140,24 @@ void set_projectile_image (projectile *p, SDL_Texture *img) {
 
 /* * * * * * Get * * * * * */
 
-float get_projectile_real_position_x (projectile p) {
-  return p.realPosX;
+floatpoint get_projectile_real_position (projectile p) {
+  return p.realPos;
 }
 
-float get_projectile_real_position_y (projectile p) {
-  return p.realPosY;
+intpoint get_projectile_screen_position (projectile p) {
+  return p.screenPos;
 }
 
-SDL_Rect get_projectile_direction (projectile p) {
+vector get_projectile_direction (projectile p) {
   return p.dir;
 }
 
-SDL_Rect get_projectile_position (projectile p) {
-  return p.pos;
+SDL_Rect get_projectile_hitbox (projectile p) {
+  return p.hitbox;
+}
+
+SDL_Rect get_projectile_sprite_pos (projectile p) {
+  return p.spritePos;
 }
 
 SDL_Texture* get_projectile_image (projectile p) {
