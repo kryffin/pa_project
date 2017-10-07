@@ -274,8 +274,7 @@ int main () {
       update_controls(event, key, quit);
       control(p, key, jumped, renderer, display);
 
-      player_blit(*p, playerSprite, renderer);
-      
+      player_blit(*p, playerSprite, renderer);      
       //newton time
       *timeN_B = SDL_GetTicks();
       if (*timeN_B >= *timeN_A + 1000){
@@ -285,7 +284,7 @@ int main () {
       player_jumping_v2(p, *timeN_A, *timeN_B);
       player_apply_velocity(p, timeN_A, timeN_B);
     
-
+      
       //RAW vertical hyper space in function of the absolute position 
       if (p->posAbs.x + IMG_WIDTH > display->w) {
         p->posAbs.x = 0;
@@ -295,9 +294,12 @@ int main () {
         p->posAbs.x = display->w - IMG_WIDTH;
       }
       
-    
-
+      
+      printf("~~\nx: %d\ty: %d\n************\n", get_player_posAbs(*p).x, get_player_posAbs(*p).y);
       player_gravity(p);
+      player_colision(p, display);
+     
+      
       
       //RAW gravity
       if (get_player_state(*p) == 0 || get_player_state(*p) == 3) {
@@ -315,6 +317,8 @@ int main () {
       if (p->dJump == false && p->posAbs.y == display->h - IMG_HEIGHT) {
         p->dJump = true;
       }
+
+      player_blit(*p, playerSprite, renderer);
       
       /* debug */
 

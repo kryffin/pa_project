@@ -187,12 +187,12 @@ int player_jumping_v2_x (player p, Uint32 timeN_A)
   x0 = get_player_posAbs(p).x;
   t = timeN_A;
   v = get_player_vel_x (p);
-  a = 1; //valeur a determiner
-  return COEF_A*(a*t*t)+(v*t)+(x0);
+ 
+  return (v*t)+(x0);
   
 }
 
-int player_jumping_v2_y (player p, Uint32 timeN_A, Uint32 timeN_B)
+int player_jumping_v2_y (player p, Uint32 timeN_A)
 {
 
   /*definition des variables
@@ -209,38 +209,50 @@ int player_jumping_v2_y (player p, Uint32 timeN_A, Uint32 timeN_B)
   int t;
   int y0;
   y0 = get_player_posAbs(p).y;
-  t = timeN_B-timeN_A;
+  t = timeN_A;
   v = get_player_vel_y (p);
+  if (v < 0) v = -v;
   a = 1; //valeur a determiner
   // printf("%d :\n", y0 + (v*t) - (COEF_A*a*t*t));
-  return y0 + (v*t) - (COEF_A*a*t*t);
+  return y0 - (v*t);
   }
 
 void player_gravity (player *p)
 {
   //check if currently jumping
-  if (get_player_state(*p) == 1 || get_player_state(*p) == 2)
-    {
-      printf("gravity mdfq\n");
-      set_player_posAbs(p, 0, get_player_posAbs(*p).y + GRAVITY, IMG_WIDTH, IMG_HEIGHT);
-    }
+  //  if (get_player_state(*p) == 1 || get_player_state(*p) == 2)
+  //  {
+      set_player_posAbs(p, get_player_posAbs(*p).x, get_player_posAbs(*p).y + 2, IMG_WIDTH, IMG_HEIGHT);
+      // }
+      // else
+      //  {
+      //    return;
+      //  }
+  
 
 }
 
-void player_colision (player *p)
+void player_colision (player *p, SDL_Rect* display)
 {
   //RAW
   //colision avec les edges de l'écran
-  //fait pour une resolution de 640x480
-  if (get_player_posAbs(*p).y > 480 - IMG_HEIGHT)
+;
+  if (get_player_posAbs(*p).y > display->h - IMG_HEIGHT)
     {
-      printf("DUO 0");
-      set_player_posAbs(p, get_player_posAbs(*p).x, 480 - IMG_HEIGHT - 5, IMG_WIDTH, IMG_HEIGHT);
+ 
+      set_player_posAbs(p, get_player_posAbs(*p).x, display->h - IMG_HEIGHT, IMG_WIDTH, IMG_HEIGHT);
     }
-  else if (get_player_posAbs(*p).y < 0)
+  if (get_player_posAbs(*p).y < 0)
     {
-      printf("UNO 0");
       set_player_posAbs(p, get_player_posAbs(*p).x, 0, IMG_WIDTH, IMG_HEIGHT);
+    }
+  if (get_player_posAbs(*p).x < 0)
+    {
+      set_player_posAbs(p, display->w - IMG_WIDTH, get_player_posAbs(*p).y, IMG_WIDTH, IMG_HEIGHT);
+    }
+  if (get_player_posAbs(*p).x > display->w - IMG_WIDTH)
+    {
+      set_player_posAbs(p, 0, get_player_posAbs(*p).y, IMG_WIDTH, IMG_HEIGHT);
     }
 
 }
@@ -259,11 +271,10 @@ void player_jumping_v2 (player *p, Uint32 timeN_A, Uint32 timeN_B)
       pos->x = get_player_posAbs(*p).x;
       pos->y = get_player_posAbs(*p).y;
       
-      *next_pos = calcul_position(*p, get_player_vel_x(*p), *pos, ANGLE_SAUT, *time);
-
-      set_player_posAbs(p, next_pos->x, next_pos->y, IMG_WIDTH, IMG_HEIGHT);
-      player_colision(p);
+      *next_pos = calcul_position(*p, get_player_vel_x(*p), *pos, 0.78, *time);
       printf("time:%d\t nx : %f \t|| ny : %f \n", *time, next_pos->x, next_pos->y);
+      set_player_posAbs(p, next_pos->x + pos->x, next_pos->y + pos->y, IMG_WIDTH, IMG_HEIGHT);
+    
       free (next_pos);
       free (pos);
       
@@ -277,25 +288,9 @@ void player_jumping_v2 (player *p, Uint32 timeN_A, Uint32 timeN_B)
 vector calcul_position (player p, float v_init, vector pos_init, float angle, unsigned short int time)
 {
   vector position_finale;
-  printf("\n\t******* %f ********\n", v_init);
-  if (v_init == 0.)//saut sur place
-    {
-      //printf("HELLO ITS ME");
-      position_finale.y = (pos_init.y) - 3;
-  
-      if (get_player_dir(p) == 0)
-	{
-	  position_finale.x = fmod((C_VEL_L * (0.05*time) * cos(angle) + pos_init.x), 600);
-	}
-      else
-	{
-	  position_finale.x = fmod((C_VEL_R * (0.05*time) * cos(angle) + pos_init.x), 600);
-	}
-      return position_finale;
-    }//vinit != 0
-  
-  position_finale.y = ((v_init * sin(angle)) + pos_init.y);
-  position_finale.x = (v_init * time * cos(angle) + pos_init.x);
+  //printf("\n\t******* %f ********\n", v_init);
+  position_finale.y = -0.01*player_jumping_v2_y(p, time);
+  position_finale.x = 0.001*player_jumping_v2_x(p, time);
   return position_finale;
   
 }

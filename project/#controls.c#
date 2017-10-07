@@ -61,7 +61,8 @@ void control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer *renderer
       set_player_jumpPoint(p, *temp_posAbs);
       temp_posAbs->x += 100;
       int x = (temp_posAbs->x + (temp_posAbs->x -100)) /2;
-      printf("***\t%d\n\n", x);
+      //printf("***\t%d\n\n", x);
+      set_player_posRel(p, -50, 0);
       set_player_highPoint(p, *temp_posAbs);
 
       // player_jumping_v2(p, *timeN_A, *timeN_B);

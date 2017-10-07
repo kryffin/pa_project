@@ -22,7 +22,7 @@
 #define PATH_SPRITES "./res/spritesheet.bmp"
 #define PATH_FONT "./res/font.ttf"
 //physics
-#define COEF_A -0.0025
+#define COEF_A 0.25
 #define COEF_B 0.
 #define COEF_C 100.
 #define C_VEL_L -3
@@ -62,7 +62,7 @@ struct Player {
 typedef struct Player player;
 
 /* DIR
-  0 : left
+  -1 : left
   1 : right
 */
 
@@ -137,7 +137,7 @@ void player_melee (player p, SDL_Renderer *renderer);
 void player_apply_velocity (player *p, Uint32* timeN_A, Uint32* timeN_B);
 void player_jumping_v2 (player *p, Uint32 timeN_A, Uint32 timeN_B);
 void player_gravity (player* p);
-void player_colision (player *p);
+void player_colision (player *p, SDL_Rect* display);
 player set_player (short int maxHealthPoints, short int healthPoints, short int direction, bool doubleJump, SDL_Rect position, SDL_Rect velocity, SDL_Texture *image, SDL_Rect posSprite);
 player set_player_copy (player p);
 void set_player_maxhp (player *p, short int maxhp);
