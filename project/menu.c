@@ -57,7 +57,7 @@ bool mouse_hover_menu (SDL_Rect mouse_pos, int targetx, int targety, int width, 
   3 : Quit
 */
 
-int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Texture *cursor) {
+int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Texture *cursor) {
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
@@ -100,9 +100,10 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
   event = (SDL_Event*)malloc(sizeof(SDL_Event));
 
   //render the messages
-  surContinue = TTF_RenderText_Solid(font, strFull, *black);
-  surOptions = TTF_RenderText_Solid(font, str43, *black);
-  surQuit = TTF_RenderText_Solid(font, str1610, *black);
+  printf("%d\n", palette[0].r);
+  surContinue = TTF_RenderText_Solid(font, strFull, palette[14]);
+  surOptions = TTF_RenderText_Solid(font, str43, palette[0]);
+  surQuit = TTF_RenderText_Solid(font, str1610, palette[0]);
 
   //message positions
   posContinue->x = (SCREEN_WIDTH / 2) - (surContinue->clip_rect.w / 2);
@@ -126,17 +127,17 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
       if (*control == 0) {
 
         SDL_FreeSurface(surContinue);
-        surContinue = TTF_RenderText_Solid(font, strFull, *green);
+        surContinue = TTF_RenderText_Solid(font, strFull, palette[3]);
 
       } else if (*control == 1){
 
         SDL_FreeSurface(surContinue);
-        surContinue = TTF_RenderText_Solid(font, strFull, *red);
+        surContinue = TTF_RenderText_Solid(font, strFull, palette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surContinue);
-        surContinue = TTF_RenderText_Solid(font, strFull, *green);
+        surContinue = TTF_RenderText_Solid(font, strFull, palette[3]);
         *option = 1;
 
       }
@@ -146,17 +147,17 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
       if (*control == 0) {
 
         SDL_FreeSurface(surOptions);
-        surOptions = TTF_RenderText_Solid(font, str43, *green);
+        surOptions = TTF_RenderText_Solid(font, str43, palette[3]);
 
       } else if (*control == 1){
 
         SDL_FreeSurface(surOptions);
-        surOptions = TTF_RenderText_Solid(font, str43, *red);
+        surOptions = TTF_RenderText_Solid(font, str43, palette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surOptions);
-        surOptions = TTF_RenderText_Solid(font, str43, *green);
+        surOptions = TTF_RenderText_Solid(font, str43, palette[3]);
         *option = 2;
 
       }
@@ -166,17 +167,17 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
       if (*control == 0) {
 
         SDL_FreeSurface(surQuit);
-        surQuit = TTF_RenderText_Solid(font, str1610, *green);
+        surQuit = TTF_RenderText_Solid(font, str1610, palette[3]);
 
       } else if (*control == 1) {
 
         SDL_FreeSurface(surQuit);
-        surQuit = TTF_RenderText_Solid(font, str1610, *red);
+        surQuit = TTF_RenderText_Solid(font, str1610, palette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surContinue);
-        surContinue = TTF_RenderText_Solid(font, strFull, *green);
+        surContinue = TTF_RenderText_Solid(font, strFull, palette[3]);
         *option = 3;
 
       }
@@ -184,11 +185,11 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
     } else {
       //render the messages
       SDL_FreeSurface(surContinue);
-      surContinue = TTF_RenderText_Solid(font, strFull, *black);
+      surContinue = TTF_RenderText_Solid(font, strFull, palette[0]);
       SDL_FreeSurface(surOptions);
-      surOptions = TTF_RenderText_Solid(font, str43, *black);
+      surOptions = TTF_RenderText_Solid(font, str43, palette[0]);
       SDL_FreeSurface(surQuit);
-      surQuit = TTF_RenderText_Solid(font, str1610, *black);
+      surQuit = TTF_RenderText_Solid(font, str1610, palette[0]);
 
     }
 
@@ -234,7 +235,7 @@ int main_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_C
 /* resolution options menu */
 
 /* 1 : FullScreen | 2 : 4:3 | 3 : 16:10 | 4 : 16:9 | 5 : Ad | 6 : Back */
-int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL_Color *red, SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Texture *cursor) {
+int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Texture *cursor) {
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
@@ -301,12 +302,12 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
   event = (SDL_Event*)malloc(sizeof(SDL_Event));
 
   //render the messages
-  surFull = TTF_RenderText_Solid(font, strFull, *black);
-  sur43 = TTF_RenderText_Solid(font, str43, *black);
-  sur1610 = TTF_RenderText_Solid(font, str1610, *black);
-  sur169 = TTF_RenderText_Solid(font, str169, *black);
-  surAd = TTF_RenderText_Solid(font, strAd, *black);
-  surBack = TTF_RenderText_Solid(font, strBack, *black);
+  surFull = TTF_RenderText_Solid(font, strFull, palette[0]);
+  sur43 = TTF_RenderText_Solid(font, str43, palette[0]);
+  sur1610 = TTF_RenderText_Solid(font, str1610, palette[0]);
+  sur169 = TTF_RenderText_Solid(font, str169, palette[0]);
+  surAd = TTF_RenderText_Solid(font, strAd, palette[0]);
+  surBack = TTF_RenderText_Solid(font, strBack, palette[0]);
 
   int *span = NULL;
   span = (int*)malloc(sizeof(int));
@@ -342,17 +343,17 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
       if (*control == 0) {
 
         SDL_FreeSurface(surFull);
-        surFull = TTF_RenderText_Solid(font, strFull, *green);
+        surFull = TTF_RenderText_Solid(font, strFull, palette[3]);
 
       } else if (*control == 1){
 
         SDL_FreeSurface(surFull);
-        surFull = TTF_RenderText_Solid(font, strFull, *red);
+        surFull = TTF_RenderText_Solid(font, strFull, palette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surFull);
-        surFull = TTF_RenderText_Solid(font, strFull, *green);
+        surFull = TTF_RenderText_Solid(font, strFull, palette[3]);
         *option = 1;
 
       }
@@ -362,17 +363,17 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
       if (*control == 0) {
 
         SDL_FreeSurface(sur43);
-        sur43 = TTF_RenderText_Solid(font, str43, *green);
+        sur43 = TTF_RenderText_Solid(font, str43, palette[3]);
 
       } else if (*control == 1){
 
         SDL_FreeSurface(sur43);
-        sur43 = TTF_RenderText_Solid(font, str43, *red);
+        sur43 = TTF_RenderText_Solid(font, str43, palette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(sur43);
-        sur43 = TTF_RenderText_Solid(font, str43, *green);
+        sur43 = TTF_RenderText_Solid(font, str43, palette[3]);
         *option = 2;
 
       }
@@ -382,17 +383,17 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
       if (*control == 0) {
 
         SDL_FreeSurface(sur1610);
-        sur1610 = TTF_RenderText_Solid(font, str1610, *green);
+        sur1610 = TTF_RenderText_Solid(font, str1610, palette[3]);
 
       } else if (*control == 1) {
 
         SDL_FreeSurface(sur1610);
-        sur1610 = TTF_RenderText_Solid(font, str1610, *red);
+        sur1610 = TTF_RenderText_Solid(font, str1610, palette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(sur1610);
-        sur1610 = TTF_RenderText_Solid(font, str1610, *green);
+        sur1610 = TTF_RenderText_Solid(font, str1610, palette[3]);
         *option = 3;
 
       }
@@ -402,17 +403,17 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
       if (*control == 0) {
 
         SDL_FreeSurface(sur169);
-        sur169 = TTF_RenderText_Solid(font, str169, *green);
+        sur169 = TTF_RenderText_Solid(font, str169, palette[3]);
 
       } else if (*control == 1) {
 
         SDL_FreeSurface(sur169);
-        sur169 = TTF_RenderText_Solid(font, str169, *red);
+        sur169 = TTF_RenderText_Solid(font, str169, palette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(sur169);
-        sur169 = TTF_RenderText_Solid(font, str169, *green);
+        sur169 = TTF_RenderText_Solid(font, str169, palette[3]);
         *option = 4;
 
       }
@@ -422,17 +423,17 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
       if (*control == 0) {
 
         SDL_FreeSurface(surAd);
-        surAd = TTF_RenderText_Solid(font, strAd, *green);
+        surAd = TTF_RenderText_Solid(font, strAd, palette[3]);
 
       } else if (*control == 1) {
 
         SDL_FreeSurface(surAd);
-        surAd = TTF_RenderText_Solid(font, strAd, *red);
+        surAd = TTF_RenderText_Solid(font, strAd, palette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surAd);
-        surAd = TTF_RenderText_Solid(font, strAd, *green);
+        surAd = TTF_RenderText_Solid(font, strAd, palette[3]);
         *option = 5;
 
       }
@@ -442,17 +443,17 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
       if (*control == 0) {
 
         SDL_FreeSurface(surBack);
-        surBack = TTF_RenderText_Solid(font, strBack, *green);
+        surBack = TTF_RenderText_Solid(font, strBack, palette[3]);
 
       } else if (*control == 1) {
 
         SDL_FreeSurface(surBack);
-        surBack = TTF_RenderText_Solid(font, strBack, *red);
+        surBack = TTF_RenderText_Solid(font, strBack, palette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surBack);
-        surBack = TTF_RenderText_Solid(font, strBack, *green);
+        surBack = TTF_RenderText_Solid(font, strBack, palette[3]);
         *option = 6;
 
       }
@@ -461,17 +462,17 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
 
       //reset the messages
       SDL_FreeSurface(surFull);
-      surFull = TTF_RenderText_Solid(font, strFull, *black);
+      surFull = TTF_RenderText_Solid(font, strFull, palette[0]);
       SDL_FreeSurface(sur43);
-      sur43 = TTF_RenderText_Solid(font, str43, *black);
+      sur43 = TTF_RenderText_Solid(font, str43, palette[0]);
       SDL_FreeSurface(sur1610);
-      sur1610 = TTF_RenderText_Solid(font, str1610, *black);
+      sur1610 = TTF_RenderText_Solid(font, str1610, palette[0]);
       SDL_FreeSurface(sur169);
-      sur169 = TTF_RenderText_Solid(font, str169, *black);
+      sur169 = TTF_RenderText_Solid(font, str169, palette[0]);
       SDL_FreeSurface(surAd);
-      surAd = TTF_RenderText_Solid(font, strAd, *black);
+      surAd = TTF_RenderText_Solid(font, strAd, palette[0]);
       SDL_FreeSurface(surBack);
-      surBack = TTF_RenderText_Solid(font, strBack, *black);
+      surBack = TTF_RenderText_Solid(font, strBack, palette[0]);
 
     }
 
@@ -533,4 +534,106 @@ int option_menu_display (TTF_Font *font, SDL_Color *black, SDL_Color *green, SDL
       return *option;
     }
   }
+}
+
+int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, SDL_Rect *mouse_pos, SDL_Texture *cursor) {
+
+  //keeps the option in the main menu
+  int *mainMenuOption = NULL;
+  mainMenuOption = (int*)malloc(sizeof(int));
+  if (mainMenuOption == NULL) {
+    printf("Error allocating memory for the mainMenuOption\n");
+    return 0;
+  }
+  *mainMenuOption = 0;
+
+  //keeps the option in the option menu
+  int *optionMenuOption = NULL;
+  optionMenuOption = (int*)malloc(sizeof(int));
+  if (optionMenuOption == NULL) {
+    printf("Error allocating memory for the optionMenuOption\n");
+    return 0;
+  }
+  *optionMenuOption = 0;
+
+  //while we are in the main or option menu
+  while (*mainMenuOption == 0 || *mainMenuOption == 2) {
+
+    //set the option menu to 0, which means nothing have been selected
+    *optionMenuOption = 0;
+
+    //getting the option selected from the main menu
+    *mainMenuOption = main_menu_display (font, palette, renderer, mouse_pos, cursor);
+
+    //if we wanna enter the option menu
+    if (*mainMenuOption == 2) {
+
+      //while we don't select back in the option menu
+      while (*optionMenuOption != 6) {
+
+        //getting the option selected from the option menu
+        *optionMenuOption = option_menu_display (font, palette, renderer, mouse_pos, cursor);
+
+        //depending on the choice selected
+        switch (*optionMenuOption) {
+
+          case 1:
+            //option 1
+            break;
+
+          case 2:
+            //option 2
+            break;
+
+          case 3:
+            //option 3
+            break;
+
+          case 4:
+            //option 4
+            break;
+
+          case 5:
+            //option 5
+            break;
+
+          case 6:
+            //option 6 : quitting the option menu
+            *mainMenuOption = 0;
+            *optionMenuOption = 6;
+            break;
+
+        }
+
+      }
+    }
+
+    //if we choose "quit" in the main menu
+    if (*mainMenuOption == 3) {
+      //quitting the game
+      *quit = true;
+
+      free(mainMenuOption);
+      free(optionMenuOption);
+
+      return 1;
+    }
+
+    //if we wanna Continue
+    if (*mainMenuOption == 1) {
+
+      free(mainMenuOption);
+      free(optionMenuOption);
+
+      return 1;
+    }
+
+  }
+
+  //security check
+  free(mainMenuOption);
+  free(optionMenuOption);
+
+  return 1;
+
 }

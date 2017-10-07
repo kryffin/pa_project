@@ -132,3 +132,19 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer 
   }
 
 }
+
+void controls (SDL_Event *event, bool *quit, player *p, bool *jumped, SDL_Renderer *renderer, SDL_Rect *mouse_pos, bool *mouse_btn, SDL_Texture *cursor, SDL_Keycode *key) {
+
+  //update the keyboard controls
+  update_keyboard_controls(event, key, quit);
+
+  //act depending on the keyboard state
+  keyboard_control(p, key, jumped, renderer);
+
+  //update the mouse position and mouse button state
+  update_mouse_controls(event, mouse_pos, mouse_btn);
+
+  //render the cursor
+  render_cursor(cursor, renderer, *mouse_pos);
+
+}
