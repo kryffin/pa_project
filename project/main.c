@@ -179,7 +179,7 @@ int main () {
     //init a projectile if shooting
     shooting(*mouse_btn, *p, projectiles, *mouse_pos);
 
-    update_projectiles(&projectiles);
+    update_projectiles(projectiles);
 
     //render the projectile
     render_projectile(projectiles, renderer);

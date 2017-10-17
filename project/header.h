@@ -34,8 +34,8 @@
 /* * * * * * Player Structure * * * * * */
 
 struct IntegerPoint {
-  float x;
-  float y;
+  int x;
+  int y;
 };
 
 typedef struct IntegerPoint intpoint;
@@ -163,9 +163,9 @@ typedef struct Level level;
 void level_render (level l, SDL_Surface *screen);
 
 /* projectile.c */
-
+void delete_projectile (projectile *p);
 void shooting (bool mouse_btn, player p, projectile proj[100], intpoint mouse_pos);
-void update_projectiles (projectile *p[100]);
+void update_projectiles (projectile p[100]);
 void render_projectile (projectile p[100], SDL_Renderer *renderer);
 projectile set_projectile (float x, float y, vector dir, SDL_Rect hitbox, SDL_Rect spritePos, SDL_Texture *img);
 void set_projectile_screen_position (projectile *p, int x, int y);

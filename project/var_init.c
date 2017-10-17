@@ -199,8 +199,10 @@ int init_projectiles (projectile *projectiles[100], SDL_Texture *img) {
 
   SDL_Rect *hitbox = NULL;
   hitbox = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  hitbox->w = BULLET_WIDTH;
-  hitbox->h = BULLET_HEIGHT;
+  hitbox->x = 0;
+  hitbox->y = 0;
+  hitbox->w = 16;
+  hitbox->h = 16;
 
   SDL_Rect *spritePos = NULL;
   spritePos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
