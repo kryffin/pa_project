@@ -24,6 +24,7 @@
 #define CURSOR_HEIGHT 15
 #define BULLET_WIDTH 16
 #define BULLET_HEIGHT 16
+#define BULLET_SPEED 10
 //paths
 #define PATH_SPRITES "./res/spritesheet.bmp"
 #define PATH_FONT "./res/font.ttf"
