@@ -289,7 +289,9 @@ float player_jumping_y (player p, Uint32 timeN) {
 }
 
 void player_gravity(player *p) {
-  set_player_real_position(p, get_floatpoint_x(get_player_real_position(*p)), get_floatpoint_y(get_player_real_position(*p)) + 2);
+  if ((get_floatpoint_y(get_player_real_position(*p)) + IMG_HEIGHT) < SCREEN_HEIGHT) {
+    set_player_real_position(p, get_floatpoint_x(get_player_real_position(*p)), get_floatpoint_y(get_player_real_position(*p)) + 2);
+  }
 
   return;
 }

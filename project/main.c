@@ -103,9 +103,13 @@ int main () {
   Uint32 *timeN_A = NULL;
   Uint32 *timeN_B = NULL;
 
+  level *currLevel = NULL;
+  SDL_Texture *blocks_spritesheet = NULL;
+  SDL_Texture *background = NULL;
+
   /* * * * * * initialization * * * * * */
 
-  if (init_variables(&initTimer, &manager, &window, &renderer, &mouse_pos, &event, &jumped, &mouse_btn, &i, &font, &colorPalette, &p, &projectiles, &stepDelay, &quit, &temp, &playerSprite, &cursor, &timeN_A, &timeN_B) == 0) {
+  if (init_variables(&initTimer, &manager, &window, &renderer, &mouse_pos, &event, &jumped, &mouse_btn, &i, &font, &colorPalette, &p, &projectiles, &stepDelay, &quit, &temp, &playerSprite, &cursor, &timeN_A, &timeN_B, &currLevel, &blocks_spritesheet, &background) == 0) {
     return EXIT_FAILURE;
   }
 
@@ -162,6 +166,8 @@ int main () {
     return EXIT_FAILURE;
   }
 
+  *currLevel = init_level(blocks_spritesheet, background);
+
   *timeN_A = SDL_GetTicks();
 
   /* * * * * * main game loop * * * * * */
@@ -182,14 +188,11 @@ int main () {
 
     controls(event, quit, p, jumped, renderer, mouse_pos, mouse_btn, cursor, key);
 
-    player_jumping(p, *timeN_A, *timeN_B);
+    //player_jumping(p, *timeN_A, *timeN_B);
 
     player_gravity(p);
 
     update_player(p);
-
-    //PLACEHOLDER to render the enemy
-    render_player(*p, renderer, *mouse_pos);
 
     //init a projectile if shooting
     shooting(*mouse_btn, *p, projectiles, *mouse_pos);
@@ -198,6 +201,12 @@ int main () {
 
     //render the projectile
     render_projectile(projectiles, renderer);
+
+    //render the player
+    render_player(*p, renderer, *mouse_pos);
+
+    //render the level
+    render_level(*currLevel, renderer);
 
     if (SDL_GetTicks() >= *stepDelay + DELAY_STEP) {
       player_update_step(p);
@@ -208,11 +217,11 @@ int main () {
     player_update_dir(p, *mouse_pos);
 
     //RAW vertical hyper space
-    if (p->realPos.x + IMG_WIDTH > SCREEN_HEIGHT) {
+    if (p->realPos.x + (IMG_WIDTH / 2) > SCREEN_WIDTH) {
       p->realPos.x = 0;
     }
 
-    if (p->realPos.x < 0) {
+    if (p->realPos.x + (IMG_WIDTH / 2) < 0) {
       p->realPos.x = SCREEN_WIDTH - IMG_WIDTH;
     }
 
@@ -274,7 +283,7 @@ int main () {
 
   }
 
-  free_variables(msgState, msgJump, playerSprite, tempTxt, renderer, window, font, i, projectiles, p, manager, colorPalette, strState, strJump, posMsgState, posMsgJump, event, quit, jumped, mouse_pos, mouse_btn);
+  free_variables(msgState, msgJump, playerSprite, tempTxt, renderer, window, font, i, projectiles, p, manager, colorPalette, strState, strJump, posMsgState, posMsgJump, event, quit, jumped, mouse_pos, mouse_btn, timeN_A, timeN_B, currLevel, blocks_spritesheet, background);
 
   return EXIT_SUCCESS;
 }

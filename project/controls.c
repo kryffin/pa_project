@@ -77,7 +77,7 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer 
   }
 
   //'space' key
-  if (keys[keysTab[2]] == 1 && *jumped == false) {
+  /*if (keys[keysTab[2]] == 1 && *jumped == false) {
     if (get_player_real_position(*p).y == SCREEN_HEIGHT - SCREEN_WIDTH) {
       set_player_state(p, 1);
       set_player_jumpPoint(p, get_player_real_position(*p).y);
@@ -87,7 +87,7 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer 
       set_player_jumpPoint(p, get_player_real_position(*p).y);
     }
     *jumped = true;
-  }
+  }*/
 
   //'f' key
   if (keys[keysTab[3]] == 1) {
@@ -118,9 +118,9 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer 
   }
 
   //'space' key
-  if (keys[keysTab[2]] == 0) {
+  /*if (keys[keysTab[2]] == 0) {
     *jumped = false;
-  }
+  }*/
 
   //'f' key
   if (keys[keysTab[3]] == 0) {

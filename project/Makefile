@@ -1,4 +1,4 @@
-SRC=main.c controls.c player.c menu.c projectile.c var_init.c vector.c 2dpoint.c #level.c #block.c #source file
+SRC=main.c controls.c player.c menu.c projectile.c var_init.c vector.c 2dpoint.c level.c blocks.c #source file
 BIN=mvt #exe file
 
 
