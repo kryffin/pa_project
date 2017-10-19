@@ -226,7 +226,7 @@ int init_projectiles (projectile *projectiles[100], SDL_Texture *img) {
   return 1;
 }
 
-int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor) {
+int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B) {
 
   //used to print the initialization time
   *initTimer = (Uint32*)malloc(sizeof(Uint32));
@@ -327,6 +327,18 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
   }
 
   if (init_projectiles(projectiles, *playerSprite) == 0) {
+    return 0;
+  }
+
+  *timeN_A = (Uint32*)malloc(sizeof(Uint32));
+  if (*timeN_A == NULL) {
+    printf("Error allocating memory for the timeN_A\n");
+    return 0;
+  }
+
+  *timeN_B = (Uint32*)malloc(sizeof(Uint32));
+  if (*timeN_B == NULL) {
+    printf("Error allocating memory for the timeN_B\n");
     return 0;
   }
 

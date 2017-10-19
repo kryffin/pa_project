@@ -183,13 +183,18 @@ SDL_Texture* get_projectile_image (projectile p);
 
 /* player.h */
 
+floatpoint calcul_position (player p, float v_init, floatpoint pos_init, float angle, Uint32 timeN);
+float player_jumping_y (player p, Uint32 timeN);
+float player_jumping_x (player p, Uint32 timeN);
+void player_jumping (player *p, Uint32 timeN_A, Uint32 timeN_B);
+void player_gravity(player *p);
+
 void update_player (player *p);
 void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos);
 void player_melee (player p, SDL_Renderer *renderer);
 void player_update_step(player *p);
 void player_update_dir (player *p, intpoint mouse_pos);
 void player_apply_velocity (player *p);
-void player_jumping (player *p);
 player set_player (short int maxHealthPoints, floatpoint position, vector velocity, SDL_Texture *image, SDL_Rect posSprite, SDL_Rect hitbox);
 void set_player_maxhp (player *p, short int maxhp);
 void set_player_hp (player *p, short int hp);
@@ -231,7 +236,7 @@ int init_renderer (SDL_Renderer **renderer, SDL_Window *window);
 int init_sdl (SDL_Window **window, SDL_Renderer **renderer);
 int init_images (SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor, SDL_Renderer *renderer);
 int init_projectiles (projectile *projectiles[100], SDL_Texture *img);
-int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor);
+int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B);
 void free_variables (SDL_Surface *msgState, SDL_Surface *msgJump, SDL_Texture *playerSprite, SDL_Texture *tempTxt, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player *p, FPSmanager *manager, SDL_Color *colorPalette, char *strState, char *strJump, SDL_Rect *posMsgState, SDL_Rect *posMsgJump, SDL_Event *event, bool *quit, bool *jumped, intpoint *mouse_pos, bool *mouse_btn);
 
 /* menu.c */

@@ -276,8 +276,48 @@ void player_apply_velocity (player *p) {
   return;
 }
 
-void player_jumping (player *p) {
-  //TO DO
+float player_jumping_x (player p, Uint32 timeN) {
+  float t = timeN, x0 = get_floatpoint_x(get_player_real_position(p)), v = get_player_velocity(p).x;
+
+  return (v * t) + x0;
+}
+
+float player_jumping_y (player p, Uint32 timeN) {
+  float t = timeN, y0 = get_floatpoint_y(get_player_real_position(p)), v = abs(get_player_velocity(p).y);
+
+  return y0 - (v * t);
+}
+
+void player_gravity(player *p) {
+  set_player_real_position(p, get_floatpoint_x(get_player_real_position(*p)), get_floatpoint_y(get_player_real_position(*p)) + 2);
+
+  return;
+}
+
+//temporary
+floatpoint calcul_position (player p, float v_init, floatpoint pos_init, float angle, Uint32 timeN) {
+  floatpoint pos = set_floatpoint(0.001 * player_jumping_x(p, timeN), -0.01 * player_jumping_y(p, timeN));
+
+  return pos;
+}
+
+void player_jumping (player *p, Uint32 timeN_A, Uint32 timeN_B) {
+
+  Uint32 timeN = timeN_B - timeN_A;
+
+  if (get_player_state(*p) == 1 || get_player_state(*p) == 2) {
+    floatpoint pos = set_floatpoint(get_player_real_position(*p).x, get_player_real_position(*p).y);
+    floatpoint next_pos = calcul_position(*p, get_player_velocity(*p).x, pos, 0.78, timeN);
+
+    set_player_real_position(p, get_floatpoint_x(next_pos) + get_floatpoint_x(pos), get_floatpoint_y(next_pos) + get_floatpoint_y(pos));
+
+    return;
+  }
+
+  if (timeN >= 950) {
+    set_player_state(p, 0);
+  }
+
   return;
 }
 

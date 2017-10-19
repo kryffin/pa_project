@@ -100,9 +100,12 @@ int main () {
   //variable running the main loop and quitting the game if desired
   bool *quit = NULL;
 
+  Uint32 *timeN_A = NULL;
+  Uint32 *timeN_B = NULL;
+
   /* * * * * * initialization * * * * * */
 
-  if (init_variables(&initTimer, &manager, &window, &renderer, &mouse_pos, &event, &jumped, &mouse_btn, &i, &font, &colorPalette, &p, &projectiles, &stepDelay, &quit, &temp, &playerSprite, &cursor) == 0) {
+  if (init_variables(&initTimer, &manager, &window, &renderer, &mouse_pos, &event, &jumped, &mouse_btn, &i, &font, &colorPalette, &p, &projectiles, &stepDelay, &quit, &temp, &playerSprite, &cursor, &timeN_A, &timeN_B) == 0) {
     return EXIT_FAILURE;
   }
 
@@ -159,10 +162,18 @@ int main () {
     return EXIT_FAILURE;
   }
 
+  *timeN_A = SDL_GetTicks();
+
   /* * * * * * main game loop * * * * * */
 
   //while we are not quitting the game
   while (*quit == false) {
+
+    //hashing the time
+    *timeN_B = SDL_GetTicks();
+    if (*timeN_B >= *timeN_A + 1000) {
+      *timeN_A = *timeN_B;
+    }
 
     //clearing the render to the draw color
     SDL_RenderClear(renderer);
@@ -170,6 +181,10 @@ int main () {
     /* * * * * * player controls * * * * * */
 
     controls(event, quit, p, jumped, renderer, mouse_pos, mouse_btn, cursor, key);
+
+    player_jumping(p, *timeN_A, *timeN_B);
+
+    player_gravity(p);
 
     update_player(p);
 
@@ -200,8 +215,6 @@ int main () {
     if (p->realPos.x < 0) {
       p->realPos.x = SCREEN_WIDTH - IMG_WIDTH;
     }
-
-    player_jumping(p);
 
     //RAW re-enabling double jump
     if (p->dJump == false && p->realPos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
