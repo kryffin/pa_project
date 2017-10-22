@@ -31,6 +31,8 @@
 
 #define DELAY_STEP 150 //delay for the step updating
 
+//physics
+#define JUMP_HEIGHT -10.
 /* * * * * * Player Structure * * * * * */
 
 struct IntegerPoint {
@@ -183,11 +185,13 @@ SDL_Texture* get_projectile_image (projectile p);
 
 /* player.h */
 
-floatpoint calcul_position (player p, float v_init, floatpoint pos_init, float angle, Uint32 timeN);
+floatpoint calcul_position (player p, float v_x, float v_y, float timeN);
 float player_jumping_y (player p, Uint32 timeN);
 float player_jumping_x (player p, Uint32 timeN);
-void player_jumping (player *p, Uint32 timeN_A, Uint32 timeN_B);
+void player_jumping (player *p, Uint32 timeN_A,Uint32 timeN_B);
 void player_gravity(player *p);
+void player_colision (player *p);
+
 
 void update_player (player *p);
 void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos);
@@ -226,6 +230,7 @@ vector get_player_velocity (player p);
 SDL_Texture* get_player_img (player p);
 SDL_Rect get_player_sprite_pos (player p);
 SDL_Rect get_player_hitbox (player p);
+bool is_colision (player *p);
 
 /* var_init.c */
 

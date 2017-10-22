@@ -148,7 +148,8 @@ int main () {
   //PLACEHOLDER for these won't be used again
   free(basePosition);
   free(baseVelocity);
-  free(desRec);
+  /**unfree this area to test colision**/
+  //free(desRec);
 
   //rendering the initialization time
   printf("Init time : %u ms\n", SDL_GetTicks() - *initTimer);
@@ -162,10 +163,20 @@ int main () {
     return EXIT_FAILURE;
   }
 
+  /* * * * * *  time initialization * * * */
   *timeN_A = SDL_GetTicks();
+  float flPreviousTime = 0.;
+  float flCurrentTime = SDL_GetTicks();
 
   /* * * * * * main game loop * * * * * */
 
+ // temporary
+ /*
+   v_x = get_player_real_position(*p).x
+   v_saut = -4;
+   v_grav = 0.08;
+
+   v_y = v_saut;*/
   //while we are not quitting the game
   while (*quit == false) {
 
@@ -173,6 +184,14 @@ int main () {
     *timeN_B = SDL_GetTicks();
     if (*timeN_B >= *timeN_A + 1000) {
       *timeN_A = *timeN_B;
+    }
+    flPreviousTime = flCurrentTime;
+    flCurrentTime = SDL_GetTicks();
+    float delta_t = flCurrentTime - flPreviousTime;
+
+    if (delta_t > 0.15)
+    {
+      delta_t = 0.15;
     }
 
     //clearing the render to the draw color
@@ -182,10 +201,15 @@ int main () {
 
     controls(event, quit, p, jumped, renderer, mouse_pos, mouse_btn, cursor, key);
 
+    if (!is_colision(p))
+      player_gravity(p);
+
     player_jumping(p, *timeN_A, *timeN_B);
 
-    player_gravity(p);
+    //player_apply_velocity(p);
 
+    player_colision (p);
+    player_apply_velocity(p);
     update_player(p);
 
     //PLACEHOLDER to render the enemy
@@ -204,7 +228,7 @@ int main () {
       *stepDelay = SDL_GetTicks();
     }
 
-    player_apply_velocity(p);
+
     player_update_dir(p, *mouse_pos);
 
     //RAW vertical hyper space

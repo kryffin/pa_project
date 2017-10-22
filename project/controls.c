@@ -65,28 +65,34 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer 
   //'q' or 'a' key
   if (keys[keysTab[0]] == 1) {
     if(get_player_state(*p) != 4) {
-      set_player_vel_x(p, -3); //set a left velocity
+      //printf("q pressed\n");
+      set_player_vel_x(p, -3.); //set a left velocity
     }
   }
 
   //'d' key
   if (keys[keysTab[1]] == 1) {
     if(get_player_state(*p) != 4) {
-      set_player_vel_x(p, 3); //set a left velocity
+      //printf("a pressed\n");
+      set_player_vel_x(p, 3.); //set a left velocity
     }
   }
 
   //'space' key
-  if (keys[keysTab[2]] == 1 && *jumped == false) {
-    if (get_player_real_position(*p).y == SCREEN_HEIGHT - SCREEN_WIDTH) {
+  if (keys[keysTab[2]] == 1 && get_player_dJump(*p)== true) {
+    //if the player is in the screen
+    //if (get_player_real_position(*p).y == SCREEN_HEIGHT - SCREEN_WIDTH) {
+      printf("space pressed\n");
       set_player_state(p, 1);
-      set_player_jumpPoint(p, get_player_real_position(*p).y);
-    } else if (get_player_dJump(*p)) {
-      set_player_dJump(p, false);
-      set_player_state(p, 2);
-      set_player_jumpPoint(p, get_player_real_position(*p).y);
-    }
-    *jumped = true;
+      set_player_vel_y (p, JUMP_HEIGHT);
+      //printf("*v_y : %f\n", get_player_velocity(*p).y);
+    //} /*else if (get_player_dJump(*p)) {
+      /*set_player_dJump(p, false);
+      set_player_state(p, 2);*/
+
+    //}
+    printf("false\n");
+    set_player_dJump(p, false);
   }
 
   //'f' key
