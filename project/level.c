@@ -1,6 +1,35 @@
 #include "header.h"
 
-void render_level (level l, SDL_Renderer *renderer) {
+void rendering (player *player, projectile bullets[100], SDL_Texture *cursor, level currLevel, intpoint *mouse_pos, SDL_Renderer *renderer) {
+
+  SDL_RenderCopy(renderer, get_level_background(currLevel), NULL, NULL);
+
+  //render the background elements
+  render_background_level(currLevel, renderer);
+
+  //render the projectile
+  render_projectile(bullets, renderer);
+
+  //render the player
+  render_player(*player, renderer, *mouse_pos);
+
+  //render the attack and process it
+  if (get_player_state(*player) == 3)  {
+    player_melee(*player, renderer);
+  }
+
+  //render the foreground
+  render_foreground_level(currLevel, renderer);
+
+  //render the cursor
+  render_cursor(cursor, renderer, *mouse_pos);
+
+  SDL_RenderPresent(renderer);
+
+  return;
+}
+
+void render_foreground_level (level l, SDL_Renderer *renderer) {
 
   unsigned short int type;
   SDL_Rect tempSpritePos = {0, 0, 16, 16};
@@ -17,38 +46,55 @@ void render_level (level l, SDL_Renderer *renderer) {
 
         case 0:
           tempSpritePos.x = 0;
-          tempSpritePos.y = 0;
-          break;
-
-        case 1:
-          tempSpritePos.x = 16;
-          tempSpritePos.y = 0;
+          SDL_RenderCopy(renderer, get_level_blocks_spritesheet(l), &tempSpritePos, &tempPos);
           break;
 
         case 2:
           tempSpritePos.x = 32;
-          tempSpritePos.y = 0;
-          break;
-
-        case 3:
-          tempSpritePos.x = 48;
-          tempSpritePos.y = 0;
+          SDL_RenderCopy(renderer, get_level_blocks_spritesheet(l), &tempSpritePos, &tempPos);
           break;
 
         default:
           break;
 
       }
-
-      SDL_RenderCopy(renderer, get_level_blocks_spritesheet(l), &tempSpritePos, &tempPos);
-
     }
   }
 
   return;
 }
 
-level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background) {
+void render_background_level (level l, SDL_Renderer *renderer) {
+
+  unsigned short int type;
+  SDL_Rect tempSpritePos = {0, 0, 16, 16};
+  SDL_Rect tempPos = {0, 0, 16, 16};
+  int i, j;
+  for (i = 0; i < NB_BLOCKS_WIDTH; i++) {
+    for (j = 0; j < NB_BLOCKS_HEIGHT; j++) {
+
+      type = get_block_type(get_level_block(l, i, j));
+      tempPos.x = i * 16;
+      tempPos.y = j * 16;
+
+      switch (type) {
+
+        case 1:
+          tempSpritePos.x = 16;
+          SDL_RenderCopy(renderer, get_level_blocks_spritesheet(l), &tempSpritePos, &tempPos);
+          break;
+
+        default:
+          break;
+
+      }
+    }
+  }
+
+  return;
+}
+
+level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player *p) {
 
   level l;
 
@@ -69,7 +115,7 @@ level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background) {
 
     if (curr == '\n')
     {
-      
+
       y++;
       x = 0;
 
@@ -97,6 +143,10 @@ level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background) {
           spritesheet_pos.x = 32;
           spritesheet_pos.y = 0;
           b = set_block(hitbox, spritesheet_pos, 2);
+          break;
+
+        case 'p':
+          set_player_real_position(p, x * 16, (y * 16) - 48);
           break;
 
         default:

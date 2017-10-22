@@ -153,6 +153,7 @@ int main () {
   free(basePosition);
   free(baseVelocity);
   free(desRec);
+  free(hitbox);
 
   //rendering the initialization time
   printf("Init time : %u ms\n", SDL_GetTicks() - *initTimer);
@@ -166,7 +167,7 @@ int main () {
     return EXIT_FAILURE;
   }
 
-  *currLevel = init_level(blocks_spritesheet, background);
+  *currLevel = init_level(blocks_spritesheet, background, p);
 
   *timeN_A = SDL_GetTicks();
 
@@ -186,7 +187,7 @@ int main () {
 
     /* * * * * * player controls * * * * * */
 
-    controls(event, quit, p, jumped, renderer, mouse_pos, mouse_btn, cursor, key);
+    controls(event, quit, p, jumped, mouse_pos, mouse_btn, key);
 
     //player_jumping(p, *timeN_A, *timeN_B);
 
@@ -198,15 +199,6 @@ int main () {
     shooting(*mouse_btn, *p, projectiles, *mouse_pos);
 
     update_projectiles(projectiles);
-
-    //render the projectile
-    render_projectile(projectiles, renderer);
-
-    //render the player
-    render_player(*p, renderer, *mouse_pos);
-
-    //render the level
-    render_level(*currLevel, renderer);
 
     if (SDL_GetTicks() >= *stepDelay + DELAY_STEP) {
       player_update_step(p);
@@ -275,15 +267,14 @@ int main () {
     SDL_QueryTexture(tempTxt, NULL, NULL, &(posMsgJump->w), &(posMsgJump->h));
     SDL_RenderCopy(renderer, tempTxt, NULL, posMsgJump);
 
-    /* * * */
-
-    SDL_RenderPresent(renderer);
+    /* rendering */
+    rendering(p, projectiles, cursor, *currLevel, mouse_pos, renderer);
 
     SDL_framerateDelay(manager);
 
   }
 
-  free_variables(msgState, msgJump, playerSprite, tempTxt, renderer, window, font, i, projectiles, p, manager, colorPalette, strState, strJump, posMsgState, posMsgJump, event, quit, jumped, mouse_pos, mouse_btn, timeN_A, timeN_B, currLevel, blocks_spritesheet, background);
+  free_variables(msgState, msgJump, playerSprite, tempTxt, renderer, window, font, i, projectiles, p, manager, colorPalette, strState, strJump, posMsgState, posMsgJump, event, quit, jumped, mouse_pos, mouse_btn, timeN_A, timeN_B, currLevel, blocks_spritesheet, background, stepDelay);
 
   return EXIT_SUCCESS;
 }

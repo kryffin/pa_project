@@ -24,11 +24,12 @@ void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos) {
   temp = (SDL_Rect*)malloc(sizeof(SDL_Rect));
   temp->w = 32;
   temp->h = 64;
+  short int step = get_player_state(p);
 
   if (get_player_dir(p) == 1) {
     //player facing right
 
-    switch (get_player_state(p)) {
+    switch (step) {
 
       //stand-by/walking
       case 0:
@@ -43,7 +44,7 @@ void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos) {
         } else {
 
           //sprite moving
-          switch (get_player_step(p)) {
+          switch (step) {
 
             case 0:
               temp->x = 32;
@@ -113,7 +114,7 @@ void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos) {
   } else {
     //player facing left
 
-    switch (get_player_state(p)) {
+    switch (step) {
 
       //stand-by/walking
       case 0:
@@ -128,7 +129,7 @@ void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos) {
         } else {
 
           //sprite moving
-          switch (get_player_step(p)) {
+          switch (step) {
 
             case 0:
               temp->x = 32;
@@ -247,17 +248,21 @@ void player_melee (player p, SDL_Renderer *renderer) {
 
 void player_update_step (player *p) {
 
+  short int step = get_player_step(*p);
+
   if(get_player_velocity(*p).x != 0) {
 
     set_player_step(p, get_player_step(*p) + 1);
 
-    if(get_player_step(*p) == 4) {
+    if(step == 4) {
 
       set_player_step(p, 0);
 
     }
 
   }
+
+  return;
 
 }
 
@@ -332,6 +337,7 @@ player set_player (short int maxHealthPoints, floatpoint position, vector veloci
   set_player_maxhp(&p, maxHealthPoints);
   set_player_hp(&p, maxHealthPoints);
   set_player_dir(&p, 0);
+  set_player_step(&p, 0);
   set_player_dJump(&p, true);
   set_player_jumpPoint(&p, 0);
   set_player_highPoint(&p, 0);

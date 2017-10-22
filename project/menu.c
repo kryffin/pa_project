@@ -61,9 +61,7 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
-  int *option = NULL;
-  option = (int*)malloc(sizeof(int));
-  *option = 0;
+  int option = 0;
 
   //message surfaces
   SDL_Surface *surContinue = NULL;
@@ -137,7 +135,7 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
 
         SDL_FreeSurface(surContinue);
         surContinue = TTF_RenderText_Solid(font, strFull, palette[3]);
-        *option = 1;
+        option = 1;
 
       }
 
@@ -157,7 +155,7 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
 
         SDL_FreeSurface(surOptions);
         surOptions = TTF_RenderText_Solid(font, str43, palette[3]);
-        *option = 2;
+        option = 2;
 
       }
 
@@ -177,7 +175,7 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
 
         SDL_FreeSurface(surContinue);
         surContinue = TTF_RenderText_Solid(font, strFull, palette[3]);
-        *option = 3;
+        option = 3;
 
       }
 
@@ -211,10 +209,10 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
 
     //if we escape
     if (*control == 10) {
-      *option = 3;
+      option = 3;
     }
 
-    if (*option != 0) {
+    if (option != 0) {
       free(control);
       SDL_FreeSurface(surContinue);
       SDL_FreeSurface(surOptions);
@@ -226,7 +224,7 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
       free(posOptions);
       free(posQuit);
       free(event);
-      return *option;
+      return option;
     }
   }
 }
@@ -238,9 +236,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
-  int *option = NULL;
-  option = (int*)malloc(sizeof(int));
-  *option = 0;
+  int option = 0;
 
   //message surfaces
   SDL_Surface *surFull = NULL;
@@ -353,7 +349,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
 
         SDL_FreeSurface(surFull);
         surFull = TTF_RenderText_Solid(font, strFull, palette[3]);
-        *option = 1;
+        option = 1;
 
       }
 
@@ -373,7 +369,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
 
         SDL_FreeSurface(sur43);
         sur43 = TTF_RenderText_Solid(font, str43, palette[3]);
-        *option = 2;
+        option = 2;
 
       }
 
@@ -393,7 +389,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
 
         SDL_FreeSurface(sur1610);
         sur1610 = TTF_RenderText_Solid(font, str1610, palette[3]);
-        *option = 3;
+        option = 3;
 
       }
 
@@ -413,7 +409,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
 
         SDL_FreeSurface(sur169);
         sur169 = TTF_RenderText_Solid(font, str169, palette[3]);
-        *option = 4;
+        option = 4;
 
       }
 
@@ -433,7 +429,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
 
         SDL_FreeSurface(surAd);
         surAd = TTF_RenderText_Solid(font, strAd, palette[3]);
-        *option = 5;
+        option = 5;
 
       }
 
@@ -453,7 +449,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
 
         SDL_FreeSurface(surBack);
         surBack = TTF_RenderText_Solid(font, strBack, palette[3]);
-        *option = 6;
+        option = 6;
 
       }
 
@@ -506,7 +502,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
 
     //if we escape
     if (*control == 10) {
-      *option = 3;
+      option = 3;
     }
 
     if (option != 0) {
@@ -530,7 +526,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
       free(posAd);
       free(posBack);
       free(event);
-      return *option;
+      return option;
     }
   }
 }
@@ -550,7 +546,7 @@ int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer
   int *optionMenuOption = NULL;
   optionMenuOption = (int*)malloc(sizeof(int));
   if (optionMenuOption == NULL) {
-    printf("Error allocating memory for the optionMenuOption\n");
+    printf("Error allocating memory for the *optionMenuOption\n");
     return 0;
   }
   *optionMenuOption = 0;

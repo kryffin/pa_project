@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL2_framerate.h>
+#include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,10 +31,10 @@
 #define BULLET_HEIGHT 16
 #define BULLET_SPEED 10
 //paths
-#define PATH_SPRITES "./res/spritesheet.bmp"
+#define PATH_SPRITES "./res/spritesheet.png"
 #define PATH_FONT "./res/font.ttf"
-#define PATH_CURSOR "./res/cursor.bmp"
-#define PATH_BLOCKS_SHEET "./res/blocks_spritesheet.bmp"
+#define PATH_CURSOR "./res/cursor.png"
+#define PATH_BLOCKS_SHEET "./res/blocks_spritesheet.png"
 #define PATH_BACKGROUND "./res/background.bmp"
 #define PATH_TXT_FILE "./res/arena.txt"
 
@@ -116,6 +117,7 @@ typedef struct Block {
   0 : solid
   1 : walkable background
   2 : walkable foreground
+  3 : blank
 */
 
 typedef struct Level {
@@ -127,12 +129,6 @@ typedef struct Level {
 
 } level;
 
-/* TYPES ::
-  0 : solid
-  1 : phantom
-  2 : damaging (solid)
-*/
-
 /* blocks.c */
 block set_block (SDL_Rect hitbox, SDL_Rect spritesheet_pos, unsigned short int type);
 void set_block_hitbox (block *b, int x, int y, int w, int h);
@@ -143,15 +139,16 @@ SDL_Rect get_block_spritesheet_position (block b);
 unsigned short int get_block_type (block b);
 
 /* controls.c */
-void update_keyboard_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit);
+void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit, intpoint *mouse_pos, bool *mouse_btn);
 void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, intpoint mouse_pos);
-void update_mouse_controls (SDL_Event *event, intpoint *mouse_pos, bool *mouse_btn);
-void keyboard_control (player *p, SDL_Keycode *key, bool *jumped, SDL_Renderer *renderer);
-void controls (SDL_Event *event, bool *quit, player *p, bool *jumped, SDL_Renderer *renderer, intpoint *mouse_pos, bool *mouse_btn, SDL_Texture *cursor, SDL_Keycode *key);
+void keyboard_control (player *p, SDL_Keycode *key, bool *jumped);
+void controls (SDL_Event *event, bool *quit, player *p, bool *jumped, intpoint *mouse_pos, bool *mouse_btn, SDL_Keycode *key);
 
 /* level.c */
-void render_level (level l, SDL_Renderer *renderer);
-level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background);
+void rendering (player *player, projectile bullets[100], SDL_Texture *cursor, level currLevel, intpoint *mouse_pos, SDL_Renderer *renderer);
+void render_foreground_level (level l, SDL_Renderer *renderer);
+void render_background_level (level l, SDL_Renderer *renderer);
+level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player *p);
 level set_level (block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], SDL_Texture *blocks_spritesheet, SDL_Texture *background);
 void set_level_block (level *l, int x, int y, block b);
 void set_level_blocks_spritesheet (level *l, SDL_Texture *blocks_spritesheet);
@@ -233,7 +230,7 @@ int init_sdl (SDL_Window **window, SDL_Renderer **renderer);
 int init_images (SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor, SDL_Texture **blocks_spritesheet, SDL_Texture **background, SDL_Renderer *renderer);
 int init_projectiles (projectile *projectiles[100], SDL_Texture *img);
 int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B, level **currLevel, SDL_Texture **blocks_spritesheet, SDL_Texture **background);
-void free_variables (SDL_Surface *msgState, SDL_Surface *msgJump, SDL_Texture *playerSprite, SDL_Texture *tempTxt, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player *p, FPSmanager *manager, SDL_Color *colorPalette, char *strState, char *strJump, SDL_Rect *posMsgState, SDL_Rect *posMsgJump, SDL_Event *event, bool *quit, bool *jumped, intpoint *mouse_pos, bool *mouse_btn, Uint32 *timeN_A, Uint32 *timeN_B, level *currLevel, SDL_Texture *blocks_spritesheet, SDL_Texture *background);
+void free_variables (SDL_Surface *msgState, SDL_Surface *msgJump, SDL_Texture *playerSprite, SDL_Texture *tempTxt, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player *p, FPSmanager *manager, SDL_Color *colorPalette, char *strState, char *strJump, SDL_Rect *posMsgState, SDL_Rect *posMsgJump, SDL_Event *event, bool *quit, bool *jumped, intpoint *mouse_pos, bool *mouse_btn, Uint32 *timeN_A, Uint32 *timeN_B, level *currLevel, SDL_Texture *blocks_spritesheet, SDL_Texture *background, int *stepDelay);
 
 /* menu.c */
 int menu_controls(SDL_Event *event, intpoint *mouse_pos);

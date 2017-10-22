@@ -3,7 +3,7 @@ BIN=mvt #exe file
 
 
 $(BIN): $(SRC)
-	gcc -Wall -g -std=c99 $(SRC) -lSDL2 -o $(BIN) -lSDL2_ttf -lSDL2_gfx -lm
+	gcc -Wall -g -std=c99 $(SRC) -lSDL2 -o $(BIN) -lSDL2_ttf -lSDL2_gfx -lSDL2_image -lm
 
 clean:
 	rm -f $(BIN)

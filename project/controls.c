@@ -1,6 +1,6 @@
 #include "header.h"
 
-void update_keyboard_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit) {
+void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit, intpoint *mouse_pos, bool *mouse_btn) {
 
   while (SDL_PollEvent(event)) {
 
@@ -21,7 +21,22 @@ void update_keyboard_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit) 
       keys[event->key.keysym.scancode] = 1;
 
     }
+
+    if (event->type == SDL_MOUSEMOTION) {
+      set_intpoint_x(mouse_pos, event->motion.x);
+      set_intpoint_y(mouse_pos, event->motion.y);
+    }
+    if (event->type == SDL_MOUSEBUTTONUP) {
+      *mouse_btn = false;
+    }
+    if (event->type == SDL_MOUSEBUTTONDOWN) {
+      *mouse_btn = true;
+    }
+
   }
+
+  return;
+
 }
 
 void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, intpoint mouse_pos) {
@@ -37,25 +52,8 @@ void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, intpoint mouse_pos
   return;
 }
 
-//gestion du click de la souris et de sa position
-void update_mouse_controls (SDL_Event *event, intpoint *mouse_pos, bool *mouse_btn) {
-
-  if (event->type == SDL_MOUSEMOTION) {
-    set_intpoint_x(mouse_pos, event->motion.x);
-    set_intpoint_y(mouse_pos, event->motion.y);
-  }
-  if (event->type == SDL_MOUSEBUTTONUP) {
-    *mouse_btn = false;
-  }
-  if (event->type == SDL_MOUSEBUTTONDOWN) {
-    *mouse_btn = true;
-  }
-
-  return;
-}
-
 //gestion des touches du clavier
-void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer *renderer) {
+void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped) {
 
   //keys :: left, right, jump, melee
   SDL_Keycode keysTab[5] = {SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_SPACE, SDL_SCANCODE_F, SDL_SCANCODE_S};
@@ -92,7 +90,6 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer 
   //'f' key
   if (keys[keysTab[3]] == 1) {
     set_player_state(p, 3);
-    player_melee(*p, renderer);
   }
 
   //'s' key
@@ -138,18 +135,14 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped, SDL_Renderer 
 
 }
 
-void controls (SDL_Event *event, bool *quit, player *p, bool *jumped, SDL_Renderer *renderer, intpoint *mouse_pos, bool *mouse_btn, SDL_Texture *cursor, SDL_Keycode *key) {
+void controls (SDL_Event *event, bool *quit, player *p, bool *jumped, intpoint *mouse_pos, bool *mouse_btn, SDL_Keycode *key) {
 
-  //update the keyboard controls
-  update_keyboard_controls(event, key, quit);
+  //update the keyboard & mouse controls
+  update_controls(event, key, quit, mouse_pos, mouse_btn);
 
   //act depending on the keyboard state
-  keyboard_control(p, key, jumped, renderer);
+  keyboard_control(p, key, jumped);
 
-  //update the mouse position and mouse button state
-  update_mouse_controls(event, mouse_pos, mouse_btn);
-
-  //render the cursor
-  render_cursor(cursor, renderer, *mouse_pos);
+  return;
 
 }
