@@ -103,9 +103,13 @@ int main () {
   Uint32 *timeN_A = NULL;
   Uint32 *timeN_B = NULL;
 
+  level *currLevel = NULL;
+  SDL_Texture *blocks_spritesheet = NULL;
+  SDL_Texture *background = NULL;
+
   /* * * * * * initialization * * * * * */
 
-  if (init_variables(&initTimer, &manager, &window, &renderer, &mouse_pos, &event, &jumped, &mouse_btn, &i, &font, &colorPalette, &p, &projectiles, &stepDelay, &quit, &temp, &playerSprite, &cursor, &timeN_A, &timeN_B) == 0) {
+  if (init_variables(&initTimer, &manager, &window, &renderer, &mouse_pos, &event, &jumped, &mouse_btn, &i, &font, &colorPalette, &p, &projectiles, &stepDelay, &quit, &temp, &playerSprite, &cursor, &timeN_A, &timeN_B, &currLevel, &blocks_spritesheet, &background) == 0) {
     return EXIT_FAILURE;
   }
 
@@ -148,8 +152,8 @@ int main () {
   //PLACEHOLDER for these won't be used again
   free(basePosition);
   free(baseVelocity);
-  /**unfree this area to test colision**/
-  //free(desRec);
+  free(desRec);
+  free(hitbox);
 
   //rendering the initialization time
   printf("Init time : %u ms\n", SDL_GetTicks() - *initTimer);
@@ -163,20 +167,12 @@ int main () {
     return EXIT_FAILURE;
   }
 
-  /* * * * * *  time initialization * * * */
+  *currLevel = init_level(blocks_spritesheet, background, p);
+
   *timeN_A = SDL_GetTicks();
-  float flPreviousTime = 0.;
-  float flCurrentTime = SDL_GetTicks();
 
   /* * * * * * main game loop * * * * * */
 
- // temporary
- /*
-   v_x = get_player_real_position(*p).x
-   v_saut = -4;
-   v_grav = 0.08;
-
-   v_y = v_saut;*/
   //while we are not quitting the game
   while (*quit == false) {
 
@@ -184,14 +180,6 @@ int main () {
     *timeN_B = SDL_GetTicks();
     if (*timeN_B >= *timeN_A + 1000) {
       *timeN_A = *timeN_B;
-    }
-    flPreviousTime = flCurrentTime;
-    flCurrentTime = SDL_GetTicks();
-    float delta_t = flCurrentTime - flPreviousTime;
-
-    if (delta_t > 0.15)
-    {
-      delta_t = 0.15;
     }
 
     //clearing the render to the draw color
@@ -207,36 +195,30 @@ int main () {
     player_jumping(p, *timeN_A, *timeN_B);
 
     //player_apply_velocity(p);
-
-    player_colision (p);
+    ////
+    player_colision (p, currLevel);
     player_apply_velocity(p);
     update_player(p);
-
-    //PLACEHOLDER to render the enemy
-    render_player(*p, renderer, *mouse_pos);
 
     //init a projectile if shooting
     shooting(*mouse_btn, *p, projectiles, *mouse_pos);
 
     update_projectiles(projectiles);
 
-    //render the projectile
-    render_projectile(projectiles, renderer);
-
     if (SDL_GetTicks() >= *stepDelay + DELAY_STEP) {
       player_update_step(p);
       *stepDelay = SDL_GetTicks();
     }
 
-
+    player_apply_velocity(p);
     player_update_dir(p, *mouse_pos);
 
     //RAW vertical hyper space
-    if (p->realPos.x + IMG_WIDTH > SCREEN_HEIGHT) {
+    if (p->realPos.x + (IMG_WIDTH / 2) > SCREEN_WIDTH) {
       p->realPos.x = 0;
     }
 
-    if (p->realPos.x < 0) {
+    if (p->realPos.x + (IMG_WIDTH / 2) < 0) {
       p->realPos.x = SCREEN_WIDTH - IMG_WIDTH;
     }
 
@@ -290,15 +272,14 @@ int main () {
     SDL_QueryTexture(tempTxt, NULL, NULL, &(posMsgJump->w), &(posMsgJump->h));
     SDL_RenderCopy(renderer, tempTxt, NULL, posMsgJump);
 
-    /* * * */
-
-    SDL_RenderPresent(renderer);
+    /* rendering */
+    rendering(p, projectiles, cursor, *currLevel, mouse_pos, renderer);
 
     SDL_framerateDelay(manager);
 
   }
 
-  free_variables(msgState, msgJump, playerSprite, tempTxt, renderer, window, font, i, projectiles, p, manager, colorPalette, strState, strJump, posMsgState, posMsgJump, event, quit, jumped, mouse_pos, mouse_btn);
+  free_variables(msgState, msgJump, playerSprite, tempTxt, renderer, window, font, i, projectiles, p, manager, colorPalette, strState, strJump, posMsgState, posMsgJump, event, quit, jumped, mouse_pos, mouse_btn, timeN_A, timeN_B, currLevel, blocks_spritesheet, background, stepDelay);
 
   return EXIT_SUCCESS;
 }

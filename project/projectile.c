@@ -13,9 +13,11 @@ void delete_projectile (projectile *p) {
 
 void shooting (bool mouse_btn, player p, projectile proj[100], intpoint mouse_pos) {
 
-  vector dir = set_vector(get_intpoint_x(mouse_pos) - get_player_real_position(p).x, get_intpoint_y(mouse_pos) - get_player_real_position(p).y);
+  vector dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2)));
 
   dir = normalize(dir);
+
+  dir = set_vector(get_vector_x(dir) * BULLET_SPEED, get_vector_y(dir) * BULLET_SPEED);
 
   int i;
 
@@ -27,7 +29,7 @@ void shooting (bool mouse_btn, player p, projectile proj[100], intpoint mouse_po
       //if a projectile has no direction it doesn't exists
       if (get_projectile_direction(proj[i]).x == 0.0 && get_projectile_direction(proj[i]).y == 0.0) {
 
-        set_projectile_real_position(&proj[i], get_player_real_position(p).x, get_player_real_position(p).y);
+        set_projectile_real_position(&proj[i], (get_player_real_position(p).x + (IMG_WIDTH / 2)) - (BULLET_WIDTH / 2), (get_player_real_position(p).y + (IMG_HEIGHT / 2)) - (BULLET_HEIGHT / 2));
         set_projectile_direction(&proj[i], dir);
 
         return;
@@ -52,7 +54,7 @@ void update_projectiles (projectile p[100]) {
     if (get_projectile_direction(p[i]).x != 0.0 || get_projectile_direction(p[i]).y != 0.0) {
 
       //if the projectile is not in the screen
-      if ((get_projectile_real_position(p[i]).x < 0.0 || get_projectile_real_position(p[i]).x > SCREEN_WIDTH) || (get_projectile_real_position(p[i]).y < 0.0 || get_projectile_real_position(p[i]).y > SCREEN_HEIGHT)) {
+      if ((get_projectile_real_position(p[i]).x + BULLET_WIDTH < 0.0 || get_projectile_real_position(p[i]).x > SCREEN_WIDTH) || (get_projectile_real_position(p[i]).y + BULLET_HEIGHT < 0.0 || get_projectile_real_position(p[i]).y > SCREEN_HEIGHT)) {
 
         //delete the projectile
         delete_projectile(&p[i]);
@@ -69,8 +71,8 @@ void update_projectiles (projectile p[100]) {
 
         //temp rectangle used for the hitbox
         SDL_Rect temp;
-        temp.x = get_projectile_screen_position(p[i]).x;
-        temp.y = get_projectile_screen_position(p[i]).y;
+        temp.x = get_projectile_screen_position(p[i]).x - (BULLET_WIDTH / 2);
+        temp.y = get_projectile_screen_position(p[i]).y - (BULLET_HEIGHT / 2);
         temp.w = get_projectile_hitbox(p[i]).w;
         temp.h = get_projectile_hitbox(p[i]).h;
 

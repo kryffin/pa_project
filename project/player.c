@@ -24,11 +24,12 @@ void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos) {
   temp = (SDL_Rect*)malloc(sizeof(SDL_Rect));
   temp->w = 32;
   temp->h = 64;
+  short int step = get_player_state(p);
 
   if (get_player_dir(p) == 1) {
     //player facing right
 
-    switch (get_player_state(p)) {
+    switch (step) {
 
       //stand-by/walking
       case 0:
@@ -43,7 +44,7 @@ void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos) {
         } else {
 
           //sprite moving
-          switch (get_player_step(p)) {
+          switch (step) {
 
             case 0:
               temp->x = 32;
@@ -113,7 +114,7 @@ void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos) {
   } else {
     //player facing left
 
-    switch (get_player_state(p)) {
+    switch (step) {
 
       //stand-by/walking
       case 0:
@@ -128,7 +129,7 @@ void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos) {
         } else {
 
           //sprite moving
-          switch (get_player_step(p)) {
+          switch (step) {
 
             case 0:
               temp->x = 32;
@@ -247,17 +248,21 @@ void player_melee (player p, SDL_Renderer *renderer) {
 
 void player_update_step (player *p) {
 
+  short int step = get_player_step(*p);
+
   if(get_player_velocity(*p).x != 0) {
 
     set_player_step(p, get_player_step(*p) + 1);
 
-    if(get_player_step(*p) == 4) {
+    if(step == 4) {
 
       set_player_step(p, 0);
 
     }
 
   }
+
+  return;
 
 }
 
@@ -276,65 +281,103 @@ void player_apply_velocity (player *p) {
   return;
 }
 
-float player_jumping_x (player p, Uint32 timeN) {
-  float t = timeN, x0 = get_floatpoint_x(get_player_real_position(p)), v = get_player_velocity(p).x;
-
-  return (v * t) + x0;
-}
-
-float player_jumping_y (player p, Uint32 timeN) {
-  float t = timeN, y0 = get_floatpoint_y(get_player_real_position(p)), v = abs(get_player_velocity(p).y);
-
-  return y0 - (v * t);
-}
 
 void player_gravity(player *p) {
-  if (get_player_screen_position(*p).y < SCREEN_HEIGHT - IMG_HEIGHT)
-  {
-    set_player_vel_y (p, get_player_velocity(*p).y + 1);
-  }
+  //if ((get_floatpoint_y(get_player_real_position(*p)) + IMG_HEIGHT) < SCREEN_HEIGHT) {
+    set_player_real_position(p, get_floatpoint_x(get_player_real_position(*p)), get_floatpoint_y(get_player_real_position(*p)) + 2);
+  //}
+  set_player_vel_y (p, get_player_velocity(*p).y + 2);
+
   return;
 }
 
-//temporary
-floatpoint calcul_position (player p, float v_x, float v_y, float timeN)
-{
-  floatpoint pos = set_floatpoint(0.01*get_player_real_position(p).x + (v_x * timeN), 0.001*get_player_real_position(p).y + (v_y * timeN));
-
-  return pos;
-}
 
 void player_jumping (player *p, Uint32 timeN_A, Uint32 timeN_B) {
+
   if (get_player_state(*p) == 1 || get_player_state(*p) == 2)
   {
-    printf("v_y : %f\n", get_player_velocity(*p).y);
+
     //set_player_real_position (p, get_player_real_position(*p).x + get_player_velocity(*p).x , get_player_real_position(*p).y + get_player_velocity(*p).y);
   }
 
   return;
 }
 
-bool p_test_aabb (SDL_Rect hitbox, projectile p)
+bool raw_test_aabb (player p, SDL_Rect hitboxWorld, unsigned short int type)
 {
-  int Ax, Ay, Bx, By;
-  Ax = hitbox.x;
-  Ay = hitbox.y;
-  Bx = p.x;
-  By = p.y;
+  /*penser a mettre tout ça en dynamique / ne plus décclarer dans le débyt
+    de la fonction les strucutres AABB
+   ie CF MTV research AABB collisions
+     implanter dans la fonction player la struct AABB  ;)
+  */
+//si le type est un bloc dur test de la collision sinon on retourne faux
+/*  if (type != 0){
+    //printf("**\t%d\t\ttest2\n", type);
+    return false;
+  }*/
+  //else{
+  //  AABB player;
+    AABB* world;
+    AABB = (AABB*)malloc(sizeof(AABB));
+/*
+    player.HG.x = get_player_real_position(p).x;
+    player.HG.y = get_player_real_position(p).y;
 
-  return;
+    player.HD.x = get_player_real_position(p).x + get_player_hitbox(p).w;
+    player.HD.y = get_player_real_position(p).y;
+
+    player.BG.x = get_player_real_position(p).x + get_player_hitbox(p).h;
+    player.BG.y = get_player_real_position(p).y + get_player_hitbox(p).h;
+
+*/
+    world.HG.x = hitboxWorld.x;
+    world.HG.y = hitboxWorld.y;
+
+    world.HD.x = hitboxWorld.x + hitboxWorld.w;
+    world.HD.y = hitboxWorld.y;
+
+    world.BG.x = hitboxWorld.x + hitboxWorld.h;
+    world.BG.y = hitboxWorld.y + hitboxWorld.h;
+    ///////////////////end initi var pour le traitement;
+      //printf("**\t%d\t\ttest1\n", type);
+    return (point_dans_aabb(get_player_real_position(p), world));
+
+    /* faire une fonction test du point dans aabb */
+
+  //}
+  free(world);
+}
+
+bool point_dans_aabb (floatpoint realpos, AABB world)
+{
+  /*
+
+  -/*/
+    if (world.HG.x > realpos.x && realpos.x < world.HD.x){
+      //dans l'intervale x
+      if (world.HG.y > realpos.y && realpos.y < world.HD.y){
+
+        return true;
+      }
+      else{
+        return false;
+      }
+    }
+    else{
+      return false;
+    }
 }
 
 bool is_colision (player *p)
 {
-  if (get_player_screen_position(*p).y >= SCREEN_HEIGHT + IMG_HEIGHT)
-  {
+  if (get_player_screen_position(*p).y >= SCREEN_HEIGHT - IMG_HEIGHT)
+  {;
     return true;
   }
   return false;
 
 }
-void player_colision (player *p)
+void player_colision (player *p, level* l)
 {
 
   //RAW COLLISIONS
@@ -345,10 +388,58 @@ void player_colision (player *p)
     set_player_dJump(p, true);
     set_player_state(p, 0);
   }
+  int indiceX, indiceY;
+  indiceX = get_player_screen_position(*p).x / BLOCK_WIDTH ;
+  indiceY = get_player_screen_position(*p).y / BLOCK_HEIGHT;
+  if(raw_test_aabb(*p, l->blocks[indiceX-1][indiceY].hitbox, l->blocks[indiceX-1][indiceY].type))
+    printf("collision bloc gauche\n");
+    adjust_vector_collision(get_player_velocity(*p), p, )
+  if(raw_test_aabb(*p, l->blocks[indiceX+1][indiceY].hitbox, l->blocks[indiceX-1][indiceY].type))
+    printf("collision bloc droit\n");
+    //set_player_vel_x(p, 0);
+    //set_player_real_position(p, get_player_screen_position(*p).x , get_player_screen_position(*p).y);
+  if(raw_test_aabb(*p, l->blocks[indiceX][indiceY-1].hitbox, l->blocks[indiceX-1][indiceY].type))
+    printf("collision bloc du haut\n");
+  if(raw_test_aabb(*p, l->blocks[indiceX][indiceY+1].hitbox, l->blocks[indiceX-1][indiceY].type))
+    printf("collision bloc du bas\n");
+
+  //printf("___*\n%d\t%d\n%d\t%d\n*___\n", l->blocks[indiceX-1][indiceY-1].hitbox.x,  l->blocks[indiceX-1][indiceY-1].hitbox.y,  l->blocks[indiceX+1][indiceY-1].hitbox.x,  l->blocks[indiceX+1][indiceY-1].hitbox.y);
 
 }
 
+void adjust_vector_collision(vector V, player *hero, AABB box, double eps)
+{
+    double min,max,mid;
+    min = 0.0;
+    max = 1.0;
+    mid = (max+min)/2;
+    hero->box.middle.x = hero->box.middle.x-(V.x*mid);
+    hero->box.middle.y = hero->box.middle.y-(V.y*mid);
 
+    player_update(hero);
+
+    while(max-min>eps)
+    {
+        if(testbox(hero->point,box))
+        {
+            max=mid;
+        }
+        else
+        {
+            min=mid;
+        }
+
+        mid = (max+min)/2;
+        hero->point.middel.x = hero->point.middel.x-(V.x*mid);
+        hero->point.middel.y = hero->point.middel.y-(V.y*mid);
+        sprite_update(hero);
+
+    }
+    printf("mid : %f\n", mid);
+    hero->point.middel.x = hero->point.middel.x-(V.x*mid);
+    hero->point.middel.y = hero->point.middel.y-(V.y*mid);
+    sprite_update(hero);
+}
 /* SET */
 
 //create a new player
@@ -358,6 +449,7 @@ player set_player (short int maxHealthPoints, floatpoint position, vector veloci
   set_player_maxhp(&p, maxHealthPoints);
   set_player_hp(&p, maxHealthPoints);
   set_player_dir(&p, 0);
+  set_player_step(&p, 0);
   set_player_dJump(&p, true);
   set_player_jumpPoint(&p, 0);
   set_player_highPoint(&p, 0);

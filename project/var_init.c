@@ -138,7 +138,7 @@ int init_sdl (SDL_Window **window, SDL_Renderer **renderer) {
   //SDL initialization
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     printf("Error while SDL initialization : %s\n", SDL_GetError());
-    return EXIT_FAILURE;
+    return 0;
   }
 
   //hide the computer cursor to only show the game's
@@ -156,13 +156,15 @@ int init_sdl (SDL_Window **window, SDL_Renderer **renderer) {
 
 }
 
-int init_images (SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor, SDL_Renderer *renderer) {
+int init_images (SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor, SDL_Texture **blocks_spritesheet, SDL_Texture **background, SDL_Renderer *renderer) {
+
+  IMG_Init(IMG_INIT_PNG);
 
   //spritesheet image loading through the temp surface to a texture
-  *temp = SDL_LoadBMP(PATH_SPRITES);
+  *temp = IMG_Load(PATH_SPRITES);
   *playerSprite = SDL_CreateTextureFromSurface(renderer, *temp);
   if (*playerSprite == NULL) {
-    printf("Error during sprite sheet image loading : %s\n", SDL_GetError());
+    printf("Error during sprite sheet image loading : %s\n", IMG_GetError());
     return 0;
   }
 
@@ -170,7 +172,7 @@ int init_images (SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **c
   SDL_FreeSurface(*temp);
 
   //cursor image loading through the temp surface to a texture
-  *temp = SDL_LoadBMP(PATH_CURSOR);
+  *temp = IMG_Load(PATH_CURSOR);
   *cursor = SDL_CreateTextureFromSurface(renderer, *temp);
   if (*cursor == NULL) {
     printf("Error during cursor image loading : %s\n", SDL_GetError());
@@ -179,6 +181,30 @@ int init_images (SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **c
 
   //temp won't be used again
   SDL_FreeSurface(*temp);
+
+  //blocks_spritesheet image loading through the temp surface to a texture
+  *temp = IMG_Load(PATH_BLOCKS_SHEET);
+  *blocks_spritesheet = SDL_CreateTextureFromSurface(renderer, *temp);
+  if (*blocks_spritesheet == NULL) {
+    printf("Error during blocks_spritesheet image loading : %s\n", SDL_GetError());
+    return 0;
+  }
+
+  //temp won't be used again
+  SDL_FreeSurface(*temp);
+
+  //background image loading through the temp surface to a texture
+  *temp = IMG_Load(PATH_BACKGROUND);
+  *background = SDL_CreateTextureFromSurface(renderer, *temp);
+  if (*background == NULL) {
+    printf("Error during background image loading : %s\n", SDL_GetError());
+    return 0;
+  }
+
+  //temp won't be used again
+  SDL_FreeSurface(*temp);
+
+  IMG_Quit();
 
   return 1;
 
@@ -226,7 +252,7 @@ int init_projectiles (projectile *projectiles[100], SDL_Texture *img) {
   return 1;
 }
 
-int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B) {
+int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B, level **currLevel, SDL_Texture **blocks_spritesheet, SDL_Texture **background) {
 
   //used to print the initialization time
   *initTimer = (Uint32*)malloc(sizeof(Uint32));
@@ -256,6 +282,7 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
     printf("Error allocating memory for the mouse_pos\n");
     return 0;
   }
+  **mouse_pos = set_intpoint(0, 0);
 
   //event running the controls
   *event = (SDL_Event*)malloc(sizeof(SDL_Event));
@@ -322,7 +349,7 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
   **quit = false;
 
   //initialization of the sprite sheet and cursor
-  if (init_images(temp, playerSprite, cursor, *renderer) == 0) {
+  if (init_images(temp, playerSprite, cursor, blocks_spritesheet, background, *renderer) == 0) {
     return 0;
   }
 
@@ -342,15 +369,23 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
     return 0;
   }
 
+  *currLevel = (level*)malloc(sizeof(level));
+  if (*currLevel == NULL) {
+    printf("Error allocating memory for the level\n");
+    return 0;
+  }
+
   return 1;
 
 }
 
-void free_variables (SDL_Surface *msgState, SDL_Surface *msgJump, SDL_Texture *playerSprite, SDL_Texture *tempTxt, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player *p, FPSmanager *manager, SDL_Color *colorPalette, char *strState, char *strJump, SDL_Rect *posMsgState, SDL_Rect *posMsgJump, SDL_Event *event, bool *quit, bool *jumped, intpoint *mouse_pos, bool *mouse_btn) {
+void free_variables (SDL_Surface *msgState, SDL_Surface *msgJump, SDL_Texture *playerSprite, SDL_Texture *tempTxt, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player *p, FPSmanager *manager, SDL_Color *colorPalette, char *strState, char *strJump, SDL_Rect *posMsgState, SDL_Rect *posMsgJump, SDL_Event *event, bool *quit, bool *jumped, intpoint *mouse_pos, bool *mouse_btn, Uint32 *timeN_A, Uint32 *timeN_B, level *currLevel, SDL_Texture *blocks_spritesheet, SDL_Texture *background, int *stepDelay) {
 
   SDL_FreeSurface(msgState);
   SDL_FreeSurface(msgJump);
   SDL_DestroyTexture(playerSprite);
+  SDL_DestroyTexture(blocks_spritesheet);
+  SDL_DestroyTexture(background);
   SDL_DestroyTexture(tempTxt);
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
@@ -373,5 +408,10 @@ void free_variables (SDL_Surface *msgState, SDL_Surface *msgJump, SDL_Texture *p
   free(jumped);
   free(mouse_pos);
   free(mouse_btn);
+  free(timeN_A);
+  free(timeN_B);
+  free(currLevel);
+  free(stepDelay);
 
+  return;
 }
