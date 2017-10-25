@@ -1,6 +1,6 @@
 #include "header.h"
 
-void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit, intpoint *mouse_pos, bool *mouse_btn) {
+void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit, intpoint_t *mouse_pos, bool *mouse_btn) {
 
   while (SDL_PollEvent(event)) {
 
@@ -39,7 +39,7 @@ void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit, intpoint 
 
 }
 
-void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, intpoint mouse_pos) {
+void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, intpoint_t mouse_pos) {
 
   SDL_Rect temp;
   temp.x = get_intpoint_x(mouse_pos) - (CURSOR_WIDTH/2);
@@ -53,7 +53,7 @@ void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, intpoint mouse_pos
 }
 
 //gestion des touches du clavier
-void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped) {
+void keyboard_control (player_t *p, SDL_Keycode *keys, bool *jumped) {
 
   //keys :: left, right, jump, melee
   SDL_Keycode keysTab[5] = {SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_SPACE, SDL_SCANCODE_F, SDL_SCANCODE_S};
@@ -135,7 +135,7 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped) {
 
 }
 
-void controls (SDL_Event *event, bool *quit, player *p, bool *jumped, intpoint *mouse_pos, bool *mouse_btn, SDL_Keycode *key) {
+void controls (SDL_Event *event, bool *quit, player_t *p, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, SDL_Keycode *key) {
 
   //update the keyboard & mouse controls
   update_controls(event, key, quit, mouse_pos, mouse_btn);

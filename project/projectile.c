@@ -2,7 +2,7 @@
 
 void delete_projectile (projectile *p) {
 
-  vector dir = set_vector(0.0, 0.0);
+  vector_t dir = set_vector(0.0, 0.0);
 
   set_projectile_direction(p, dir);
   set_projectile_real_position(p, 0.0, 0.0);
@@ -11,9 +11,9 @@ void delete_projectile (projectile *p) {
 
 }
 
-void shooting (bool mouse_btn, player p, projectile proj[100], intpoint mouse_pos) {
+void shooting (bool mouse_btn, player_t p, projectile proj[100], intpoint_t mouse_pos) {
 
-  vector dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2)));
+  vector_t dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2)));
 
   dir = normalize(dir);
 
@@ -112,7 +112,7 @@ void render_projectile (projectile p[100], SDL_Renderer *renderer) {
 
 /* * * * * * Set * * * * * */
 
-projectile set_projectile (float x, float y, vector dir, SDL_Rect hitbox, SDL_Rect spritePos, SDL_Texture *img) {
+projectile set_projectile (float x, float y, vector_t dir, SDL_Rect hitbox, SDL_Rect spritePos, SDL_Texture *img) {
 
   projectile p;
 
@@ -139,7 +139,7 @@ void set_projectile_real_position (projectile *p, float x, float y) {
   return;
 }
 
-void set_projectile_direction (projectile *p, vector dir) {
+void set_projectile_direction (projectile *p, vector_t dir) {
   p->dir.x = dir.x;
   p->dir.y = dir.y;
   return;
@@ -168,15 +168,15 @@ void set_projectile_image (projectile *p, SDL_Texture *img) {
 
 /* * * * * * Get * * * * * */
 
-floatpoint get_projectile_real_position (projectile p) {
+floatpoint_t get_projectile_real_position (projectile p) {
   return p.realPos;
 }
 
-intpoint get_projectile_screen_position (projectile p) {
+intpoint_t get_projectile_screen_position (projectile p) {
   return p.screenPos;
 }
 
-vector get_projectile_direction (projectile p) {
+vector_t get_projectile_direction (projectile p) {
   return p.dir;
 }
 

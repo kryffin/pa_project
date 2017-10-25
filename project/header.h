@@ -37,6 +37,7 @@
 #define PATH_BLOCKS_SHEET "./res/blocks_spritesheet.png"
 #define PATH_BACKGROUND "./res/background.bmp"
 #define PATH_TXT_FILE "./res/arena.txt"
+#define PATH_YOU_DIED "./res/you_died.png"
 
 #define DELAY_STEP 150 //delay for the step updating
 
@@ -45,17 +46,17 @@
 typedef struct IntegerPoint {
   int x;
   int y;
-} intpoint;
+} intpoint_t;
 
-typedef struct FloatPoint {
+typedef struct floatpoint_t {
   float x;
   float y;
-} floatpoint;
+} floatpoint_t;
 
 typedef struct Vector {
   float x;
   float y;
-} vector;
+} vector_t;
 
 typedef struct Player {
   short int maxhp; //max health points
@@ -67,14 +68,14 @@ typedef struct Player {
   int jumpPoint; //point from where you jumped
   int highPoint; //highest point of the jump (used for falling?)
 
-  short int state; //curent state of the player
-  floatpoint realPos; //position in float
-  intpoint screenPos; //position in integer
-  vector vel; //velocity for the player's movement
-  SDL_Texture *img; //image used for displaying the player
+  short int state; //curent state of the player_t
+  floatpoint_t realPos; //position in float
+  intpoint_t screenPos; //position in integer
+  vector_t vel; //velocity for the player_t's movement
+  SDL_Texture *img; //image used for displaying the player_t
   SDL_Rect spritePos; //position of the sprite in the sprite sheet
   SDL_Rect hitbox; //hitbox
-} player;
+} player_t;
 
 /* DIR
   0 : left
@@ -92,10 +93,10 @@ typedef struct Player {
 /* * * * * * Projectile Structure * * * * * */
 
 typedef struct Projectile {
-  floatpoint realPos;
+  floatpoint_t realPos;
 
-  vector dir; //direction
-  intpoint screenPos; //screen position
+  vector_t dir; //direction
+  intpoint_t screenPos; //screen position
   SDL_Rect hitbox; //hitbox
   SDL_Rect spritePos; //position in the sprite sheet
 
@@ -139,16 +140,17 @@ SDL_Rect get_block_spritesheet_position (block b);
 unsigned short int get_block_type (block b);
 
 /* controls.c */
-void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit, intpoint *mouse_pos, bool *mouse_btn);
-void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, intpoint mouse_pos);
-void keyboard_control (player *p, SDL_Keycode *key, bool *jumped);
-void controls (SDL_Event *event, bool *quit, player *p, bool *jumped, intpoint *mouse_pos, bool *mouse_btn, SDL_Keycode *key);
+void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit, intpoint_t *mouse_pos, bool *mouse_btn);
+void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, intpoint_t mouse_pos);
+void keyboard_control (player_t *p, SDL_Keycode *key, bool *jumped);
+void controls (SDL_Event *event, bool *quit, player_t *p, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, SDL_Keycode *key);
 
 /* level.c */
-void rendering (player *player, projectile bullets[100], SDL_Texture *cursor, level currLevel, intpoint *mouse_pos, SDL_Renderer *renderer);
+void game_over (SDL_Renderer *renderer);
+void rendering (player_t *player, projectile bullets[100], SDL_Texture *cursor, level currLevel, intpoint_t *mouse_pos, SDL_Renderer *renderer);
 void render_foreground_level (level l, SDL_Renderer *renderer);
 void render_background_level (level l, SDL_Renderer *renderer);
-level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player *p);
+level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player_t *p);
 level set_level (block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], SDL_Texture *blocks_spritesheet, SDL_Texture *background);
 void set_level_block (level *l, int x, int y, block b);
 void set_level_blocks_spritesheet (level *l, SDL_Texture *blocks_spritesheet);
@@ -159,67 +161,68 @@ SDL_Texture *get_level_background (level l);
 
 /* projectile.c */
 void delete_projectile (projectile *p);
-void shooting (bool mouse_btn, player p, projectile proj[100], intpoint mouse_pos);
+void shooting (bool mouse_btn, player_t p, projectile proj[100], intpoint_t mouse_pos);
 void update_projectiles (projectile p[100]);
 void render_projectile (projectile p[100], SDL_Renderer *renderer);
-projectile set_projectile (float x, float y, vector dir, SDL_Rect hitbox, SDL_Rect spritePos, SDL_Texture *img);
+projectile set_projectile (float x, float y, vector_t dir, SDL_Rect hitbox, SDL_Rect spritePos, SDL_Texture *img);
 void set_projectile_screen_position (projectile *p, int x, int y);
 void set_projectile_real_position (projectile *p, float x, float y);
-void set_projectile_direction (projectile *p, vector dir);
+void set_projectile_direction (projectile *p, vector_t dir);
 void set_projectile_hitbox (projectile *p, SDL_Rect hitbox);
 void set_projectile_sprite_pos (projectile *p, SDL_Rect spritePos);
 void set_projectile_image (projectile *p, SDL_Texture *img);
-floatpoint get_projectile_real_position (projectile p);
-intpoint get_projectile_screen_position (projectile p);
-vector get_projectile_direction (projectile p);
+floatpoint_t get_projectile_real_position (projectile p);
+intpoint_t get_projectile_screen_position (projectile p);
+vector_t get_projectile_direction (projectile p);
 SDL_Rect get_projectile_hitbox (projectile p);
 SDL_Rect get_projectile_sprite_pos (projectile p);
 SDL_Texture* get_projectile_image (projectile p);
 
-/* player.c */
-floatpoint calcul_position (player p, float v_init, floatpoint pos_init, float angle, Uint32 timeN);
-float player_jumping_y (player p, Uint32 timeN);
-float player_jumping_x (player p, Uint32 timeN);
-void player_jumping (player *p, Uint32 timeN_A, Uint32 timeN_B);
-void player_gravity(player *p);
+/* player_t.c */
+floatpoint_t calcul_position (player_t p, float v_init, floatpoint_t pos_init, float angle, Uint32 timeN);
+float player_jumping_y (player_t p, Uint32 timeN);
+float player_jumping_x (player_t p, Uint32 timeN);
+void player_jumping (player_t *p, Uint32 timeN_A, Uint32 timeN_B);
+void player_gravity(player_t *p);
 
-void update_player (player *p);
-void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos);
-void player_melee (player p, SDL_Renderer *renderer);
-void player_update_step(player *p);
-void player_update_dir (player *p, intpoint mouse_pos);
-void player_apply_velocity (player *p);
-player set_player (short int maxHealthPoints, floatpoint position, vector velocity, SDL_Texture *image, SDL_Rect posSprite, SDL_Rect hitbox);
-void set_player_maxhp (player *p, short int maxhp);
-void set_player_hp (player *p, short int hp);
-void set_player_dir (player *p, short int dir);
-void set_player_step (player *p, short int step);
-void set_player_dJump (player *p, bool dJump);
-void set_player_jumpPoint (player *p, int jumpPoint);
-void set_player_highPoint (player *p, int highPoint);
-void set_player_state (player *p, short int state);
-void set_player_real_position (player *p, float x, float y);
-void set_player_screen_position (player *p, int x, int y);
-void set_player_vel_x (player *p, float x);
-void set_player_vel_y (player *p, float y);
-void set_player_img (player *p, SDL_Texture *img);
-void set_player_sprite_pos (player *p, SDL_Rect posSprite);
-void set_player_hitbox (player *p, SDL_Rect hitbox);
+void update_player (player_t *p, bool *quit);
+void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos);
+void player_melee (player_t p, SDL_Renderer *renderer);
+void player_update_step(player_t *p);
+void player_update_dir (player_t *p, intpoint_t mouse_pos);
+void player_apply_velocity (player_t *p);
+bool is_alive(player_t p);
+player_t set_player (short int maxHealthPoints, floatpoint_t position, vector_t velocity, SDL_Texture *image, SDL_Rect posSprite, SDL_Rect hitbox);
+void set_player_maxhp (player_t *p, short int maxhp);
+void set_player_hp (player_t *p, short int hp);
+void set_player_dir (player_t *p, short int dir);
+void set_player_step (player_t *p, short int step);
+void set_player_dJump (player_t *p, bool dJump);
+void set_player_jumpPoint (player_t *p, int jumpPoint);
+void set_player_highPoint (player_t *p, int highPoint);
+void set_player_state (player_t *p, short int state);
+void set_player_real_position (player_t *p, float x, float y);
+void set_player_screen_position (player_t *p, int x, int y);
+void set_player_vel_x (player_t *p, float x);
+void set_player_vel_y (player_t *p, float y);
+void set_player_img (player_t *p, SDL_Texture *img);
+void set_player_sprite_pos (player_t *p, SDL_Rect posSprite);
+void set_player_hitbox (player_t *p, SDL_Rect hitbox);
 
-short int get_player_maxhp (player p);
-short int get_player_hp (player p);
-short int get_player_dir (player p);
-short int get_player_step (player p);
-bool get_player_dJump (player p);
-int get_player_jumpPoint (player p);
-int get_player_highPoint (player p);
-short int get_player_state (player p);
-floatpoint get_player_real_position (player p);
-intpoint get_player_screen_position (player p);
-vector get_player_velocity (player p);
-SDL_Texture* get_player_img (player p);
-SDL_Rect get_player_sprite_pos (player p);
-SDL_Rect get_player_hitbox (player p);
+short int get_player_maxhp (player_t p);
+short int get_player_hp (player_t p);
+short int get_player_dir (player_t p);
+short int get_player_step (player_t p);
+bool get_player_dJump (player_t p);
+int get_player_jumpPoint (player_t p);
+int get_player_highPoint (player_t p);
+short int get_player_state (player_t p);
+floatpoint_t get_player_real_position (player_t p);
+intpoint_t get_player_screen_position (player_t p);
+vector_t get_player_velocity (player_t p);
+SDL_Texture* get_player_img (player_t p);
+SDL_Rect get_player_sprite_pos (player_t p);
+SDL_Rect get_player_hitbox (player_t p);
 
 /* var_init.c */
 int init_palette (SDL_Color **palette);
@@ -227,38 +230,39 @@ int init_font (TTF_Font **font);
 int init_window (SDL_Window **window);
 int init_renderer (SDL_Renderer **renderer, SDL_Window *window);
 int init_sdl (SDL_Window **window, SDL_Renderer **renderer);
-int init_images (SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor, SDL_Texture **blocks_spritesheet, SDL_Texture **background, SDL_Renderer *renderer);
+int init_images (SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, SDL_Texture **blocks_spritesheet, SDL_Texture **background, SDL_Renderer *renderer);
 int init_projectiles (projectile *projectiles[100], SDL_Texture *img);
-int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B, level **currLevel, SDL_Texture **blocks_spritesheet, SDL_Texture **background);
-void free_variables (SDL_Surface *msgState, SDL_Surface *msgJump, SDL_Texture *playerSprite, SDL_Texture *tempTxt, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player *p, FPSmanager *manager, SDL_Color *colorPalette, char *strState, char *strJump, SDL_Rect *posMsgState, SDL_Rect *posMsgJump, SDL_Event *event, bool *quit, bool *jumped, intpoint *mouse_pos, bool *mouse_btn, Uint32 *timeN_A, Uint32 *timeN_B, level *currLevel, SDL_Texture *blocks_spritesheet, SDL_Texture *background, int *stepDelay);
+int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint_t **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player_t **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B, level **currLevel, SDL_Texture **blocks_spritesheet, SDL_Texture **background);
+void free_variables (SDL_Texture *player_tSprite, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player_t *p, FPSmanager *manager, SDL_Color *colorPalette, SDL_Event *event, bool *quit, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, Uint32 *timeN_A, Uint32 *timeN_B, level *currLevel, SDL_Texture *blocks_spritesheet, SDL_Texture *background, int *stepDelay);
 
 /* menu.c */
-int menu_controls(SDL_Event *event, intpoint *mouse_pos);
-int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint *mouse_pos, SDL_Texture *playerSprite);
-bool mouse_hover_menu (intpoint mouse_pos, int targetx, int targety, int width, int height);
-int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint *mouse_pos, SDL_Texture *playerSprite);
-int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint *mouse_pos, SDL_Texture *cursor);
+void render_text(char *string, SDL_Rect pos, TTF_Font *font, SDL_Color color, SDL_Renderer *renderer);
+int menu_controls(SDL_Event *event, intpoint_t *mouse_pos);
+int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint_t *mouse_pos, SDL_Texture *player_tSprite);
+bool mouse_hover_menu (intpoint_t mouse_pos, int targetx, int targety, int width, int height);
+int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint_t *mouse_pos, SDL_Texture *player_tSprite);
+int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint_t *mouse_pos, SDL_Texture *cursor);
 
 /* vector.c */
-vector normalize (vector v);
-vector vector_direction (SDL_Rect a, SDL_Rect b);
-float vector_length (vector v);
-vector set_vector (float x, float y);
-void set_vector_x (vector *v, float x);
-void set_vector_y (vector *v, float y);
-float get_vector_x (vector v);
-float get_vector_y (vector v);
+vector_t normalize (vector_t v);
+vector_t vector_direction (SDL_Rect a, SDL_Rect b);
+float vector_length (vector_t v);
+vector_t set_vector (float x, float y);
+void set_vector_x (vector_t *v, float x);
+void set_vector_y (vector_t *v, float y);
+float get_vector_x (vector_t v);
+float get_vector_y (vector_t v);
 
 /* 2dpoint.c */
-floatpoint set_floatpoint (float x, float y);
-void set_floatpoint_x (floatpoint *p, float x);
-void set_floatpoint_y (floatpoint *p, float y);
-intpoint set_intpoint (int x, int y);
-void set_intpoint_x (intpoint *p, int x);
-void set_intpoint_y (intpoint *p, int y);
-float get_floatpoint_x (floatpoint p);
-float get_floatpoint_y (floatpoint p);
-int get_intpoint_x (intpoint p);
-int get_intpoint_y (intpoint p);
+floatpoint_t set_floatpoint (float x, float y);
+void set_floatpoint_x (floatpoint_t *p, float x);
+void set_floatpoint_y (floatpoint_t *p, float y);
+intpoint_t set_intpoint (int x, int y);
+void set_intpoint_x (intpoint_t *p, int x);
+void set_intpoint_y (intpoint_t *p, int y);
+float get_floatpoint_x (floatpoint_t p);
+float get_floatpoint_y (floatpoint_t p);
+int get_intpoint_x (intpoint_t p);
+int get_intpoint_y (intpoint_t p);
 
 #endif

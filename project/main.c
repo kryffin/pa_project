@@ -22,7 +22,7 @@ int main () {
   SDL_Surface *temp = NULL;
 
   //texture of the sprite sheet
-  SDL_Texture *playerSprite = NULL;
+  SDL_Texture *player_tSprite = NULL;
 
   //texture of the cursor
   SDL_Texture *cursor = NULL;
@@ -30,7 +30,7 @@ int main () {
   /* * * * * * keyboard & mouse * * * * * */
 
   //mouse position
-  intpoint *mouse_pos = NULL;
+  intpoint_t *mouse_pos = NULL;
 
   //array for the keys pressed
   SDL_Keycode key[SDL_NUM_SCANCODES] = {0};
@@ -38,7 +38,7 @@ int main () {
   //event running the controls
   SDL_Event *event = NULL;
 
-  //used to know if the player jumped
+  //used to know if the player_t jumped
   //  essentially used to avoid the key from being pressed multiple times in one stroke
   bool *jumped = NULL;
 
@@ -55,41 +55,12 @@ int main () {
   //palette of 15 colors
   SDL_Color *colorPalette = NULL;
 
-  /* * * * * * messages * * * * * */
-
-  //message stating the current player state
-  SDL_Surface *msgState = NULL;
-
-  //message stating if the double jump is available
-  SDL_Surface *msgJump = NULL;
-
-  //text strings for the 2 messages above
-  char *strState = NULL;
-  strState = (char*)malloc(25 * sizeof(char));
-
-  char *strJump = NULL;
-  strJump = (char*)malloc(25 * sizeof(char));
-
-  //texts positions of the 2 messages above
-  SDL_Rect *posMsgState = NULL;
-  posMsgState = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  posMsgState->x = 10;
-  posMsgState->y = 10;
-
-  SDL_Rect *posMsgJump = NULL;
-  posMsgJump = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  posMsgJump->x = 10;
-  posMsgJump->y = 30;
-
-  //temporary texture used to load the messages to render them
-  SDL_Texture *tempTxt = NULL;
-
   /* * * * * * characters * * * * * */
 
-  //the main player
-  player *p = NULL;
+  //the main player_t
+  player_t *p = NULL;
 
-  //projectiles of the player : array of 100
+  //projectiles of the player_t : array of 100
   projectile *projectiles = NULL;
 
   //delay used between each step in the character animation
@@ -109,7 +80,7 @@ int main () {
 
   /* * * * * * initialization * * * * * */
 
-  if (init_variables(&initTimer, &manager, &window, &renderer, &mouse_pos, &event, &jumped, &mouse_btn, &i, &font, &colorPalette, &p, &projectiles, &stepDelay, &quit, &temp, &playerSprite, &cursor, &timeN_A, &timeN_B, &currLevel, &blocks_spritesheet, &background) == 0) {
+  if (init_variables(&initTimer, &manager, &window, &renderer, &mouse_pos, &event, &jumped, &mouse_btn, &i, &font, &colorPalette, &p, &projectiles, &stepDelay, &quit, &temp, &player_tSprite, &cursor, &timeN_A, &timeN_B, &currLevel, &blocks_spritesheet, &background) == 0) {
     return EXIT_FAILURE;
   }
 
@@ -120,16 +91,16 @@ int main () {
   SDL_RenderPresent(renderer);
 
 
-  /* * * * * * player initialization * * * * * */
+  /* * * * * * player_t initialization * * * * * */
 
-  //base position of the player
-  floatpoint *basePosition = NULL;
-  basePosition = (floatpoint*)malloc(sizeof(floatpoint));
+  //base position of the player_t
+  floatpoint_t *basePosition = NULL;
+  basePosition = (floatpoint_t*)malloc(sizeof(floatpoint_t));
   *basePosition = set_floatpoint((SCREEN_WIDTH / 2) - (IMG_WIDTH / 2), SCREEN_HEIGHT - IMG_HEIGHT);
 
-  //base velocity of the player
-  vector *baseVelocity = NULL;
-  baseVelocity = (vector*)malloc(sizeof(vector));
+  //base velocity of the player_t
+  vector_t *baseVelocity = NULL;
+  baseVelocity = (vector_t*)malloc(sizeof(vector_t));
   *baseVelocity = set_vector(0.0, 0.0);
 
   //base hitbox
@@ -146,8 +117,8 @@ int main () {
   desRec->w = 32;
   desRec->h = 64;
 
-  //creating the player
-  *p = set_player(10, *basePosition, *baseVelocity, playerSprite, *desRec, *hitbox);
+  //creating the player_t
+  *p = set_player(10, *basePosition, *baseVelocity, player_tSprite, *desRec, *hitbox);
 
   //PLACEHOLDER for these won't be used again
   free(basePosition);
@@ -185,7 +156,7 @@ int main () {
     //clearing the render to the draw color
     SDL_RenderClear(renderer);
 
-    /* * * * * * player controls * * * * * */
+    /* * * * * * player_t controls * * * * * */
 
     controls(event, quit, p, jumped, mouse_pos, mouse_btn, key);
 
@@ -193,7 +164,7 @@ int main () {
 
     player_gravity(p);
 
-    update_player(p);
+    update_player(p, quit);
 
     //init a projectile if shooting
     shooting(*mouse_btn, *p, projectiles, *mouse_pos);
@@ -210,7 +181,7 @@ int main () {
 
     //RAW vertical hyper space
     if (p->realPos.x + (IMG_WIDTH / 2) > SCREEN_WIDTH) {
-      p->realPos.x = 0;
+      p->hp = 0;
     }
 
     if (p->realPos.x + (IMG_WIDTH / 2) < 0) {
@@ -222,59 +193,17 @@ int main () {
       p->dJump = true;
     }
 
-    /* debug */
-
-    //text rendering
-    switch (get_player_state(*p)) {
-      case 0:
-        sprintf(strState, "state : walking");
-        break;
-      case 1:
-        sprintf(strState, "state : jumping");
-        break;
-      case 2:
-        sprintf(strState, "state : double-jumping");
-        break;
-      case 3:
-        sprintf(strState, "state : attacking");
-        break;
-      case 4:
-        sprintf(strState, "state : crouching");
-        break;
-      default:
-        break;
-    }
-
-    if (get_player_dJump(*p)) {
-      sprintf(strJump, "dJump : true");
-      SDL_FreeSurface(msgJump);
-      msgJump = TTF_RenderText_Solid(font, strJump, colorPalette[3]);
-    } else {
-      sprintf(strJump, "dJump : false");
-      SDL_FreeSurface(msgJump);
-      msgJump = TTF_RenderText_Solid(font, strJump, colorPalette[2]);
-    }
-
-    SDL_FreeSurface(msgState);
-    msgState = TTF_RenderText_Solid(font, strState, colorPalette[0]);
-
-    //renderting the message on the window
-    tempTxt = SDL_CreateTextureFromSurface(renderer, msgState);
-    SDL_QueryTexture(tempTxt, NULL, NULL, &(posMsgState->w), &(posMsgState->h));
-    SDL_RenderCopy(renderer, tempTxt, NULL, posMsgState);
-
-    tempTxt = SDL_CreateTextureFromSurface(renderer, msgJump);
-    SDL_QueryTexture(tempTxt, NULL, NULL, &(posMsgJump->w), &(posMsgJump->h));
-    SDL_RenderCopy(renderer, tempTxt, NULL, posMsgJump);
-
     /* rendering */
     rendering(p, projectiles, cursor, *currLevel, mouse_pos, renderer);
+    if (!is_alive(*p)) {
+      game_over(renderer);
+    }
 
     SDL_framerateDelay(manager);
 
   }
 
-  free_variables(msgState, msgJump, playerSprite, tempTxt, renderer, window, font, i, projectiles, p, manager, colorPalette, strState, strJump, posMsgState, posMsgJump, event, quit, jumped, mouse_pos, mouse_btn, timeN_A, timeN_B, currLevel, blocks_spritesheet, background, stepDelay);
+  free_variables(player_tSprite, renderer, window, font, i, projectiles, p, manager, colorPalette, event, quit, jumped, mouse_pos, mouse_btn, timeN_A, timeN_B, currLevel, blocks_spritesheet, background, stepDelay);
 
   return EXIT_SUCCESS;
 }

@@ -2,13 +2,25 @@
 
   /* FUNCTIONS */
 
+void render_text(char *string, SDL_Rect pos, TTF_Font *font, SDL_Color color, SDL_Renderer *renderer) {
+  SDL_Surface *tempSur;
+  SDL_Texture *tempTex;
+
+  tempSur = TTF_RenderText_Solid(font, string, color);
+  tempTex = SDL_CreateTextureFromSurface(renderer, tempSur);
+  SDL_QueryTexture(tempTex, NULL, NULL, &(pos.w), &(pos.h));
+  SDL_RenderCopy(renderer, tempTex, NULL, &pos);
+
+  return;
+}
+
 //function returning the state of the mouse :
 /* 0 : no motion
    1 : button down
    2 : button up
    10 : quit
 */
-int menu_controls(SDL_Event *event, intpoint *mouse_pos) {
+int menu_controls(SDL_Event *event, intpoint_t *mouse_pos) {
   //controls
   while (SDL_PollEvent(event)) {
     switch(event->type) {
@@ -44,7 +56,7 @@ int menu_controls(SDL_Event *event, intpoint *mouse_pos) {
 }
 
 //returns true if the mouse is hovering the target
-bool mouse_hover_menu (intpoint mouse_pos, int targetx, int targety, int width, int height) {
+bool mouse_hover_menu (intpoint_t mouse_pos, int targetx, int targety, int width, int height) {
   if(mouse_pos.x >= targetx && mouse_pos.x <= targetx + width && mouse_pos.y >= targety && mouse_pos.y <= targety + height) {
     return true;
   }
@@ -57,7 +69,7 @@ bool mouse_hover_menu (intpoint mouse_pos, int targetx, int targety, int width, 
   3 : Quit
 */
 
-int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint *mouse_pos, SDL_Texture *cursor) {
+int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint_t *mouse_pos, SDL_Texture *cursor) {
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
@@ -117,7 +129,6 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
 
     //controls
     *control = menu_controls(event, mouse_pos);
-    render_cursor(cursor, renderer, *mouse_pos);
 
     if (mouse_hover_menu(*mouse_pos, posContinue->x, posContinue->y, surContinue->clip_rect.w, surContinue->clip_rect.h)) {
 
@@ -203,6 +214,8 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
     SDL_QueryTexture(tempT, NULL, NULL, &(posQuit->w), &(posQuit->h));
     SDL_RenderCopy(renderer, tempT, NULL, posQuit);
 
+    render_cursor(cursor, renderer, *mouse_pos);
+
     SDL_RenderPresent(renderer);
 
     SDL_Delay(1000 / SCREEN_FPS);
@@ -232,7 +245,7 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
 /* resolution options menu */
 
 /* 1 : FullScreen | 2 : 4:3 | 3 : 16:10 | 4 : 16:9 | 5 : Ad | 6 : Back */
-int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint *mouse_pos, SDL_Texture *cursor) {
+int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint_t *mouse_pos, SDL_Texture *cursor) {
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
@@ -531,7 +544,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
   }
 }
 
-int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint *mouse_pos, SDL_Texture *cursor) {
+int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint_t *mouse_pos, SDL_Texture *cursor) {
 
   //keeps the option in the main menu
   int *mainMenuOption = NULL;

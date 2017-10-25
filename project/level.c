@@ -1,6 +1,22 @@
 #include "header.h"
 
-void rendering (player *player, projectile bullets[100], SDL_Texture *cursor, level currLevel, intpoint *mouse_pos, SDL_Renderer *renderer) {
+void game_over (SDL_Renderer *renderer) {
+  SDL_Surface *temp;
+  SDL_Texture *panel;
+
+  temp = IMG_Load(PATH_YOU_DIED);
+  panel = SDL_CreateTextureFromSurface(renderer, temp);
+  SDL_FreeSurface(temp);
+
+  SDL_RenderCopy(renderer, panel, NULL, NULL);
+
+  SDL_RenderPresent(renderer);
+
+  SDL_Delay(1000);
+  return;
+}
+
+void rendering (player_t *player, projectile bullets[100], SDL_Texture *cursor, level currLevel, intpoint_t *mouse_pos, SDL_Renderer *renderer) {
 
   SDL_RenderCopy(renderer, get_level_background(currLevel), NULL, NULL);
 
@@ -10,7 +26,7 @@ void rendering (player *player, projectile bullets[100], SDL_Texture *cursor, le
   //render the projectile
   render_projectile(bullets, renderer);
 
-  //render the player
+  //render the player_t
   render_player(*player, renderer, *mouse_pos);
 
   //render the attack and process it
@@ -94,7 +110,7 @@ void render_background_level (level l, SDL_Renderer *renderer) {
   return;
 }
 
-level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player *p) {
+level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player_t *p) {
 
   level l;
 
