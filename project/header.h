@@ -43,7 +43,7 @@
 #define DELAY_STEP 150 //delay for the step updating
 
 //player
-#define JUMP_HEIGHT -10
+#define JUMP_HEIGHT -14
 /* * * * * * Player Structure * * * * * */
 
 
@@ -67,10 +67,8 @@ typedef struct AABB {
   floatpoint HD;
   floatpoint BG;
   floatpoint BD;
-  //unecessary
   vector size;
   floatpoint middle;
-
 }AABB;
 
 typedef struct Player {
@@ -126,6 +124,7 @@ typedef struct Block {
   SDL_Rect hitbox; //hitbox of the block
   SDL_Rect spritesheet_pos; //position on the spritesheet
   unsigned short int type; //type of the block
+  AABB box;
 
 } block;
 
@@ -193,15 +192,14 @@ SDL_Rect get_projectile_sprite_pos (projectile p);
 SDL_Texture* get_projectile_image (projectile p);
 
 /* player.c */
+//temporaire a enlever
 floatpoint calcul_position (player p, float v_init, floatpoint pos_init, float angle, Uint32 timeN);
-float player_jumping_y (player p, Uint32 timeN);
-float player_jumping_x (player p, Uint32 timeN);
+
 void player_jumping (player *p, Uint32 timeN_A, Uint32 timeN_B);
 void player_gravity(player *p);
-//RAW J'ai pas rangé j'm'en balek
-bool is_colision(player *p);
-void player_colision (player *p, level* l);
-bool point_dans_aabb (floatpoint realpos, AABB world);
+
+
+//////////////////////////////////
 void update_player (player *p);
 void render_player (player p, SDL_Renderer *renderer, intpoint mouse_pos);
 void player_melee (player p, SDL_Renderer *renderer);
@@ -280,4 +278,25 @@ float get_floatpoint_y (floatpoint p);
 int get_intpoint_x (intpoint p);
 int get_intpoint_y (intpoint p);
 
+//aabb.c
+floatpoint get_aabb_HG (AABB box);
+floatpoint get_aabb_HD (AABB box);
+floatpoint get_aabb_BG (AABB box);
+floatpoint get_aabb_BD (AABB box);
+floatpoint get_aabb_middle (AABB box);
+vector get_aabb_size (AABB box);
+
+void set_aabb_HG (AABB *box, floatpoint hg);
+void set_aabb_HD (AABB *box, floatpoint hd);
+void set_aabb_BG (AABB *box, floatpoint bg);
+void set_aabb_BD (AABB *box, floatpoint bd);
+void set_aabb_middle (AABB *box, floatpoint middlePoint);
+void set_aabb_size (AABB *box, vector size);
+
+
+
+bool is_colision(player *p);
+void player_colision (player *p, level* l);
+bool point_dans_aabb (floatpoint realpos, AABB world);
+void adjust_vector_collision(vector V, player *hero, AABB box, double eps);
 #endif
