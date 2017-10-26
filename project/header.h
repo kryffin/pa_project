@@ -147,10 +147,10 @@ void controls (SDL_Event *event, bool *quit, player_t *p, bool *jumped, intpoint
 
 /* level.c */
 void game_over (SDL_Renderer *renderer);
-void rendering (player_t *player, projectile bullets[100], SDL_Texture *cursor, level currLevel, intpoint_t *mouse_pos, SDL_Renderer *renderer);
+void rendering (player_t *player, player_t enemies[10], projectile bullets[100], projectile enemyProjectiles[100], SDL_Texture *cursor, level currLevel, intpoint_t *mouse_pos, SDL_Renderer *renderer);
 void render_foreground_level (level l, SDL_Renderer *renderer);
 void render_background_level (level l, SDL_Renderer *renderer);
-level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player_t *p);
+level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player_t *p, player_t enemies[10]);
 level set_level (block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], SDL_Texture *blocks_spritesheet, SDL_Texture *background);
 void set_level_block (level *l, int x, int y, block b);
 void set_level_blocks_spritesheet (level *l, SDL_Texture *blocks_spritesheet);
@@ -186,6 +186,7 @@ void player_jumping (player_t *p, Uint32 timeN_A, Uint32 timeN_B);
 void player_gravity(player_t *p);
 
 void update_player (player_t *p, bool *quit);
+void update_enemy (player_t *p);
 void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos);
 void player_melee (player_t p, SDL_Renderer *renderer);
 void player_update_step(player_t *p);
@@ -231,9 +232,9 @@ int init_window (SDL_Window **window);
 int init_renderer (SDL_Renderer **renderer, SDL_Window *window);
 int init_sdl (SDL_Window **window, SDL_Renderer **renderer);
 int init_images (SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, SDL_Texture **blocks_spritesheet, SDL_Texture **background, SDL_Renderer *renderer);
-int init_projectiles (projectile *projectiles[100], SDL_Texture *img);
-int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint_t **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player_t **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B, level **currLevel, SDL_Texture **blocks_spritesheet, SDL_Texture **background);
-void free_variables (SDL_Texture *player_tSprite, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player_t *p, FPSmanager *manager, SDL_Color *colorPalette, SDL_Event *event, bool *quit, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, Uint32 *timeN_A, Uint32 *timeN_B, level *currLevel, SDL_Texture *blocks_spritesheet, SDL_Texture *background, int *stepDelay);
+int init_projectiles (projectile *projectiles[100], SDL_Texture *img, int x, int y);
+int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint_t **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player_t **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B, level **currLevel, SDL_Texture **blocks_spritesheet, SDL_Texture **background, player_t **enemies, projectile **enemyProjectiles);
+void free_variables (SDL_Texture *player_tSprite, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player_t *p, FPSmanager *manager, SDL_Color *colorPalette, SDL_Event *event, bool *quit, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, Uint32 *timeN_A, Uint32 *timeN_B, level *currLevel, SDL_Texture *blocks_spritesheet, SDL_Texture *background, int *stepDelay, player_t *enemies, projectile *enemyProjectiles);
 
 /* menu.c */
 void render_text(char *string, SDL_Rect pos, TTF_Font *font, SDL_Color color, SDL_Renderer *renderer);

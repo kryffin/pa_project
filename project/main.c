@@ -58,10 +58,13 @@ int main () {
   /* * * * * * characters * * * * * */
 
   //the main player_t
-  player_t *p = NULL;
+  player_t *player = NULL;
+  intpoint_t player_pos;
+  player_t *enemies = NULL;
 
   //projectiles of the player_t : array of 100
-  projectile *projectiles = NULL;
+  projectile *playerProjectiles = NULL;
+  projectile *enemyProjectiles = NULL;
 
   //delay used between each step in the character animation
   int *stepDelay = NULL;
@@ -80,7 +83,7 @@ int main () {
 
   /* * * * * * initialization * * * * * */
 
-  if (init_variables(&initTimer, &manager, &window, &renderer, &mouse_pos, &event, &jumped, &mouse_btn, &i, &font, &colorPalette, &p, &projectiles, &stepDelay, &quit, &temp, &player_tSprite, &cursor, &timeN_A, &timeN_B, &currLevel, &blocks_spritesheet, &background) == 0) {
+  if (init_variables(&initTimer, &manager, &window, &renderer, &mouse_pos, &event, &jumped, &mouse_btn, &i, &font, &colorPalette, &player, &playerProjectiles, &stepDelay, &quit, &temp, &player_tSprite, &cursor, &timeN_A, &timeN_B, &currLevel, &blocks_spritesheet, &background, &enemies, &enemyProjectiles) == 0) {
     return EXIT_FAILURE;
   }
 
@@ -118,7 +121,10 @@ int main () {
   desRec->h = 64;
 
   //creating the player_t
-  *p = set_player(10, *basePosition, *baseVelocity, player_tSprite, *desRec, *hitbox);
+  *player = set_player(10, *basePosition, *baseVelocity, player_tSprite, *desRec, *hitbox);
+  for (*i = 0; *i < 10; *i += 1) {
+    enemies[*i] = set_player(0, *basePosition, *baseVelocity, player_tSprite, *desRec, *hitbox);
+  }
 
   //PLACEHOLDER for these won't be used again
   free(basePosition);
@@ -138,7 +144,7 @@ int main () {
     return EXIT_FAILURE;
   }
 
-  *currLevel = init_level(blocks_spritesheet, background, p);
+  *currLevel = init_level(blocks_spritesheet, background, player, enemies);
 
   *timeN_A = SDL_GetTicks();
 
@@ -158,44 +164,51 @@ int main () {
 
     /* * * * * * player_t controls * * * * * */
 
-    controls(event, quit, p, jumped, mouse_pos, mouse_btn, key);
+    controls(event, quit, player, jumped, mouse_pos, mouse_btn, key);
 
     //player_jumping(p, *timeN_A, *timeN_B);
 
-    player_gravity(p);
+    player_gravity(player);
 
-    update_player(p, quit);
+    update_player(player, quit);
 
     //init a projectile if shooting
-    shooting(*mouse_btn, *p, projectiles, *mouse_pos);
+    shooting(*mouse_btn, *player, playerProjectiles, *mouse_pos);
+    for (*i = 0; *i < 10; *i += 1) {
+      //player_gravity(&(enemies)[*i]);
+      update_enemy(&(enemies)[*i]);
+      player_pos = set_intpoint(get_player_screen_position(*player).x + (IMG_WIDTH / 2), get_player_screen_position(*player).y + (IMG_HEIGHT / 2));
+      shooting(true, enemies[*i], enemyProjectiles, player_pos);
+    }
 
-    update_projectiles(projectiles);
+    update_projectiles(playerProjectiles);
+    update_projectiles(enemyProjectiles);
 
     if (SDL_GetTicks() >= *stepDelay + DELAY_STEP) {
-      player_update_step(p);
+      player_update_step(player);
       *stepDelay = SDL_GetTicks();
     }
 
-    player_apply_velocity(p);
-    player_update_dir(p, *mouse_pos);
+    player_apply_velocity(player);
+    player_update_dir(player, *mouse_pos);
 
     //RAW vertical hyper space
-    if (p->realPos.x + (IMG_WIDTH / 2) > SCREEN_WIDTH) {
-      p->hp = 0;
+    if (player->realPos.x + (IMG_WIDTH / 2) > SCREEN_WIDTH) {
+      player->hp = 0;
     }
 
-    if (p->realPos.x + (IMG_WIDTH / 2) < 0) {
-      p->realPos.x = SCREEN_WIDTH - IMG_WIDTH;
+    if (player->realPos.x + (IMG_WIDTH / 2) < 0) {
+      player->realPos.x = SCREEN_WIDTH - IMG_WIDTH;
     }
 
     //RAW re-enabling double jump
-    if (p->dJump == false && p->realPos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
-      p->dJump = true;
+    if (player->dJump == false && player->realPos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
+      player->dJump = true;
     }
 
     /* rendering */
-    rendering(p, projectiles, cursor, *currLevel, mouse_pos, renderer);
-    if (!is_alive(*p)) {
+    rendering(player, enemies, playerProjectiles, enemyProjectiles, cursor, *currLevel, mouse_pos, renderer);
+    if (!is_alive(*player)) {
       game_over(renderer);
     }
 
@@ -203,7 +216,7 @@ int main () {
 
   }
 
-  free_variables(player_tSprite, renderer, window, font, i, projectiles, p, manager, colorPalette, event, quit, jumped, mouse_pos, mouse_btn, timeN_A, timeN_B, currLevel, blocks_spritesheet, background, stepDelay);
+  free_variables(player_tSprite, renderer, window, font, i, playerProjectiles, player, manager, colorPalette, event, quit, jumped, mouse_pos, mouse_btn, timeN_A, timeN_B, currLevel, blocks_spritesheet, background, stepDelay, enemies, enemyProjectiles);
 
   return EXIT_SUCCESS;
 }

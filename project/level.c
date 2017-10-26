@@ -16,7 +16,7 @@ void game_over (SDL_Renderer *renderer) {
   return;
 }
 
-void rendering (player_t *player, projectile bullets[100], SDL_Texture *cursor, level currLevel, intpoint_t *mouse_pos, SDL_Renderer *renderer) {
+void rendering (player_t *player, player_t enemies[10], projectile bullets[100], projectile enemyProjectiles[100], SDL_Texture *cursor, level currLevel, intpoint_t *mouse_pos, SDL_Renderer *renderer) {
 
   SDL_RenderCopy(renderer, get_level_background(currLevel), NULL, NULL);
 
@@ -26,8 +26,17 @@ void rendering (player_t *player, projectile bullets[100], SDL_Texture *cursor, 
   //render the projectile
   render_projectile(bullets, renderer);
 
+  //render the enemy projectile
+  render_projectile(enemyProjectiles, renderer);
+
   //render the player_t
   render_player(*player, renderer, *mouse_pos);
+  int i = 0;
+  for (i = 0; i < 10; i++) {
+    if (is_alive(enemies[i])) {
+      render_player(enemies[i], renderer, *mouse_pos);
+    }
+  }
 
   //render the attack and process it
   if (get_player_state(*player) == 3)  {
@@ -110,9 +119,10 @@ void render_background_level (level l, SDL_Renderer *renderer) {
   return;
 }
 
-level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player_t *p) {
+level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player_t *p, player_t enemies[10]) {
 
   level l;
+  int i = 0;
 
   FILE *txtFile = fopen(PATH_TXT_FILE, "r");
   if (txtFile == NULL) {
@@ -163,6 +173,12 @@ level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, play
 
         case 'p':
           set_player_real_position(p, x * 16, (y * 16) - 48);
+          break;
+
+        case 'e':
+          set_player_real_position(&(enemies)[i], x * 16, (y * 16) - 48);
+          set_player_hp(&(enemies)[i], 10);
+          i++;
           break;
 
         default:

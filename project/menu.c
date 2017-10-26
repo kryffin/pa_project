@@ -76,28 +76,34 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
   int option = 0;
 
   //message surfaces
-  SDL_Surface *surContinue = NULL;
+  SDL_Surface *surPlay = NULL;
   SDL_Surface *surOptions = NULL;
   SDL_Surface *surQuit = NULL;
+  SDL_Surface *temp;
 
   SDL_Texture *tempT = NULL;
+  SDL_Texture *background;
+
+  temp = IMG_Load(PATH_BACKGROUND);
+  background = SDL_CreateTextureFromSurface(renderer, temp);
+  SDL_FreeSurface(temp);
 
   //text strings
-  char *strFull = NULL;
-  strFull = (char*)malloc(9 * sizeof(char));
-  sprintf(strFull, "New game");
+  char *strPlay = NULL;
+  strPlay = (char*)malloc(5 * sizeof(char));
+  sprintf(strPlay, "Play");
 
-  char *str43 = NULL;
-  str43 = (char*)malloc(8 * sizeof(char));
-  sprintf(str43, "Options");
+  char *strOptions = NULL;
+  strOptions = (char*)malloc(8 * sizeof(char));
+  sprintf(strOptions, "Options");
 
-  char *str1610 = NULL;
-  str1610 = (char*)malloc(5 * sizeof(char));
-  sprintf(str1610, "Quit");
+  char *strQuit = NULL;
+  strQuit = (char*)malloc(5 * sizeof(char));
+  sprintf(strQuit, "Quit");
 
   //text positions
-  SDL_Rect *posContinue = NULL;
-  posContinue = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  SDL_Rect *posPlay = NULL;
+  posPlay = (SDL_Rect*)malloc(sizeof(SDL_Rect));
 
   SDL_Rect *posOptions = NULL;
   posOptions = (SDL_Rect*)malloc(sizeof(SDL_Rect));
@@ -110,17 +116,17 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
   event = (SDL_Event*)malloc(sizeof(SDL_Event));
 
   //render the messages
-  surContinue = TTF_RenderText_Solid(font, strFull, palette[14]);
-  surOptions = TTF_RenderText_Solid(font, str43, palette[0]);
-  surQuit = TTF_RenderText_Solid(font, str1610, palette[0]);
+  surPlay = TTF_RenderText_Solid(font, strPlay, palette[14]);
+  surOptions = TTF_RenderText_Solid(font, strOptions, palette[0]);
+  surQuit = TTF_RenderText_Solid(font, strQuit, palette[0]);
 
   //message positions
-  posContinue->x = (SCREEN_WIDTH / 2) - (surContinue->clip_rect.w / 2);
-  posContinue->y = (SCREEN_HEIGHT / 2) - (surContinue->clip_rect.h / 2) - (SCREEN_HEIGHT / 3);
+  posPlay->x = (SCREEN_WIDTH / 2) - (surPlay->clip_rect.w / 2);
+  posPlay->y = (surPlay->clip_rect.h / 2) + (1 * (SCREEN_HEIGHT / 4));
   posOptions->x = (SCREEN_WIDTH / 2) - (surOptions->clip_rect.w / 2);
-  posOptions->y = (SCREEN_HEIGHT / 2) - (surOptions->clip_rect.h / 2);
+  posOptions->y = (surOptions->clip_rect.h / 2) + (2 * (SCREEN_HEIGHT / 4));
   posQuit->x = (SCREEN_WIDTH / 2) - (surQuit->clip_rect.w / 2);
-  posQuit->y = (SCREEN_HEIGHT / 2) - (surQuit->clip_rect.h / 2) + (SCREEN_HEIGHT / 3);
+  posQuit->y = (surQuit->clip_rect.h / 2) + (3 * (SCREEN_HEIGHT / 4));
 
   while (1) {
 
@@ -130,22 +136,22 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
     //controls
     *control = menu_controls(event, mouse_pos);
 
-    if (mouse_hover_menu(*mouse_pos, posContinue->x, posContinue->y, surContinue->clip_rect.w, surContinue->clip_rect.h)) {
+    if (mouse_hover_menu(*mouse_pos, posPlay->x, posPlay->y, surPlay->clip_rect.w, surPlay->clip_rect.h)) {
 
       if (*control == 0) {
 
-        SDL_FreeSurface(surContinue);
-        surContinue = TTF_RenderText_Solid(font, strFull, palette[3]);
+        SDL_FreeSurface(surPlay);
+        surPlay = TTF_RenderText_Solid(font, strPlay, palette[3]);
 
       } else if (*control == 1){
 
-        SDL_FreeSurface(surContinue);
-        surContinue = TTF_RenderText_Solid(font, strFull, palette[2]);
+        SDL_FreeSurface(surPlay);
+        surPlay = TTF_RenderText_Solid(font, strPlay, palette[2]);
 
       } else if (*control == 2) {
 
-        SDL_FreeSurface(surContinue);
-        surContinue = TTF_RenderText_Solid(font, strFull, palette[3]);
+        SDL_FreeSurface(surPlay);
+        surPlay = TTF_RenderText_Solid(font, strPlay, palette[3]);
         option = 1;
 
       }
@@ -155,17 +161,17 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
       if (*control == 0) {
 
         SDL_FreeSurface(surOptions);
-        surOptions = TTF_RenderText_Solid(font, str43, palette[3]);
+        surOptions = TTF_RenderText_Solid(font, strOptions, palette[3]);
 
       } else if (*control == 1){
 
         SDL_FreeSurface(surOptions);
-        surOptions = TTF_RenderText_Solid(font, str43, palette[2]);
+        surOptions = TTF_RenderText_Solid(font, strOptions, palette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surOptions);
-        surOptions = TTF_RenderText_Solid(font, str43, palette[3]);
+        surOptions = TTF_RenderText_Solid(font, strOptions, palette[3]);
         option = 2;
 
       }
@@ -175,36 +181,38 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
       if (*control == 0) {
 
         SDL_FreeSurface(surQuit);
-        surQuit = TTF_RenderText_Solid(font, str1610, palette[3]);
+        surQuit = TTF_RenderText_Solid(font, strQuit, palette[3]);
 
       } else if (*control == 1) {
 
         SDL_FreeSurface(surQuit);
-        surQuit = TTF_RenderText_Solid(font, str1610, palette[2]);
+        surQuit = TTF_RenderText_Solid(font, strQuit, palette[2]);
 
       } else if (*control == 2) {
 
-        SDL_FreeSurface(surContinue);
-        surContinue = TTF_RenderText_Solid(font, strFull, palette[3]);
+        SDL_FreeSurface(surPlay);
+        surPlay = TTF_RenderText_Solid(font, strPlay, palette[3]);
         option = 3;
 
       }
 
     } else {
       //render the messages
-      SDL_FreeSurface(surContinue);
-      surContinue = TTF_RenderText_Solid(font, strFull, palette[0]);
+      SDL_FreeSurface(surPlay);
+      surPlay = TTF_RenderText_Solid(font, strPlay, palette[0]);
       SDL_FreeSurface(surOptions);
-      surOptions = TTF_RenderText_Solid(font, str43, palette[0]);
+      surOptions = TTF_RenderText_Solid(font, strOptions, palette[0]);
       SDL_FreeSurface(surQuit);
-      surQuit = TTF_RenderText_Solid(font, str1610, palette[0]);
+      surQuit = TTF_RenderText_Solid(font, strQuit, palette[0]);
 
     }
 
+    SDL_RenderCopy(renderer, background, NULL, NULL);
+
     //blitting the options on the window
-    tempT = SDL_CreateTextureFromSurface(renderer, surContinue);
-    SDL_QueryTexture(tempT, NULL, NULL, &(posContinue->w), &(posContinue->h));
-    SDL_RenderCopy(renderer, tempT, NULL, posContinue);
+    tempT = SDL_CreateTextureFromSurface(renderer, surPlay);
+    SDL_QueryTexture(tempT, NULL, NULL, &(posPlay->w), &(posPlay->h));
+    SDL_RenderCopy(renderer, tempT, NULL, posPlay);
 
     tempT = SDL_CreateTextureFromSurface(renderer, surOptions);
     SDL_QueryTexture(tempT, NULL, NULL, &(posOptions->w), &(posOptions->h));
@@ -227,13 +235,13 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
 
     if (option != 0) {
       free(control);
-      SDL_FreeSurface(surContinue);
+      SDL_FreeSurface(surPlay);
       SDL_FreeSurface(surOptions);
       SDL_FreeSurface(surQuit);
-      free(strFull);
-      free(str43);
-      free(str1610);
-      free(posContinue);
+      free(strPlay);
+      free(strOptions);
+      free(strQuit);
+      free(posPlay);
       free(posOptions);
       free(posQuit);
       free(event);
@@ -258,8 +266,14 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
   SDL_Surface *sur169 = NULL;
   SDL_Surface *surAd = NULL;
   SDL_Surface *surBack = NULL;
+  SDL_Surface *temp;
 
   SDL_Texture *tempT = NULL;
+  SDL_Texture *background;
+
+  temp = IMG_Load(PATH_BACKGROUND);
+  background = SDL_CreateTextureFromSurface(renderer, temp);
+  SDL_FreeSurface(temp);
 
   //text strings
   char *strFull = NULL;
@@ -344,7 +358,6 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
 
     //controls
     *control = menu_controls(event, mouse_pos);
-    render_cursor(cursor, renderer, *mouse_pos);
 
     if (mouse_hover_menu(*mouse_pos, posFull->x, posFull->y, surFull->clip_rect.w, surFull->clip_rect.h)) {
 
@@ -484,6 +497,8 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
 
     }
 
+    SDL_RenderCopy(renderer, background, NULL, NULL);
+
     //blitting the options on the window
     tempT = SDL_CreateTextureFromSurface(renderer, surFull);
     SDL_QueryTexture(tempT, NULL, NULL, &(posFull->w), &(posFull->h));
@@ -509,13 +524,15 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
     SDL_QueryTexture(tempT, NULL, NULL, &(posBack->w), &(posBack->h));
     SDL_RenderCopy(renderer, tempT, NULL, posBack);
 
+    render_cursor(cursor, renderer, *mouse_pos);
+
     SDL_RenderPresent(renderer);
 
     SDL_Delay(1000 / SCREEN_FPS);
 
     //if we escape
     if (*control == 10) {
-      option = 3;
+      option = 6;
     }
 
     if (option != 0) {

@@ -210,7 +210,7 @@ int init_images (SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture *
 
 }
 
-int init_projectiles (projectile *projectiles[100], SDL_Texture *img) {
+int init_projectiles (projectile *projectiles[100], SDL_Texture *img, int x, int y) {
 
   //main projectiles
   *projectiles = (projectile*)malloc(100 * sizeof(projectile));
@@ -232,8 +232,8 @@ int init_projectiles (projectile *projectiles[100], SDL_Texture *img) {
 
   SDL_Rect *spritePos = NULL;
   spritePos = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  spritePos->x = 128;
-  spritePos->y = 128;
+  spritePos->x = x;
+  spritePos->y = y;
   spritePos->w = 16;
   spritePos->h = 16;
 
@@ -252,7 +252,7 @@ int init_projectiles (projectile *projectiles[100], SDL_Texture *img) {
   return 1;
 }
 
-int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint_t **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player_t **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B, level **currLevel, SDL_Texture **blocks_spritesheet, SDL_Texture **background) {
+int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint_t **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player_t **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B, level **currLevel, SDL_Texture **blocks_spritesheet, SDL_Texture **background, player_t **enemies, projectile **enemyProjectiles) {
 
   //used to print the initialization time
   *initTimer = (Uint32*)malloc(sizeof(Uint32));
@@ -328,7 +328,14 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
   //main player_t
   *p = (player_t*)malloc(sizeof(player_t));
   if (*p == NULL) {
-    printf("Error allocating memory for the player_t p\n");
+    printf("Error allocating memory for the player\n");
+    return 0;
+  }
+
+  //enemies
+  *enemies = (player_t*)malloc(10 * sizeof(player_t));
+  if (*enemies == NULL) {
+    printf("Error allocating memory for the enemies\n");
     return 0;
   }
 
@@ -353,7 +360,11 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
     return 0;
   }
 
-  if (init_projectiles(projectiles, *player_tSprite) == 0) {
+  if (init_projectiles(projectiles, *player_tSprite, 128, 128) == 0) {
+    return 0;
+  }
+
+  if (init_projectiles(enemyProjectiles, *player_tSprite, 144, 128) == 0) {
     return 0;
   }
 
@@ -379,7 +390,7 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
 
 }
 
-void free_variables (SDL_Texture *player_tSprite, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player_t *p, FPSmanager *manager, SDL_Color *colorPalette, SDL_Event *event, bool *quit, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, Uint32 *timeN_A, Uint32 *timeN_B, level *currLevel, SDL_Texture *blocks_spritesheet, SDL_Texture *background, int *stepDelay) {
+void free_variables (SDL_Texture *player_tSprite, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player_t *p, FPSmanager *manager, SDL_Color *colorPalette, SDL_Event *event, bool *quit, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, Uint32 *timeN_A, Uint32 *timeN_B, level *currLevel, SDL_Texture *blocks_spritesheet, SDL_Texture *background, int *stepDelay, player_t *enemies, projectile *enemyProjectiles) {
 
   SDL_DestroyTexture(player_tSprite);
   SDL_DestroyTexture(blocks_spritesheet);
@@ -405,6 +416,8 @@ void free_variables (SDL_Texture *player_tSprite, SDL_Renderer *renderer, SDL_Wi
   free(timeN_B);
   free(currLevel);
   free(stepDelay);
+  free(enemies);
+  free(enemyProjectiles);
 
   return;
 }

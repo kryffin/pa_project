@@ -22,6 +22,21 @@ void update_player (player_t *p, bool *quit) {
   return;
 }
 
+void update_enemy (player_t *p) {
+
+  set_player_screen_position(p, (int)get_player_real_position(*p).x, (int)get_player_real_position(*p).y);
+
+  SDL_Rect temp;
+  temp.x = get_player_screen_position(*p).x;
+  temp.y = get_player_screen_position(*p).y;
+  temp.w = get_player_hitbox(*p).w;
+  temp.h = get_player_hitbox(*p).h;
+
+  set_player_hitbox(p, temp);
+
+  return;
+}
+
 void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
 
   SDL_Rect *temp = NULL;
