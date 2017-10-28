@@ -77,6 +77,9 @@ int main () {
   Uint32 *timeN_A = NULL;
   Uint32 *timeN_B = NULL;
 
+  Uint32 enemyShootDelay = 0;
+  Uint32 playerShootDelay = 0;
+
   level *currLevel = NULL;
   SDL_Texture *blocks_spritesheet = NULL;
   SDL_Texture *background = NULL;
@@ -173,12 +176,28 @@ int main () {
     update_player(player, quit);
 
     //init a projectile if shooting
-    shooting(*mouse_btn, *player, playerProjectiles, *mouse_pos);
+    if (SDL_GetTicks() > playerShootDelay + PLAYER_SHOOT_DELAY) {
+      shooting(*mouse_btn, *player, playerProjectiles, *mouse_pos);
+      playerShootDelay = SDL_GetTicks();
+    }
+
+    //update enemies
     for (*i = 0; *i < 10; *i += 1) {
-      //player_gravity(&(enemies)[*i]);
-      update_enemy(&(enemies)[*i]);
-      player_pos = set_intpoint(get_player_screen_position(*player).x + (IMG_WIDTH / 2), get_player_screen_position(*player).y + (IMG_HEIGHT / 2));
-      shooting(true, enemies[*i], enemyProjectiles, player_pos);
+      if (is_alive(enemies[*i])) {
+        //player_gravity(&(enemies)[*i]);
+        update_enemy(&(enemies)[*i]);
+        player_pos = set_intpoint(get_player_screen_position(*player).x + (IMG_WIDTH / 2), get_player_screen_position(*player).y + (IMG_HEIGHT / 2));
+      }
+    }
+
+    //enemies shooting
+    if (SDL_GetTicks() > enemyShootDelay + ENEMY_SHOOT_DELAY) {
+      for (*i = 0; *i < 10; *i += 1) {
+        if (is_alive(enemies[*i])) {
+          shooting(true, enemies[*i], enemyProjectiles, player_pos);
+        }
+      }
+      enemyShootDelay = SDL_GetTicks();
     }
 
     update_projectiles(playerProjectiles);
@@ -207,6 +226,7 @@ int main () {
     }
 
     /* rendering */
+    printf("step : %d\n", player->step);
     rendering(player, enemies, playerProjectiles, enemyProjectiles, cursor, *currLevel, mouse_pos, renderer);
     if (!is_alive(*player)) {
       game_over(renderer);

@@ -38,6 +38,9 @@
 #define PATH_BACKGROUND "./res/background.bmp"
 #define PATH_TXT_FILE "./res/arena.txt"
 #define PATH_YOU_DIED "./res/you_died.png"
+//delays
+#define PLAYER_SHOOT_DELAY 100
+#define ENEMY_SHOOT_DELAY 500
 
 #define DELAY_STEP 150 //delay for the step updating
 

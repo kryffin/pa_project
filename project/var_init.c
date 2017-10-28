@@ -360,11 +360,11 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
     return 0;
   }
 
-  if (init_projectiles(projectiles, *player_tSprite, 128, 128) == 0) {
+  if (init_projectiles(projectiles, *player_tSprite, 128, 64) == 0) {
     return 0;
   }
 
-  if (init_projectiles(enemyProjectiles, *player_tSprite, 144, 128) == 0) {
+  if (init_projectiles(enemyProjectiles, *player_tSprite, 144, 64) == 0) {
     return 0;
   }
 

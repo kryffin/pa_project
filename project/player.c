@@ -15,7 +15,15 @@ void update_player (player_t *p, bool *quit) {
   temp.x = get_player_screen_position(*p).x;
   temp.y = get_player_screen_position(*p).y;
   temp.w = get_player_hitbox(*p).w;
-  temp.h = get_player_hitbox(*p).h;
+
+  if (get_player_state(*p) == 4) {
+    //if crouching
+    temp.y += 32;
+    temp.h = 32;
+  } else {
+    //if standing up
+    temp.h = 64;
+  }
 
   set_player_hitbox(p, temp);
 
@@ -43,12 +51,13 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
   temp = (SDL_Rect*)malloc(sizeof(SDL_Rect));
   temp->w = 32;
   temp->h = 64;
-  short int step = get_player_state(p);
+  short int step = get_player_step(p);
+  short int state = get_player_state(p);
 
   if (get_player_dir(p) == 1) {
     //player facing right
 
-    switch (step) {
+    switch (state) {
 
       //stand-by/walking
       case 0:
@@ -122,6 +131,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
 
         temp->x = 128;
         temp->y = 0;
+        temp->h = 32;
         set_player_sprite_pos(&p, *temp);
 
         break;
@@ -133,7 +143,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
   } else {
     //player facing left
 
-    switch (step) {
+    switch (state) {
 
       //stand-by/walking
       case 0:
@@ -206,7 +216,8 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
       case 4:
 
         temp->x = 128;
-        temp->y = 64;
+        temp->y = 32;
+        temp->h = 32;
         set_player_sprite_pos(&p, *temp);
 
         break;
@@ -267,13 +278,11 @@ void player_melee (player_t p, SDL_Renderer *renderer) {
 
 void player_update_step (player_t *p) {
 
-  short int step = get_player_step(*p);
-
   if(get_player_velocity(*p).x != 0) {
 
     set_player_step(p, get_player_step(*p) + 1);
 
-    if(step == 4) {
+    if(get_player_step(*p) == 4) {
 
       set_player_step(p, 0);
 
