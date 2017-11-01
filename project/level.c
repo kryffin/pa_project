@@ -1,4 +1,4 @@
-#include "header.h"
+ #include "header.h"
 
 void rendering (player *player, projectile bullets[100], SDL_Texture *cursor, level currLevel, intpoint *mouse_pos, SDL_Renderer *renderer) {
 
@@ -146,12 +146,12 @@ level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, play
           break;
 
         case 'p':
-        b = set_block(hitbox, spritesheet_pos, 5);
+          b = set_block(hitbox, spritesheet_pos, 5);
           set_player_real_position(p, x * 16, (y * 16) - 48);
           break;
 
         default:
-        b = set_block(hitbox, spritesheet_pos, 5);
+          b = set_block(hitbox, spritesheet_pos, 5);
           break;
 
       }

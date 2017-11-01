@@ -81,6 +81,7 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped) {
      //printf("space pressed\n");
      set_player_state(p, 1);
      set_player_vel_y (p, JUMP_HEIGHT);
+     set_player_real_position(p, get_player_real_position(*p).x, get_player_real_position(*p).y -1 );
      //printf("*v_y : %f\n", get_player_velocity(*p).y);
    //} /*else if (get_player_dJump(*p)) {
      /*set_player_dJump(p, false);

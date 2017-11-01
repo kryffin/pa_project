@@ -286,7 +286,7 @@ void player_gravity(player *p) {
   //if ((get_floatpoint_y(get_player_real_position(*p)) + IMG_HEIGHT) < SCREEN_HEIGHT) {
     set_player_real_position(p, get_floatpoint_x(get_player_real_position(*p)), get_floatpoint_y(get_player_real_position(*p)) + 2);
   //}
-  set_player_vel_y (p, get_player_velocity(*p).y + 2);
+  set_player_vel_y (p, get_player_velocity(*p).y + 1);
 
   return;
 }
@@ -296,7 +296,7 @@ void player_jumping (player *p, Uint32 timeN_A, Uint32 timeN_B) {
 
   if (get_player_state(*p) == 1 || get_player_state(*p) == 2)
   {
-
+    p->enableGravity = true;
     //set_player_real_position (p, get_player_real_position(*p).x + get_player_velocity(*p).x , get_player_real_position(*p).y + get_player_velocity(*p).y);
   }
 

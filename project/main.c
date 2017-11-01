@@ -148,7 +148,8 @@ int main () {
 
   //creating the player
   *p = set_player(10, *basePosition, *baseVelocity, playerSprite, *desRec, *hitbox);
-
+  //temporary
+  p->enableGravity = true;
   //PLACEHOLDER for these won't be used again
   free(basePosition);
   free(baseVelocity);
@@ -189,14 +190,16 @@ int main () {
 
     controls(event, quit, p, jumped, renderer, mouse_pos, mouse_btn, cursor, key);
 
-    if (!is_colision(p))
+    if (!is_colision(p, currLevel) & p->enableGravity){
+      //printf("\tgravity\n");
       player_gravity(p);
-
+    }
+    //printf("velx:%f\tvely:%f\n", get_player_velocity(*p).x ,get_player_velocity(*p).y);
     player_jumping(p, *timeN_A, *timeN_B);
 
     //player_apply_velocity(p);
     ////
-    player_colision (p, currLevel);
+    //player_colision (p, currLevel);
     player_apply_velocity(p);
     update_player(p);
 
@@ -210,7 +213,6 @@ int main () {
       *stepDelay = SDL_GetTicks();
     }
 
-    player_apply_velocity(p);
     player_update_dir(p, *mouse_pos);
 
     //RAW vertical hyper space

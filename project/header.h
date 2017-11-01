@@ -81,7 +81,7 @@ typedef struct Player {
   int jumpPoint; //point from where you jumped
   int highPoint; //highest point of the jump (used for falling?)
 
-  AABB box;//tout est dans le nom mamene
+  bool enableGravity;
   short int state; //curent state of the player
   floatpoint realPos; //position in float
   intpoint screenPos; //position in integer
@@ -294,8 +294,9 @@ void set_aabb_middle (AABB *box, floatpoint middlePoint);
 void set_aabb_size (AABB *box, vector size);
 
 
-
-bool is_colision(player *p);
+void correct_position (player *p, level l, unsigned int i, unsigned int j, int x, int y);
+bool check_collision_bb( SDL_Rect A, SDL_Rect B);
+bool is_colision(player *p, level* l);
 void player_colision (player *p, level* l);
 bool point_dans_aabb (floatpoint realpos, AABB world);
 void adjust_vector_collision(vector V, player *hero, AABB box, double eps);
