@@ -44,6 +44,9 @@
 
 #define DELAY_STEP 150 //delay for the step updating
 
+#define JUMP_HEIGHT -24
+#define GRAVITY 4
+
 /* * * * * * Player Structure * * * * * */
 
 typedef struct IntegerPoint {
@@ -78,6 +81,7 @@ typedef struct Player {
   SDL_Texture *img; //image used for displaying the player_t
   SDL_Rect spritePos; //position of the sprite in the sprite sheet
   SDL_Rect hitbox; //hitbox
+
 } player_t;
 
 /* DIR
@@ -182,9 +186,6 @@ SDL_Rect get_projectile_sprite_pos (projectile p);
 SDL_Texture* get_projectile_image (projectile p);
 
 /* player_t.c */
-floatpoint_t calcul_position (player_t p, float v_init, floatpoint_t pos_init, float angle, Uint32 timeN);
-float player_jumping_y (player_t p, Uint32 timeN);
-float player_jumping_x (player_t p, Uint32 timeN);
 void player_jumping (player_t *p, Uint32 timeN_A, Uint32 timeN_B);
 void player_gravity(player_t *p);
 

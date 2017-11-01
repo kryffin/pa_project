@@ -305,7 +305,28 @@ void player_update_dir (player_t *p, intpoint_t mouse_pos) {
 }
 
 void player_apply_velocity (player_t *p) {
+  if (get_player_real_position(*p).y + get_player_velocity(*p).y + IMG_HEIGHT > SCREEN_HEIGHT) {
+    set_player_vel_y(p, SCREEN_HEIGHT - (get_player_real_position(*p).y + IMG_HEIGHT));
+  }
   set_player_real_position(p, get_player_real_position(*p).x + get_player_velocity(*p).x, get_player_real_position(*p).y + get_player_velocity(*p).y);
+
+  return;
+}
+
+void player_gravity(player_t *p) {
+  if (get_player_real_position(*p).y <= SCREEN_HEIGHT - IMG_HEIGHT) {
+    set_player_vel_y(p, get_player_velocity(*p).y + GRAVITY);
+  }
+
+  return;
+}
+
+
+void player_jumping (player_t *p, Uint32 timeN_A, Uint32 timeN_B) {
+  if (get_player_state(*p) == 1 || get_player_state(*p) == 2) {
+    set_player_vel_y(p, JUMP_HEIGHT);
+  }
+
   return;
 }
 

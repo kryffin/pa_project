@@ -169,7 +169,7 @@ int main () {
 
     controls(event, quit, player, jumped, mouse_pos, mouse_btn, key);
 
-    //player_jumping(p, *timeN_A, *timeN_B);
+    player_jumping(player, *timeN_A, *timeN_B);
 
     player_gravity(player);
 
