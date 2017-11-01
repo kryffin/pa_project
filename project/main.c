@@ -226,7 +226,6 @@ int main () {
     }
 
     /* rendering */
-    printf("step : %d\n", player->step);
     rendering(player, enemies, playerProjectiles, enemyProjectiles, cursor, *currLevel, mouse_pos, renderer);
     if (!is_alive(*player)) {
       game_over(renderer);

@@ -309,53 +309,6 @@ void player_apply_velocity (player_t *p) {
   return;
 }
 
-float player_jumping_x (player_t p, Uint32 timeN) {
-  float t = timeN, x0 = get_floatpoint_x(get_player_real_position(p)), v = get_player_velocity(p).x;
-
-  return (v * t) + x0;
-}
-
-float player_jumping_y (player_t p, Uint32 timeN) {
-  float t = timeN, y0 = get_floatpoint_y(get_player_real_position(p)), v = abs(get_player_velocity(p).y);
-
-  return y0 - (v * t);
-}
-
-void player_gravity(player_t *p) {
-  if ((get_floatpoint_y(get_player_real_position(*p)) + IMG_HEIGHT) < SCREEN_HEIGHT) {
-    set_player_real_position(p, get_floatpoint_x(get_player_real_position(*p)), get_floatpoint_y(get_player_real_position(*p)) + 6);
-  }
-
-  return;
-}
-
-//temporary
-floatpoint_t calcul_position (player_t p, float v_init, floatpoint_t pos_init, float angle, Uint32 timeN) {
-  floatpoint_t pos = set_floatpoint(0.001 * player_jumping_x(p, timeN), -0.01 * player_jumping_y(p, timeN));
-
-  return pos;
-}
-
-void player_jumping (player_t *p, Uint32 timeN_A, Uint32 timeN_B) {
-
-  Uint32 timeN = timeN_B - timeN_A;
-
-  if (get_player_state(*p) == 1 || get_player_state(*p) == 2) {
-    floatpoint_t pos = set_floatpoint(get_player_real_position(*p).x, get_player_real_position(*p).y);
-    floatpoint_t next_pos = calcul_position(*p, get_player_velocity(*p).x, pos, 0.78, timeN);
-
-    set_player_real_position(p, get_floatpoint_x(next_pos) + get_floatpoint_x(pos), get_floatpoint_y(next_pos) + get_floatpoint_y(pos));
-
-    return;
-  }
-
-  if (timeN >= 950) {
-    set_player_state(p, 0);
-  }
-
-  return;
-}
-
 bool is_alive(player_t p) {
   return (get_player_hp(p) > 0);
 }
