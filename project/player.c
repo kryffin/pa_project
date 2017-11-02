@@ -304,11 +304,19 @@ void player_update_dir (player_t *p, intpoint_t mouse_pos) {
 
 }
 
-void player_apply_velocity (player_t *p) {
+void player_apply_velocity (player_t *p, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
   if (get_player_real_position(*p).y + get_player_velocity(*p).y + IMG_HEIGHT > SCREEN_HEIGHT) {
     set_player_vel_y(p, SCREEN_HEIGHT - (get_player_real_position(*p).y + IMG_HEIGHT));
   }
+
   set_player_real_position(p, get_player_real_position(*p).x + get_player_velocity(*p).x, get_player_real_position(*p).y + get_player_velocity(*p).y);
+
+  int w, h;
+  if (colision(*p, blocks, &w, &h)) {
+    intpoint_t dist;
+    dist = closest_out(*p, w, h);
+    set_player_real_position(p, get_intpoint_x(dist), get_intpoint_y(dist));
+  }
 
   return;
 }

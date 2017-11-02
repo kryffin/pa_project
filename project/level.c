@@ -1,5 +1,109 @@
 #include "header.h"
 
+intpoint_t closest_out (player_t player, int w, int h) {
+
+  intpoint_t posBlock, distx, disty, distmx, distmy;
+  int i;
+
+  distx = set_intpoint((int)get_player_real_position(player).x, (int)get_player_real_position(player).y);
+  disty = set_intpoint((int)get_player_real_position(player).x, (int)get_player_real_position(player).y);
+  distmx = set_intpoint((int)get_player_real_position(player).x, (int)get_player_real_position(player).y);
+  distmy = set_intpoint((int)get_player_real_position(player).x, (int)get_player_real_position(player).y);
+
+
+  posBlock = set_intpoint(w, h);
+
+  while (true) {
+
+    for (i = 0; i < 4; i++) {
+      switch (i) {
+        case 0:
+          set_intpoint_x(&distx, get_intpoint_x(distx) + 1);
+          if (!collision_intpoint(posBlock, distx)) {
+            printf("choix x+\n");
+            return distx;
+          }
+          break;
+
+        case 1:
+          set_intpoint_y(&disty, get_intpoint_y(disty) + 1);
+          if (!collision_intpoint(posBlock, disty)) {
+            printf("choix y+\n");
+            return disty;
+          }
+          break;
+
+        case 2:
+          set_intpoint_x(&distmx, get_intpoint_x(distmx) - 1);
+          if (!collision_intpoint(posBlock, distmx)) {
+            printf("choix x-\n");
+            return distmx;
+          }
+          break;
+
+        case 3:
+          set_intpoint_y(&distmy, get_intpoint_y(distmy) - 1);
+          if (!collision_intpoint(posBlock, distmy)) {
+            printf("choix y-\n");
+            return distmy;
+          }
+          break;
+
+        default:
+          break;
+      }
+    }
+
+  }
+
+}
+
+bool collision_intpoint (intpoint_t a, intpoint_t b) {
+  if (((get_intpoint_x(a) >= get_intpoint_x(b) && get_intpoint_x(a) <= get_intpoint_x(b) + IMG_WIDTH) || (get_intpoint_x(a) + 16 >= get_intpoint_x(b) && get_intpoint_x(a) + 16 <= get_intpoint_x(b) + IMG_WIDTH))) {
+
+    if (((get_intpoint_y(a) >= get_intpoint_y(b) && get_intpoint_y(a) <= get_intpoint_y(b) + IMG_HEIGHT) || (get_intpoint_y(a) + 16 >= get_intpoint_y(b) && get_intpoint_y(a) + 16 <= get_intpoint_y(b) + IMG_HEIGHT))) {
+
+      return true;
+
+    }
+
+  }
+
+  return false;
+}
+
+bool colision (player_t player, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], int *width, int *height) {
+  int w,h;
+  intpoint_t posBlock;
+
+  set_player_real_position(&player, get_player_real_position(player).x + get_player_velocity(player).x, get_player_real_position(player).y + get_player_velocity(player).y);
+
+  for (w = 0; w < NB_BLOCKS_WIDTH; w++) {
+    for (h = 0; h < NB_BLOCKS_HEIGHT; h++) {
+
+      if (get_block_type(blocks[w][h]) == 0) {
+        posBlock = set_intpoint(w*16, h*16);
+
+        if ((get_intpoint_x(posBlock) >= get_player_real_position(player).x && get_intpoint_x(posBlock) <= get_player_real_position(player).x + IMG_WIDTH) || (get_intpoint_x(posBlock) + 16 >= get_player_real_position(player).x && get_intpoint_x(posBlock) + 16 <= get_player_real_position(player).x + IMG_WIDTH)) {
+
+          if ((get_intpoint_y(posBlock) >= get_player_real_position(player).y && get_intpoint_y(posBlock) <= get_player_real_position(player).y + IMG_HEIGHT) || (get_intpoint_y(posBlock) + 16 >= get_player_real_position(player).y && get_intpoint_y(posBlock) + 16 <= get_player_real_position(player).y + IMG_HEIGHT)) {
+
+            *width = w * 16;
+            *height = h * 16;
+            return true;
+
+          }
+
+        }
+
+      }
+
+    }
+  }
+
+  return false;
+}
+
 void game_over (SDL_Renderer *renderer) {
   SDL_Surface *temp;
   SDL_Texture *panel;

@@ -153,6 +153,9 @@ void keyboard_control (player_t *p, SDL_Keycode *key, bool *jumped);
 void controls (SDL_Event *event, bool *quit, player_t *p, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, SDL_Keycode *key);
 
 /* level.c */
+intpoint_t closest_out (player_t player, int w, int h);
+bool collision_intpoint (intpoint_t a, intpoint_t b);
+bool colision (player_t player, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], int *width, int *height);
 void game_over (SDL_Renderer *renderer);
 void rendering (player_t *player, player_t enemies[10], projectile bullets[100], projectile enemyProjectiles[100], SDL_Texture *cursor, level currLevel, intpoint_t *mouse_pos, SDL_Renderer *renderer);
 void render_foreground_level (level l, SDL_Renderer *renderer);
@@ -195,7 +198,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos);
 void player_melee (player_t p, SDL_Renderer *renderer);
 void player_update_step(player_t *p);
 void player_update_dir (player_t *p, intpoint_t mouse_pos);
-void player_apply_velocity (player_t *p);
+void player_apply_velocity (player_t *p, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]);
 bool is_alive(player_t p);
 player_t set_player (short int maxHealthPoints, floatpoint_t position, vector_t velocity, SDL_Texture *image, SDL_Rect posSprite, SDL_Rect hitbox);
 void set_player_maxhp (player_t *p, short int maxhp);
