@@ -189,8 +189,10 @@ SDL_Rect get_projectile_sprite_pos (projectile p);
 SDL_Texture* get_projectile_image (projectile p);
 
 /* player_t.c */
+intpoint_t get_player_grid_pos (player_t p);
+
 void player_jumping (player_t *p, Uint32 timeN_A, Uint32 timeN_B);
-void player_gravity(player_t *p);
+void player_gravity(player_t *p, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]);
 
 void update_player (player_t *p, bool *quit);
 void update_enemy (player_t *p);

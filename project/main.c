@@ -171,7 +171,7 @@ int main () {
 
     player_jumping(player, *timeN_A, *timeN_B);
 
-    player_gravity(player);
+    player_gravity(player, currLevel->blocks);
 
     //init a projectile if shooting
     if (SDL_GetTicks() > playerShootDelay + PLAYER_SHOOT_DELAY) {
@@ -209,10 +209,11 @@ int main () {
     player_apply_velocity(player, currLevel->blocks);
     player_update_dir(player, *mouse_pos);
     update_player(player, quit);
-    printf("%d :: real : %.2f \t sreen : %d \t hitbox : %d\n", SDL_GetTicks(), player->realPos.y, player->screenPos.y, player->hitbox.y);
+    get_player_grid_pos(*player);
+    //printf("%d :: real : %.2f \t sreen : %d \t hitbox : %d\n", SDL_GetTicks(), player->realPos.y, player->screenPos.y, player->hitbox.y);
 
     //RAW vertical hyper space
-    if (player->realPos.x + (IMG_WIDTH / 2) > SCREEN_WIDTH) {
+    /*if (player->realPos.x + (IMG_WIDTH / 2) > SCREEN_WIDTH) {
       player->hp = 0;
     }
 
@@ -223,7 +224,7 @@ int main () {
     //RAW re-enabling double jump
     if (player->dJump == false && player->realPos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
       player->dJump = true;
-    }
+    }*/
 
     /* rendering */
     rendering(player, enemies, playerProjectiles, enemyProjectiles, cursor, *currLevel, mouse_pos, renderer);

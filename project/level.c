@@ -20,7 +20,7 @@ intpoint_t closest_out (player_t player, int w, int h) {
         case 0:
           set_intpoint_x(&distx, get_intpoint_x(distx) + 1);
           if (!collision_intpoint(posBlock, distx)) {
-            printf("choix x+\n");
+            //printf("choix x+\n");
             return distx;
           }
           break;
@@ -28,7 +28,7 @@ intpoint_t closest_out (player_t player, int w, int h) {
         case 1:
           set_intpoint_y(&disty, get_intpoint_y(disty) + 1);
           if (!collision_intpoint(posBlock, disty)) {
-            printf("choix y+\n");
+            //printf("choix y+\n");
             return disty;
           }
           break;
@@ -36,7 +36,7 @@ intpoint_t closest_out (player_t player, int w, int h) {
         case 2:
           set_intpoint_x(&distmx, get_intpoint_x(distmx) - 1);
           if (!collision_intpoint(posBlock, distmx)) {
-            printf("choix x-\n");
+            //printf("choix x-\n");
             return distmx;
           }
           break;
@@ -44,7 +44,7 @@ intpoint_t closest_out (player_t player, int w, int h) {
         case 3:
           set_intpoint_y(&distmy, get_intpoint_y(distmy) - 1);
           if (!collision_intpoint(posBlock, distmy)) {
-            printf("choix y-\n");
+            //printf("choix y-\n");
             return distmy;
           }
           break;

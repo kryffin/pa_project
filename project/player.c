@@ -1,6 +1,24 @@
 #include "header.h"
 
-/* renderTING */
+intpoint_t get_player_grid_pos (player_t p) {
+  int x, y, i, j;
+  x = (int)get_player_real_position(p).x;
+  y = (int)get_player_real_position(p).y;
+
+  for (i = 0; i < SCREEN_WIDTH; i += 16) {
+    if (x >= i && x < i + 16) {
+      for (j = 0; j < SCREEN_HEIGHT; j += 16) {
+        if (y >= j && y < j + 16) {
+
+          return set_intpoint(i/16, j/16);
+        }
+      }
+    }
+  }
+
+  printf("Error in the grid\n");
+  return set_intpoint(0, 0);
+}
 
 void update_player (player_t *p, bool *quit) {
 
@@ -305,6 +323,7 @@ void player_update_dir (player_t *p, intpoint_t mouse_pos) {
 }
 
 void player_apply_velocity (player_t *p, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
+
   if (get_player_real_position(*p).y + get_player_velocity(*p).y + IMG_HEIGHT > SCREEN_HEIGHT) {
     set_player_vel_y(p, SCREEN_HEIGHT - (get_player_real_position(*p).y + IMG_HEIGHT));
   }
@@ -321,7 +340,17 @@ void player_apply_velocity (player_t *p, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS
   return;
 }
 
-void player_gravity(player_t *p) {
+void player_gravity(player_t *p, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
+
+  //intpoint_t gridPos = get_player_grid_pos(*p);
+
+  /*if (get_block_type(blocks[get_intpoint_x(gridPos)][get_intpoint_y(gridPos) + 4]) == 0 || get_block_type(blocks[get_intpoint_x(gridPos) + 1][get_intpoint_y(gridPos) + 4]) == 0 || get_block_type(blocks[get_intpoint_x(gridPos) + 2][get_intpoint_y(gridPos) + 4]) == 0) {
+    printf("on ground x : %d | y : %d\n", gridPos.x, gridPos.y);
+    set_player_vel_y(p, 0.0);
+    //set_player_real_position(p, get_intpoint_x(gridPos) * 16, (get_intpoint_y(gridPos) * 16) - 1);
+    return;
+  }*/
+
   if (get_player_real_position(*p).y <= SCREEN_HEIGHT - IMG_HEIGHT) {
     set_player_vel_y(p, get_player_velocity(*p).y + GRAVITY);
   }
