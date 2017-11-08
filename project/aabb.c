@@ -125,7 +125,7 @@ bool is_colision (player *p, level *l)
 void correct_position (player *p, level l, unsigned int i, unsigned int j, int x, int y)
 {
     p->enableGravity = false;
-    set_player_real_position (p, get_player_real_position(*p).x, get_player_real_position(*p).y);
+    set_player_real_position (p, get_player_real_position(*p).x, get_player_real_position(*p).y - BLOCK_WIDTH);
   /*
   //on remet le perso sur le bord bas de lecran
   //set_player_real_position (p, get_player_real_position(*p).x,  ((y-1)*BLOCK_HEIGHT)+16);
@@ -203,7 +203,7 @@ bool check_collision_bb (SDL_Rect A, SDL_Rect B)
   topB = B.y;
   bottomB = B.y + B.h;
 
-  if (bottomA <= bottomB) { 
+  if (bottomA <= bottomB) {
     return false;
   }
   if (topA >= bottomB) { return false; }
