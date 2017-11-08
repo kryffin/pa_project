@@ -171,8 +171,6 @@ int main () {
 
     player_jumping(player, *timeN_A, *timeN_B);
 
-    player_gravity(player, currLevel->blocks);
-
     //init a projectile if shooting
     if (SDL_GetTicks() > playerShootDelay + PLAYER_SHOOT_DELAY) {
       shooting(*mouse_btn, *player, playerProjectiles, *mouse_pos);
@@ -208,8 +206,9 @@ int main () {
 
     player_apply_velocity(player, currLevel->blocks);
     player_update_dir(player, *mouse_pos);
+    player_gravity(player);
     update_player(player, quit);
-    get_player_grid_pos(*player);
+    printf("step : %d\n", player->step);
     //printf("%d :: real : %.2f \t sreen : %d \t hitbox : %d\n", SDL_GetTicks(), player->realPos.y, player->screenPos.y, player->hitbox.y);
 
     //RAW vertical hyper space

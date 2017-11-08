@@ -1,25 +1,5 @@
 #include "header.h"
 
-intpoint_t get_player_grid_pos (player_t p) {
-  int x, y, i, j;
-  x = (int)get_player_real_position(p).x;
-  y = (int)get_player_real_position(p).y;
-
-  for (i = 0; i < SCREEN_WIDTH; i += 16) {
-    if (x >= i && x < i + 16) {
-      for (j = 0; j < SCREEN_HEIGHT; j += 16) {
-        if (y >= j && y < j + 16) {
-
-          return set_intpoint(i/16, j/16);
-        }
-      }
-    }
-  }
-
-  printf("Error in the grid\n");
-  return set_intpoint(0, 0);
-}
-
 void update_player (player_t *p, bool *quit) {
 
   if (!is_alive(*p)) {
@@ -80,7 +60,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
       //stand-by/walking
       case 0:
 
-        if (get_player_velocity(p).x == 0 && get_player_velocity(p).y == 0) {
+        if (get_player_velocity(p).x == 0) {
 
           //stand by sprite
           temp->x = 0;
@@ -166,7 +146,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
       //stand-by/walking
       case 0:
 
-        if (get_player_velocity(p).x == 0 && get_player_velocity(p).y == 0) {
+        if (get_player_velocity(p).x == 0) {
 
           //stand by sprite
           temp->x = 0;
@@ -324,7 +304,7 @@ void player_update_dir (player_t *p, intpoint_t mouse_pos) {
 
 void player_apply_velocity (player_t *p, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
 
-  if (get_player_real_position(*p).y + get_player_velocity(*p).y + IMG_HEIGHT > SCREEN_HEIGHT) {
+  if (get_player_real_position(*p).y + get_player_velocity(*p).y + IMG_HEIGHT > SCREEN_HEIGHT && !(p->onGround)) {
     set_player_vel_y(p, SCREEN_HEIGHT - (get_player_real_position(*p).y + IMG_HEIGHT));
   }
 
@@ -332,26 +312,16 @@ void player_apply_velocity (player_t *p, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS
 
   int w, h;
   if (colision(*p, blocks, &w, &h)) {
-    intpoint_t dist;
-    dist = closest_out(*p, w, h);
-    set_player_real_position(p, get_intpoint_x(dist), get_intpoint_y(dist));
+    closest_out(p, w, h);
+    p->onGround = true;
   }
-
+  
   return;
 }
 
-void player_gravity(player_t *p, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
+void player_gravity(player_t *p) {
 
-  //intpoint_t gridPos = get_player_grid_pos(*p);
-
-  /*if (get_block_type(blocks[get_intpoint_x(gridPos)][get_intpoint_y(gridPos) + 4]) == 0 || get_block_type(blocks[get_intpoint_x(gridPos) + 1][get_intpoint_y(gridPos) + 4]) == 0 || get_block_type(blocks[get_intpoint_x(gridPos) + 2][get_intpoint_y(gridPos) + 4]) == 0) {
-    printf("on ground x : %d | y : %d\n", gridPos.x, gridPos.y);
-    set_player_vel_y(p, 0.0);
-    //set_player_real_position(p, get_intpoint_x(gridPos) * 16, (get_intpoint_y(gridPos) * 16) - 1);
-    return;
-  }*/
-
-  if (get_player_real_position(*p).y <= SCREEN_HEIGHT - IMG_HEIGHT) {
+  if (get_player_real_position(*p).y <= SCREEN_HEIGHT - IMG_HEIGHT && !(p->onGround)) {
     set_player_vel_y(p, get_player_velocity(*p).y + GRAVITY);
   }
 
@@ -381,7 +351,7 @@ player_t set_player (short int maxHealthPoints, floatpoint_t position, vector_t 
   set_player_hp(&p, maxHealthPoints);
   set_player_dir(&p, 0);
   set_player_step(&p, 0);
-  set_player_dJump(&p, true);
+  set_player_on_ground(&p, false);
   set_player_jumpPoint(&p, 0);
   set_player_highPoint(&p, 0);
   set_player_state(&p, 0);
@@ -421,8 +391,8 @@ void set_player_step (player_t *p, short int step) {
 }
 
 //set the player's ability to double jump
-void set_player_dJump (player_t *p, bool dJump) {
-  p->dJump = dJump;
+void set_player_on_ground (player_t *p, bool onGround) {
+  p->onGround = onGround;
   return;
 }
 
@@ -511,8 +481,8 @@ short int get_player_step (player_t p) {
 }
 
 //get the player's ability to double jump
-bool get_player_dJump (player_t p) {
-  return p.dJump;
+bool get_player_on_ground (player_t p) {
+  return p.onGround;
 }
 
 //get the player's jump point

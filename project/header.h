@@ -54,7 +54,7 @@ typedef struct IntegerPoint {
   int y;
 } intpoint_t;
 
-typedef struct floatpoint_t {
+typedef struct FloatPoint_t {
   float x;
   float y;
 } floatpoint_t;
@@ -70,7 +70,7 @@ typedef struct Player {
   short int dir; //current direction
   short int step; //step for the surrent sprite to use
 
-  bool dJump; //is double jump available?
+  bool onGround; //is the player on a ground?
   int jumpPoint; //point from where you jumped
   int highPoint; //highest point of the jump (used for falling?)
 
@@ -153,7 +153,7 @@ void keyboard_control (player_t *p, SDL_Keycode *key, bool *jumped);
 void controls (SDL_Event *event, bool *quit, player_t *p, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, SDL_Keycode *key);
 
 /* level.c */
-intpoint_t closest_out (player_t player, int w, int h);
+void closest_out (player_t *player, int w, int h);
 bool collision_intpoint (intpoint_t a, intpoint_t b);
 bool colision (player_t player, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], int *width, int *height);
 void game_over (SDL_Renderer *renderer);
@@ -189,10 +189,8 @@ SDL_Rect get_projectile_sprite_pos (projectile p);
 SDL_Texture* get_projectile_image (projectile p);
 
 /* player_t.c */
-intpoint_t get_player_grid_pos (player_t p);
-
 void player_jumping (player_t *p, Uint32 timeN_A, Uint32 timeN_B);
-void player_gravity(player_t *p, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]);
+void player_gravity(player_t *p);
 
 void update_player (player_t *p, bool *quit);
 void update_enemy (player_t *p);
@@ -207,7 +205,7 @@ void set_player_maxhp (player_t *p, short int maxhp);
 void set_player_hp (player_t *p, short int hp);
 void set_player_dir (player_t *p, short int dir);
 void set_player_step (player_t *p, short int step);
-void set_player_dJump (player_t *p, bool dJump);
+void set_player_on_ground (player_t *p, bool onGround);
 void set_player_jumpPoint (player_t *p, int jumpPoint);
 void set_player_highPoint (player_t *p, int highPoint);
 void set_player_state (player_t *p, short int state);
@@ -223,7 +221,7 @@ short int get_player_maxhp (player_t p);
 short int get_player_hp (player_t p);
 short int get_player_dir (player_t p);
 short int get_player_step (player_t p);
-bool get_player_dJump (player_t p);
+bool get_player_on_ground (player_t p);
 int get_player_jumpPoint (player_t p);
 int get_player_highPoint (player_t p);
 short int get_player_state (player_t p);
