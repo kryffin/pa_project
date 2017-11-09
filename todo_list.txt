@@ -1,0 +1,27 @@
+To do :
+
+- Enchainement de niveaux
+- 2nd option du menu : Arena
+- Différentes armes à feu
+- IA pour les ennemis
+- Différents combo au CaC
+- Collisions physique
+- Collisions des entités
+
+-- Sprites
+-- Design pour le menu
+
+
++ Tir simple
++ CaC simple
++ Gravité
++ Vecteur de direction
++ Déplacement
++ Ennemis
++ Gestion du fichier txt en niveau
+
+______________________________
+
+- à faire
+-- optionnel
++ fait
