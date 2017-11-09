@@ -62,32 +62,32 @@ void keyboard_control (player_t *p, SDL_Keycode *keys, bool *jumped) {
 
   //'q' or 'a' key
   if (keys[keysTab[0]] == 1) {
-    if(get_player_state(*p) != 4) {
+    if(get_player_state(*p) != Crouching) {
       set_player_vel_x(p, -3); //set a left velocity
     }
   }
 
   //'d' key
   if (keys[keysTab[1]] == 1) {
-    if(get_player_state(*p) != 4) {
+    if(get_player_state(*p) != Crouching) {
       set_player_vel_x(p, 3); //set a left velocity
     }
   }
 
   //'space' key
   if (keys[keysTab[2]] == 1 && *jumped == false) {
-    set_player_state(p, 1);
+    set_player_state(p, Jumping);
     *jumped = true;
   }
 
   //'f' key
   if (keys[keysTab[3]] == 1) {
-    set_player_state(p, 3);
+    set_player_state(p, Attacking);
   }
 
   //'s' key
   if (keys[keysTab[4]] == 1) {
-    set_player_state(p, 4);
+    set_player_state(p, Crouching);
     set_player_vel_x(p, 0); //set a left velocity
   }
 
@@ -109,8 +109,8 @@ void keyboard_control (player_t *p, SDL_Keycode *keys, bool *jumped) {
 
   //'space' key
   if (keys[keysTab[2]] == 0) {
-    if (get_player_state(*p) == 1) {
-      set_player_state(p, 0);
+    if (get_player_state(*p) == Jumping) {
+      set_player_state(p, Walking);
       set_player_vel_y(p, 0);
     }
     *jumped = false;
@@ -118,15 +118,15 @@ void keyboard_control (player_t *p, SDL_Keycode *keys, bool *jumped) {
 
   //'f' key
   if (keys[keysTab[3]] == 0) {
-    if (get_player_state(*p) == 3) {
-      set_player_state(p, 0);
+    if (get_player_state(*p) == Attacking) {
+      set_player_state(p, Walking);
     }
   }
 
   //'s' key
   if (keys[keysTab[4]] == 0) {
-    if (get_player_state(*p) == 4) {
-      set_player_state(p, 0);
+    if (get_player_state(*p) == Crouching) {
+      set_player_state(p, Walking);
     }
   }
 

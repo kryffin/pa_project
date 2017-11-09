@@ -36,7 +36,7 @@ bool collision_intpoint (intpoint_t a, intpoint_t b) {
   return false;
 }
 
-bool colision (player_t player, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], int *width, int *height) {
+bool collision (player_t player, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], int *width, int *height) {
   int w,h;
   intpoint_t posBlock;
 
@@ -45,7 +45,7 @@ bool colision (player_t player, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT],
   for (w = 0; w < NB_BLOCKS_WIDTH; w++) {
     for (h = 0; h < NB_BLOCKS_HEIGHT; h++) {
 
-      if (get_block_type(blocks[w][h]) == 0) {
+      if (get_block_type(blocks[w][h]) == Solid) {
         posBlock = set_intpoint(w*16, h*16);
 
         if ((get_intpoint_x(posBlock) >= get_player_real_position(player).x && get_intpoint_x(posBlock) <= get_player_real_position(player).x + IMG_WIDTH) || (get_intpoint_x(posBlock) + 16 >= get_player_real_position(player).x && get_intpoint_x(posBlock) + 16 <= get_player_real_position(player).x + IMG_WIDTH)) {
@@ -84,7 +84,7 @@ void game_over (SDL_Renderer *renderer) {
   return;
 }
 
-void rendering (player_t *player, player_t enemies[10], projectile bullets[100], projectile enemyProjectiles[100], SDL_Texture *cursor, level currLevel, intpoint_t *mouse_pos, SDL_Renderer *renderer) {
+void rendering (player_t *player, player_t enemies[10], projectile_t bullets[100], projectile_t enemyProjectiles[100], SDL_Texture *cursor, level_t currLevel, intpoint_t *mouse_pos, SDL_Renderer *renderer) {
 
   SDL_RenderCopy(renderer, get_level_background(currLevel), NULL, NULL);
 
@@ -107,7 +107,7 @@ void rendering (player_t *player, player_t enemies[10], projectile bullets[100],
   }
 
   //render the attack and process it
-  if (get_player_state(*player) == 3)  {
+  if (get_player_state(*player) == Attacking)  {
     player_melee(*player, renderer);
   }
 
@@ -122,7 +122,7 @@ void rendering (player_t *player, player_t enemies[10], projectile bullets[100],
   return;
 }
 
-void render_foreground_level (level l, SDL_Renderer *renderer) {
+void render_foreground_level (level_t l, SDL_Renderer *renderer) {
 
   unsigned short int type;
   SDL_Rect tempSpritePos = {0, 0, 16, 16};
@@ -137,12 +137,12 @@ void render_foreground_level (level l, SDL_Renderer *renderer) {
 
       switch (type) {
 
-        case 0:
+        case Solid:
           tempSpritePos.x = 0;
           SDL_RenderCopy(renderer, get_level_blocks_spritesheet(l), &tempSpritePos, &tempPos);
           break;
 
-        case 2:
+        case Foreground:
           tempSpritePos.x = 32;
           SDL_RenderCopy(renderer, get_level_blocks_spritesheet(l), &tempSpritePos, &tempPos);
           break;
@@ -157,29 +157,19 @@ void render_foreground_level (level l, SDL_Renderer *renderer) {
   return;
 }
 
-void render_background_level (level l, SDL_Renderer *renderer) {
+void render_background_level (level_t l, SDL_Renderer *renderer) {
 
-  unsigned short int type;
-  SDL_Rect tempSpritePos = {0, 0, 16, 16};
+  SDL_Rect tempSpritePos = {16, 0, 16, 16};
   SDL_Rect tempPos = {0, 0, 16, 16};
   int i, j;
   for (i = 0; i < NB_BLOCKS_WIDTH; i++) {
     for (j = 0; j < NB_BLOCKS_HEIGHT; j++) {
 
-      type = get_block_type(get_level_block(l, i, j));
       tempPos.x = i * 16;
       tempPos.y = j * 16;
 
-      switch (type) {
-
-        case 1:
-          tempSpritePos.x = 16;
-          SDL_RenderCopy(renderer, get_level_blocks_spritesheet(l), &tempSpritePos, &tempPos);
-          break;
-
-        default:
-          break;
-
+      if (get_block_type(get_level_block(l, i, j)) == Background) {
+        SDL_RenderCopy(renderer, get_level_blocks_spritesheet(l), &tempSpritePos, &tempPos);
       }
     }
   }
@@ -187,9 +177,9 @@ void render_background_level (level l, SDL_Renderer *renderer) {
   return;
 }
 
-level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player_t *p, player_t enemies[10]) {
+level_t init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player_t *p, player_t enemies[10]) {
 
-  level l;
+  level_t l;
   int i = 0;
 
   FILE *txtFile = fopen(PATH_TXT_FILE, "r");
@@ -198,9 +188,9 @@ level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, play
     exit(0);
   }
 
-  block matrix[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT];
+  block_t matrix[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT];
   char curr;
-  block b;
+  block_t b;
   SDL_Rect hitbox = {0, 0, 16, 16};
   SDL_Rect spritesheet_pos = {0, 0, 16, 16};
 
@@ -224,19 +214,19 @@ level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, play
         case '0':
           spritesheet_pos.x = 0;
           spritesheet_pos.y = 0;
-          b = set_block(hitbox, spritesheet_pos, 0);
+          b = set_block(hitbox, spritesheet_pos, Solid);
           break;
 
         case '1':
           spritesheet_pos.x = 16;
           spritesheet_pos.y = 0;
-          b = set_block(hitbox, spritesheet_pos, 1);
+          b = set_block(hitbox, spritesheet_pos, Background);
           break;
 
         case '2':
           spritesheet_pos.x = 32;
           spritesheet_pos.y = 0;
-          b = set_block(hitbox, spritesheet_pos, 2);
+          b = set_block(hitbox, spritesheet_pos, Foreground);
           break;
 
         case 'p':
@@ -268,8 +258,8 @@ level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, play
 
 /* SET */
 
-level set_level (block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], SDL_Texture *blocks_spritesheet, SDL_Texture *background) {
-  level l;
+level_t set_level (block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], SDL_Texture *blocks_spritesheet, SDL_Texture *background) {
+  level_t l;
 
   int i, j;
   for (i = 0; i < NB_BLOCKS_WIDTH; i++) {
@@ -286,19 +276,19 @@ level set_level (block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], SDL_Texture *b
   return l;
 }
 
-void set_level_block (level *l, int x, int y, block b) {
+void set_level_block (level_t *l, int x, int y, block_t b) {
   l->blocks[x][y] = b;
 
   return;
 }
 
-void set_level_blocks_spritesheet (level *l, SDL_Texture *blocks_spritesheet) {
+void set_level_blocks_spritesheet (level_t *l, SDL_Texture *blocks_spritesheet) {
   l->blocks_spritesheet = blocks_spritesheet;
 
   return;
 }
 
-void set_level_background (level *l, SDL_Texture *background) {
+void set_level_background (level_t *l, SDL_Texture *background) {
   l->background = background;
 
   return;
@@ -306,17 +296,17 @@ void set_level_background (level *l, SDL_Texture *background) {
 
 /* GET */
 
-block get_level_block (level l, int x, int y) {
+block_t get_level_block (level_t l, int x, int y) {
 
   return l.blocks[x][y];
 }
 
-SDL_Texture *get_level_blocks_spritesheet (level l) {
+SDL_Texture *get_level_blocks_spritesheet (level_t l) {
 
   return l.blocks_spritesheet;
 }
 
-SDL_Texture *get_level_background (level l) {
+SDL_Texture *get_level_background (level_t l) {
 
   return l.background;
 }

@@ -210,10 +210,10 @@ int init_images (SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture *
 
 }
 
-int init_projectiles (projectile *projectiles[100], SDL_Texture *img, int x, int y) {
+int init_projectiles (projectile_t *projectiles[100], SDL_Texture *img, int x, int y) {
 
   //main projectiles
-  *projectiles = (projectile*)malloc(100 * sizeof(projectile));
+  *projectiles = (projectile_t *)malloc(100 * sizeof(projectile_t ));
   if (*projectiles == NULL) {
     printf("Error allocating memory for the projectiles\n");
     return 0;
@@ -252,7 +252,7 @@ int init_projectiles (projectile *projectiles[100], SDL_Texture *img, int x, int
   return 1;
 }
 
-int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint_t **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player_t **p, projectile **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B, level **currLevel, SDL_Texture **blocks_spritesheet, SDL_Texture **background, player_t **enemies, projectile **enemyProjectiles) {
+int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint_t **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player_t **p, projectile_t **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B, level_t **currLevel, SDL_Texture **blocks_spritesheet, SDL_Texture **background, player_t **enemies, projectile_t **enemyProjectiles) {
 
   //used to print the initialization time
   *initTimer = (Uint32*)malloc(sizeof(Uint32));
@@ -380,7 +380,7 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
     return 0;
   }
 
-  *currLevel = (level*)malloc(sizeof(level));
+  *currLevel = (level_t*)malloc(sizeof(level_t));
   if (*currLevel == NULL) {
     printf("Error allocating memory for the level\n");
     return 0;
@@ -390,7 +390,7 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
 
 }
 
-void free_variables (SDL_Texture *player_tSprite, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile *projectiles, player_t *p, FPSmanager *manager, SDL_Color *colorPalette, SDL_Event *event, bool *quit, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, Uint32 *timeN_A, Uint32 *timeN_B, level *currLevel, SDL_Texture *blocks_spritesheet, SDL_Texture *background, int *stepDelay, player_t *enemies, projectile *enemyProjectiles) {
+void free_variables (SDL_Texture *player_tSprite, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile_t *projectiles, player_t *p, FPSmanager *manager, SDL_Color *colorPalette, SDL_Event *event, bool *quit, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, Uint32 *timeN_A, Uint32 *timeN_B, level_t *currLevel, SDL_Texture *blocks_spritesheet, SDL_Texture *background, int *stepDelay, player_t *enemies, projectile_t *enemyProjectiles) {
 
   SDL_DestroyTexture(player_tSprite);
   SDL_DestroyTexture(blocks_spritesheet);

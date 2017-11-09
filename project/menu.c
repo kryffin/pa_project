@@ -94,8 +94,8 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
   sprintf(strPlay, "Play");
 
   char *strOptions = NULL;
-  strOptions = (char*)malloc(8 * sizeof(char));
-  sprintf(strOptions, "Options");
+  strOptions = (char*)malloc(6 * sizeof(char));
+  sprintf(strOptions, "Arena");
 
   char *strQuit = NULL;
   strQuit = (char*)malloc(5 * sizeof(char));

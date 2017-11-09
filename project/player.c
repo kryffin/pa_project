@@ -14,7 +14,7 @@ void update_player (player_t *p, bool *quit) {
   temp.y = get_player_screen_position(*p).y;
   temp.w = get_player_hitbox(*p).w;
 
-  if (get_player_state(*p) == 4) {
+  if (get_player_state(*p) == Crouching) {
     //if crouching
     temp.y += 32;
     temp.h = 32;
@@ -52,13 +52,13 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
   short int step = get_player_step(p);
   short int state = get_player_state(p);
 
-  if (get_player_dir(p) == 1) {
+  if (get_player_dir(p) == Right) {
     //player facing right
 
     switch (state) {
 
       //stand-by/walking
-      case 0:
+      case Walking:
 
         if (get_player_velocity(p).x == 0) {
 
@@ -106,8 +106,8 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
         break;
 
       //jumping or double-jumping
-      case 1:
-      case 2:
+      case Jumping:
+      case nouse:
 
       temp->x = 96;
       temp->y = 0;
@@ -116,7 +116,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
         break;
 
       //attacking
-      case 3:
+      case Attacking:
 
       temp->x = 64;
       temp->y = 128;
@@ -125,7 +125,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
         break;
 
       //crouching
-      case 4:
+      case Crouching:
 
         temp->x = 128;
         temp->y = 0;
@@ -144,7 +144,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
     switch (state) {
 
       //stand-by/walking
-      case 0:
+      case Walking:
 
         if (get_player_velocity(p).x == 0) {
 
@@ -192,8 +192,8 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
         break;
 
       //jumping or double-jumping
-      case 1:
-      case 2:
+      case Jumping:
+      case nouse:
 
       temp->x = 96;
       temp->y = 64;
@@ -202,7 +202,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
         break;
 
       //attacking
-      case 3:
+      case Attacking:
 
       temp->x = 96;
       temp->y = 128;
@@ -211,7 +211,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
         break;
 
       //crouching
-      case 4:
+      case Crouching:
 
         temp->x = 128;
         temp->y = 32;
@@ -253,7 +253,7 @@ void player_melee (player_t p, SDL_Renderer *renderer) {
   effect->w = 32;
   effect->h = 64;
 
-  if (get_player_dir(p) == 0) {
+  if (get_player_dir(p) == Left) {
     //facing left
     target->x -= IMG_WIDTH;
     effect->x = 32;
@@ -295,33 +295,41 @@ void player_update_step (player_t *p) {
 void player_update_dir (player_t *p, intpoint_t mouse_pos) {
 
   if(get_player_real_position(*p).x + (IMG_WIDTH / 2) < mouse_pos.x) {
-    set_player_dir(p, 1); //right
+    set_player_dir(p, Right); //right
   } else {
-    set_player_dir(p, 0); //left
+    set_player_dir(p, Left); //left
   }
 
 }
 
-void player_apply_velocity (player_t *p, block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
+void player_apply_velocity (player_t *p, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
 
   if (get_player_real_position(*p).y + get_player_velocity(*p).y + IMG_HEIGHT > SCREEN_HEIGHT && !(p->onGround)) {
     set_player_vel_y(p, SCREEN_HEIGHT - (get_player_real_position(*p).y + IMG_HEIGHT));
+    p->onGround = true;
   }
 
   set_player_real_position(p, get_player_real_position(*p).x + get_player_velocity(*p).x, get_player_real_position(*p).y + get_player_velocity(*p).y);
 
   int w, h;
-  if (colision(*p, blocks, &w, &h)) {
+  if (collision(*p, blocks, &w, &h)) {
     closest_out(p, w, h);
-    p->onGround = true;
+    if (h >= get_player_real_position(*p).y + IMG_HEIGHT) {
+      p->onGround = true;
+    } else {
+      p->onGround = false;
+      set_player_vel_x(p, 0.0);
+    }
+  } else {
+    p->onGround = false;
   }
-  
+
   return;
 }
 
 void player_gravity(player_t *p) {
 
-  if (get_player_real_position(*p).y <= SCREEN_HEIGHT - IMG_HEIGHT && !(p->onGround)) {
+  if (!(p->onGround)) {
     set_player_vel_y(p, get_player_velocity(*p).y + GRAVITY);
   }
 
@@ -330,7 +338,7 @@ void player_gravity(player_t *p) {
 
 
 void player_jumping (player_t *p, Uint32 timeN_A, Uint32 timeN_B) {
-  if (get_player_state(*p) == 1 || get_player_state(*p) == 2) {
+  if (get_player_state(*p) == Jumping || get_player_state(*p) == nouse) {
     set_player_vel_y(p, JUMP_HEIGHT);
   }
 
@@ -349,12 +357,12 @@ player_t set_player (short int maxHealthPoints, floatpoint_t position, vector_t 
   player_t p;
   set_player_maxhp(&p, maxHealthPoints);
   set_player_hp(&p, maxHealthPoints);
-  set_player_dir(&p, 0);
+  set_player_dir(&p, Left);
   set_player_step(&p, 0);
   set_player_on_ground(&p, false);
   set_player_jumpPoint(&p, 0);
   set_player_highPoint(&p, 0);
-  set_player_state(&p, 0);
+  set_player_state(&p, Walking);
   set_player_real_position(&p, get_floatpoint_x(position), get_floatpoint_y(position));
   set_player_screen_position(&p, (int)get_floatpoint_x(position), (int)get_floatpoint_y(position));
   set_player_vel_x(&p, get_vector_x(velocity));

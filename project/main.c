@@ -63,8 +63,8 @@ int main () {
   player_t *enemies = NULL;
 
   //projectiles of the player_t : array of 100
-  projectile *playerProjectiles = NULL;
-  projectile *enemyProjectiles = NULL;
+  projectile_t  *playerProjectiles = NULL;
+  projectile_t  *enemyProjectiles = NULL;
 
   //delay used between each step in the character animation
   int *stepDelay = NULL;
@@ -80,7 +80,7 @@ int main () {
   Uint32 enemyShootDelay = 0;
   Uint32 playerShootDelay = 0;
 
-  level *currLevel = NULL;
+  level_t *currLevel = NULL;
   SDL_Texture *blocks_spritesheet = NULL;
   SDL_Texture *background = NULL;
 
@@ -171,7 +171,7 @@ int main () {
 
     player_jumping(player, *timeN_A, *timeN_B);
 
-    //init a projectile if shooting
+    //init a projectile_t if shooting
     if (SDL_GetTicks() > playerShootDelay + PLAYER_SHOOT_DELAY) {
       shooting(*mouse_btn, *player, playerProjectiles, *mouse_pos);
       playerShootDelay = SDL_GetTicks();
@@ -208,7 +208,7 @@ int main () {
     player_update_dir(player, *mouse_pos);
     player_gravity(player);
     update_player(player, quit);
-    printf("step : %d\n", player->step);
+
     //printf("%d :: real : %.2f \t sreen : %d \t hitbox : %d\n", SDL_GetTicks(), player->realPos.y, player->screenPos.y, player->hitbox.y);
 
     //RAW vertical hyper space
