@@ -1,4 +1,12 @@
-#include "header.h"
+#include <SDL2/SDL.h>
+#include <stdbool.h>
+#include "../header_files/header.h"
+#include "../header_files/2dpoint.h"
+#include "../header_files/vector.h"
+#include "../header_files/blocks.h"
+#include "../header_files/player.h"
+
+#include "../header_files/projectile.h"
 
 void delete_projectile (projectile_t *p) {
 

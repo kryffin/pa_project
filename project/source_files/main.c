@@ -1,4 +1,24 @@
-#include "header.h"
+/* INCLUDES */
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL2_framerate.h>
+#include <SDL2/SDL_image.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+#include "../header_files/header.h"
+#include "../header_files/2dpoint.h"
+#include "../header_files/blocks.h"
+#include "../header_files/vector.h"
+#include "../header_files/player.h"
+#include "../header_files/projectile.h"
+#include "../header_files/level.h"
+#include "../header_files/var_init.h"
+#include "../header_files/menu.h"
+#include "../header_files/controls.h"
 
 int main () {
 
@@ -156,20 +176,14 @@ int main () {
   //while we are not quitting the game
   while (*quit == false) {
 
-    //hashing the time
-    *timeN_B = SDL_GetTicks();
-    if (*timeN_B >= *timeN_A + 1000) {
-      *timeN_A = *timeN_B;
-    }
-
     //clearing the render to the draw color
     SDL_RenderClear(renderer);
 
     /* * * * * * player_t controls * * * * * */
 
-    controls(event, quit, player, jumped, mouse_pos, mouse_btn, key);
+    controls(event, quit, player, jumped, mouse_pos, mouse_btn, key, timeN_A);
 
-    player_jumping(player, *timeN_A, *timeN_B);
+    player_jumping(player);
 
     //init a projectile_t if shooting
     if (SDL_GetTicks() > playerShootDelay + PLAYER_SHOOT_DELAY) {

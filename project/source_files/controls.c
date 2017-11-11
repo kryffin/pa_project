@@ -1,4 +1,12 @@
-#include "header.h"
+#include <SDL2/SDL.h>
+#include <stdbool.h>
+#include "../header_files/header.h"
+#include "../header_files/2dpoint.h"
+#include "../header_files/vector.h"
+#include "../header_files/blocks.h"
+#include "../header_files/player.h"
+
+#include "../header_files/controls.h"
 
 void update_controls (SDL_Event *event, SDL_Keycode *keys, bool *quit, intpoint_t *mouse_pos, bool *mouse_btn) {
 
@@ -53,7 +61,7 @@ void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, intpoint_t mouse_p
 }
 
 //gestion des touches du clavier
-void keyboard_control (player_t *p, SDL_Keycode *keys, bool *jumped) {
+void keyboard_control (player_t *p, SDL_Keycode *keys, bool *jumped, Uint32 *timeN_A) {
 
   //keys :: left, right, jump, melee
   SDL_Keycode keysTab[5] = {SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_SPACE, SDL_SCANCODE_F, SDL_SCANCODE_S};
@@ -75,9 +83,16 @@ void keyboard_control (player_t *p, SDL_Keycode *keys, bool *jumped) {
   }
 
   //'space' key
-  if (keys[keysTab[2]] == 1 && *jumped == false) {
-    set_player_state(p, Jumping);
-    *jumped = true;
+  if (keys[keysTab[2]] == 1) {
+    if (!(p->onGround)) {
+      set_player_state(p, Walking);
+    } else {
+      set_player_state(p, Jumping);
+      p->onGround = false;
+    }
+    if (SDL_GetTicks() > *timeN_A + JUMP_DURATION) {
+      set_player_state(p, Walking);
+    }
   }
 
   //'f' key
@@ -113,7 +128,7 @@ void keyboard_control (player_t *p, SDL_Keycode *keys, bool *jumped) {
       set_player_state(p, Walking);
       set_player_vel_y(p, 0);
     }
-    *jumped = false;
+    *timeN_A = SDL_GetTicks();
   }
 
   //'f' key
@@ -132,13 +147,13 @@ void keyboard_control (player_t *p, SDL_Keycode *keys, bool *jumped) {
 
 }
 
-void controls (SDL_Event *event, bool *quit, player_t *p, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, SDL_Keycode *key) {
+void controls (SDL_Event *event, bool *quit, player_t *p, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, SDL_Keycode *key, Uint32 *timeN_A) {
 
   //update the keyboard & mouse controls
   update_controls(event, key, quit, mouse_pos, mouse_btn);
 
   //act depending on the keyboard state
-  keyboard_control(p, key, jumped);
+  keyboard_control(p, key, jumped, timeN_A);
 
   return;
 
