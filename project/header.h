@@ -32,6 +32,7 @@
 #define BULLET_WIDTH 16
 #define BULLET_HEIGHT 16
 #define BULLET_SPEED 10
+#define BULLET_SPEED_SG 5
 //paths
 #define PATH_SPRITES "./res/spritesheet.png"
 #define PATH_FONT "./res/font.ttf"
@@ -71,11 +72,13 @@ typedef struct AABB {
   floatpoint middle;
 }AABB;
 
+
 typedef struct Player {
   short int maxhp; //max health points
   short int hp; //current health points
   short int dir; //current direction
   short int step; //step for the surrent sprite to use
+  short int gunType; //type of the gun the player holds
 
   bool dJump; //is double jump available?
   int jumpPoint; //point from where you jumped

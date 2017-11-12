@@ -56,7 +56,7 @@ void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, intpoint mouse_pos
 void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped) {
 
   //keys :: left, right, jump, melee
-  SDL_Keycode keysTab[5] = {SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_SPACE, SDL_SCANCODE_F, SDL_SCANCODE_S};
+  SDL_Keycode keysTab[8] = {SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_SPACE, SDL_SCANCODE_F, SDL_SCANCODE_S, SDL_SCANCODE_1, SDL_SCANCODE_2, SDL_SCANCODE_3};
 
   /* KEYDOWN Controls */
 
@@ -76,20 +76,10 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped) {
 
   //'space' key
  if (keys[keysTab[2]] == 1 && get_player_dJump(*p)== true) {
-   //if the player is in the screen
-   //if (get_player_real_position(*p).y == SCREEN_HEIGHT - SCREEN_WIDTH) {
-     //printf("space pressed\n");
      set_player_state(p, 1);
      set_player_vel_y (p, JUMP_HEIGHT);
      set_player_real_position(p, get_player_real_position(*p).x, get_player_real_position(*p).y -BLOCK_WIDTH );
-     //printf("*v_y : %f\n", get_player_velocity(*p).y);
-   //} /*else if (get_player_dJump(*p)) {
-     /*set_player_dJump(p, false);
-     set_player_state(p, 2);*/
-
-   //}
-   //printf("false\n");
-   set_player_dJump(p, false);
+     set_player_dJump(p, false);
  }
 
   //'f' key
@@ -119,10 +109,6 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped) {
     }
   }
 
-  //'space' key
-  /*if (keys[keysTab[2]] == 0) {
-    *jumped = false;
-  }*/
 
   //'f' key
   if (keys[keysTab[3]] == 0) {
@@ -136,6 +122,18 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped) {
     if (get_player_state(*p) == 4) {
       set_player_state(p, 0);
     }
+  }
+  //'1' key
+  if (keys[keysTab[5]] == 1) {
+    p->gunType = 1;
+  }
+  //'2' key (game)//GTA MAGGLE
+  if (keys[keysTab[6]] == 1) {
+    p->gunType = 2;
+  }
+  //'3' key
+  if (keys[keysTab[7]] == 1) {
+    p->gunType = 3;
   }
 
 }

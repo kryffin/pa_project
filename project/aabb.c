@@ -43,22 +43,17 @@ void set_aabb_size (AABB *box, vector size){
 
 bool is_colision (player *p, level *l)
 {
-
   /*
   indiceX+0 indice Y+0 : haut gauche
   indiceX+0 indice Y+1 : milieu haut gauche
   indiceX+0 indice Y+2 : milieu bas gauche
   indiceX+0 indice Y+3 : bas gauche
-
-
   __________________________________
 
   indiceX+1 indice Y+0 : haut droite
   indiceX+1 indice Y+1 : milieu haut droite
   indiceX+1 indice Y+2 : milieu bas droite
   indiceX+1 indice Y+3 : bas droite
-
-
 
   */
   int indiceX, indiceY;
@@ -125,63 +120,7 @@ bool is_colision (player *p, level *l)
 void correct_position (player *p, level l, unsigned int i, unsigned int j, int x, int y)
 {
     p->enableGravity = false;
-    set_player_real_position (p, get_player_real_position(*p).x, get_player_real_position(*p).y - BLOCK_WIDTH);
-  /*
-  //on remet le perso sur le bord bas de lecran
-  //set_player_real_position (p, get_player_real_position(*p).x,  ((y-1)*BLOCK_HEIGHT)+16);
-  //printf("x:%f | y:%f\n\n", get_player_real_position(*p).x, get_player_real_position(*p).y);
 
-  if(i==0)
-  //gauche
-  {
-    switch (j) {
-      case 0:
-        set_player_real_position (p, get_player_real_position(*p).x, get_player_real_position(*p).y + 3*BLOCK_HEIGHT);
-      break;
-
-      case 1:
-        set_player_real_position (p, get_player_real_position(*p).x, get_player_real_position(*p).y + 2*BLOCK_HEIGHT);
-      break;
-
-      case 2:
-        set_player_real_position (p, get_player_real_position(*p).x, get_player_real_position(*p).y + BLOCK_HEIGHT);
-      break;
-
-      case 3:
-        set_player_real_position (p, get_player_real_position(*p).x, get_player_real_position(*p).y);
-      break;
-
-      default:
-      break;
-    }
-  }
-
-  else
-  //droite
-  {
-
-    switch (j) {
-      case 0:
-
-      break;
-
-      case 1:
-
-      break;
-
-      case 2:
-
-      break;
-
-      case 3:
-
-      break;
-
-      default:
-      break;
-
-    }
-  }*/
 
 }
 
@@ -190,8 +129,7 @@ bool check_collision_bb (SDL_Rect A, SDL_Rect B)
 {
   int leftA, leftB;
   int rightA, rightB;
-  int topA, topB;
-  int bottomA, bottomB;
+  int topA, topB, bottomA, bottomB;
 
   leftA = A.x;
   rightA = A.x + A.w;

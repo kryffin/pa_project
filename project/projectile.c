@@ -14,31 +14,95 @@ void delete_projectile (projectile *p) {
 void shooting (bool mouse_btn, player p, projectile proj[100], intpoint mouse_pos) {
 
   vector dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2)));
-
-  dir = normalize(dir);
-
-  dir = set_vector(get_vector_x(dir) * BULLET_SPEED, get_vector_y(dir) * BULLET_SPEED);
-
+  vector dir2 = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)) +10, (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2))+10);
+  vector dir3 = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)) -10, (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2))-10);
   int i;
 
-  if (mouse_btn) {
+  switch (p.gunType){
+    case 1:
 
-    //if clicking we shoot
-    for (i = 0; i < 100; i += 1) {
+      dir = normalize(dir);
 
-      //if a projectile has no direction it doesn't exists
-      if (get_projectile_direction(proj[i]).x == 0.0 && get_projectile_direction(proj[i]).y == 0.0) {
+      dir = set_vector(get_vector_x(dir) * BULLET_SPEED, get_vector_y(dir) * BULLET_SPEED);
 
-        set_projectile_real_position(&proj[i], (get_player_real_position(p).x + (IMG_WIDTH / 2)) - (BULLET_WIDTH / 2), (get_player_real_position(p).y + (IMG_HEIGHT / 2)) - (BULLET_HEIGHT / 2));
-        set_projectile_direction(&proj[i], dir);
 
-        return;
+
+      if (mouse_btn) {
+
+        //if clicking we shoot
+        for (i = 0; i < 100; i += 1) {
+
+          //if a projectile has no direction it doesn't exists
+          if (get_projectile_direction(proj[i]).x == 0.0 && get_projectile_direction(proj[i]).y == 0.0) {
+
+            set_projectile_real_position(&proj[i], (get_player_real_position(p).x + (IMG_WIDTH / 2)) - (BULLET_WIDTH / 2), (get_player_real_position(p).y + (IMG_HEIGHT / 2)) - (BULLET_HEIGHT / 2));
+            set_projectile_direction(&proj[i], dir);
+
+            return;
+          }
+
+        }
+
       }
+      break;
+    case 2:
+      dir = normalize(dir);
+      dir = set_vector(get_vector_x(dir) * BULLET_SPEED_SG, get_vector_y(dir) * BULLET_SPEED_SG);
+      dir2 = normalize(dir2);
+      dir2 = set_vector(get_vector_x(dir2) * BULLET_SPEED_SG, get_vector_y(dir2) * BULLET_SPEED_SG);
+      dir3 = normalize(dir3);
+      dir3 = set_vector(get_vector_x(dir3) * BULLET_SPEED_SG, get_vector_y(dir3) * BULLET_SPEED_SG);
 
-    }
 
-  }
 
+      if (mouse_btn) {
+
+        //if clicking we shoot
+        for (i = 0; i < 99; i += 3) {
+
+          //if a projectile has no direction it doesn't exists
+          if (get_projectile_direction(proj[i]).x == 0.0 && get_projectile_direction(proj[i]).y == 0.0) {
+
+            set_projectile_real_position(&proj[i], (get_player_real_position(p).x + (IMG_WIDTH / 2)) - (BULLET_WIDTH / 2), (get_player_real_position(p).y + (IMG_HEIGHT / 2)) - (BULLET_HEIGHT / 2));
+            set_projectile_direction(&proj[i], dir);
+
+            set_projectile_real_position(&proj[i+1], (get_player_real_position(p).x + (IMG_WIDTH / 2)) - (BULLET_WIDTH / 2), (get_player_real_position(p).y + (IMG_HEIGHT / 2)) - (BULLET_HEIGHT / 2));
+            set_projectile_direction(&proj[i+1], dir2);
+
+            set_projectile_real_position(&proj[i+2], (get_player_real_position(p).x + (IMG_WIDTH / 2)) - (BULLET_WIDTH / 2), (get_player_real_position(p).y + (IMG_HEIGHT / 2)) - (BULLET_HEIGHT / 2));
+            set_projectile_direction(&proj[i+2], dir3);
+
+            return;
+          }
+
+        }
+
+      }
+      break;
+
+    case 3:
+
+      dir = normalize(dir);
+      dir = set_vector(get_vector_x(dir) * BULLET_SPEED, get_vector_y(dir) * BULLET_SPEED);
+
+        if (mouse_btn) {
+          //if clicking we shoot
+          for (i = 0; i < 100; i += 1) {
+            //if a projectile has no direction it doesn't exists
+            if (get_projectile_direction(proj[0]).x == 0.0 && get_projectile_direction(proj[0]).y == 0.0) {
+
+              set_projectile_real_position(&proj[0], (get_player_real_position(p).x + (IMG_WIDTH / 2)) - (BULLET_WIDTH / 2), (get_player_real_position(p).y + (IMG_HEIGHT / 2)) - (BULLET_HEIGHT / 2));
+              set_projectile_direction(&proj[0], dir);
+              dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) );
+
+              return;
+            }
+
+          }
+
+        }
+      break;
+    } //end switch
   //security check
   return;
 
