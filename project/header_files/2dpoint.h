@@ -1,6 +1,11 @@
 #ifndef TDPOINT_H
 #define TDPOINT_H
 
+#include <stdbool.h>
+
+#define IMG_WIDTH 32
+#define IMG_HEIGHT 64
+
 typedef struct IntegerPoint {
   int x;
   int y;
@@ -12,6 +17,7 @@ typedef struct FloatPoint_t {
 } floatpoint_t;
 
 /* 2dpoint.c */
+bool collision_intpoint (intpoint_t a, intpoint_t b);
 floatpoint_t set_floatpoint (float x, float y);
 void set_floatpoint_x (floatpoint_t *p, float x);
 void set_floatpoint_y (floatpoint_t *p, float y);

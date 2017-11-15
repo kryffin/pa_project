@@ -1,16 +1,3 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL2_framerate.h>
-#include <SDL2/SDL_image.h>
-#include <stdbool.h>
-#include "../header_files/header.h"
-#include "../header_files/2dpoint.h"
-#include "../header_files/blocks.h"
-#include "../header_files/vector.h"
-#include "../header_files/player.h"
-#include "../header_files/projectile.h"
-#include "../header_files/level.h"
-
 #include "../header_files/var_init.h"
 
 int init_palette (SDL_Color **palette) {

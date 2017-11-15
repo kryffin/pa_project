@@ -1,6 +1,19 @@
 #ifndef PROJECTILE_H
 #define PROJECTILE_H
 
+#include <SDL2/SDL.h>
+#include "2dpoint.h"
+#include "vector.h"
+
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+#define SCREEN_BPP 32
+#define SCREEN_FPS 30
+
+#define BULLET_WIDTH 16
+#define BULLET_HEIGHT 16
+#define BULLET_SPEED 10
+
 typedef struct Projectile {
   floatpoint_t realPos;
 
@@ -14,7 +27,6 @@ typedef struct Projectile {
 
 /* projectile.c */
 void delete_projectile (projectile_t *p);
-void shooting (bool mouse_btn, player_t p, projectile_t proj[100], intpoint_t mouse_pos);
 void update_projectiles (projectile_t p[100]);
 void render_projectile (projectile_t p[100], SDL_Renderer *renderer);
 projectile_t set_projectile (float x, float y, vector_t dir, SDL_Rect hitbox, SDL_Rect spritePos, SDL_Texture *img);

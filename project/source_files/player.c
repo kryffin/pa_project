@@ -1,13 +1,97 @@
-#include <SDL2/SDL.h>
-#include <stdbool.h>
-#include "../header_files/header.h"
-#include "../header_files/blocks.h"
-#include "../header_files/vector.h"
-#include "../header_files/2dpoint.h"
-
 #include "../header_files/player.h"
-#include "../header_files/projectile.h"
-#include "../header_files/level.h"
+
+void player_update_grid_pos (player_t *player) {
+  player->xGrid = floor(get_floatpoint_x(get_player_real_position(*player))) / 16;
+  player->yGrid = floor(get_floatpoint_y(get_player_real_position(*player))) / 16;
+
+  return;
+}
+
+void closest_out (player_t *player, int w, int h) {
+
+  intpoint_t playerPos, block;
+  vector_t tempVel;
+  playerPos = set_intpoint((int)get_player_real_position(*player).x, (int)get_player_real_position(*player).y);
+  block = set_intpoint(w, h);
+  tempVel = set_vector(get_player_velocity(*player).x, get_player_velocity(*player).y);
+  tempVel = normalize(tempVel);
+
+  while (collision_intpoint(block, playerPos)) {
+
+    set_player_real_position(player, get_player_real_position(*player).x - get_vector_x(tempVel), get_player_real_position(*player).y - get_vector_y(tempVel));
+    playerPos = set_intpoint((int)get_player_real_position(*player).x, (int)get_player_real_position(*player).y);
+
+  }
+
+  return;
+
+}
+
+bool collision (player_t player, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], int *width, int *height) {
+  int w,h;
+  intpoint_t posBlock;
+
+  set_player_real_position(&player, get_player_real_position(player).x + get_player_velocity(player).x, get_player_real_position(player).y + get_player_velocity(player).y);
+
+  for (w = 0; w < NB_BLOCKS_WIDTH; w++) {
+    for (h = 0; h < NB_BLOCKS_HEIGHT; h++) {
+
+      if (get_block_type(blocks[w][h]) == Solid) {
+
+        posBlock = set_intpoint(w*16, h*16);
+
+        if ((get_intpoint_x(posBlock) >= get_player_real_position(player).x && get_intpoint_x(posBlock) <= get_player_real_position(player).x + IMG_WIDTH) || (get_intpoint_x(posBlock) + 16 >= get_player_real_position(player).x && get_intpoint_x(posBlock) + 16 <= get_player_real_position(player).x + IMG_WIDTH)) {
+
+          if ((get_intpoint_y(posBlock) >= get_player_real_position(player).y && get_intpoint_y(posBlock) <= get_player_real_position(player).y + IMG_HEIGHT) || (get_intpoint_y(posBlock) + 16 >= get_player_real_position(player).y && get_intpoint_y(posBlock) + 16 <= get_player_real_position(player).y + IMG_HEIGHT)) {
+
+            *width = w * 16;
+            *height = h * 16;
+            return true;
+
+          }
+
+        }
+
+      }
+
+    }
+  }
+
+  return false;
+}
+
+void shooting (bool mouse_btn, player_t p, projectile_t proj[100], intpoint_t mouse_pos) {
+
+  vector_t dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2)));
+
+  dir = normalize(dir);
+
+  dir = set_vector(get_vector_x(dir) * BULLET_SPEED, get_vector_y(dir) * BULLET_SPEED);
+
+  int i;
+
+  if (mouse_btn) {
+
+    //if clicking we shoot
+    for (i = 0; i < 100; i += 1) {
+
+      //if a projectile_t has no direction it doesn't exists
+      if (get_projectile_direction(proj[i]).x == 0.0 && get_projectile_direction(proj[i]).y == 0.0) {
+
+        set_projectile_real_position(&proj[i], (get_player_real_position(p).x + (IMG_WIDTH / 2)) - (BULLET_WIDTH / 2), (get_player_real_position(p).y + (IMG_HEIGHT / 2)) - (BULLET_HEIGHT / 2));
+        set_projectile_direction(&proj[i], dir);
+
+        return;
+      }
+
+    }
+
+  }
+
+  //security check
+  return;
+
+}
 
 void update_player (player_t *p, bool *quit) {
 

@@ -1,6 +1,37 @@
 #ifndef VAR_INIT_H
 #define VAR_INIT_H
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL2_framerate.h>
+#include <SDL2/SDL_image.h>
+#include <stdbool.h>
+
+#include "2dpoint.h"
+#include "blocks.h"
+#include "vector.h"
+#include "player.h"
+#include "projectile.h"
+#include "level.h"
+
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+#define SCREEN_BPP 32
+#define SCREEN_FPS 30
+
+#define FONT_SIZE 15
+
+#define PATH_SPRITES "./res/spritesheet.png"
+#define PATH_FONT "./res/font.ttf"
+#define PATH_CURSOR "./res/cursor.png"
+#define PATH_BLOCKS_SHEET "./res/blocks_spritesheet.png"
+#define PATH_BACKGROUND "./res/background.bmp"
+#define PATH_TXT_FILE "./res/arena.txt"
+#define PATH_YOU_DIED "./res/you_died.png"
+
+#define IMG_WIDTH 32
+#define IMG_HEIGHT 64
+
 /* var_init.c */
 int init_palette (SDL_Color **palette);
 int init_font (TTF_Font **font);

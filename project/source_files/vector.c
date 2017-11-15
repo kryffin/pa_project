@@ -1,6 +1,3 @@
-#include <SDL2/SDL.h>
-#include <math.h>
-
 #include "../header_files/vector.h"
 
 vector_t normalize (vector_t v) {

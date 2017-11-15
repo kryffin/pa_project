@@ -1,5 +1,3 @@
-#include <SDL2/SDL.h>
-
 #include "../header_files/blocks.h"
 
 /* SET */

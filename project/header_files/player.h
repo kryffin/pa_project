@@ -1,6 +1,34 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <SDL2/SDL.h>
+#include <stdbool.h>
+#include <math.h>
+#include "2dpoint.h"
+#include "vector.h"
+#include "projectile.h"
+#include "blocks.h"
+
+#define BULLET_WIDTH 16
+#define BULLET_HEIGHT 16
+#define BULLET_SPEED 10
+
+#define JUMP_HEIGHT -24
+
+#define GRAVITY 4
+
+#define IMG_WIDTH 32
+#define IMG_HEIGHT 64
+
+#define IMG_WIDTH 32
+#define IMG_HEIGHT 64
+
+#define NB_BLOCKS_WIDTH 40
+#define NB_BLOCKS_HEIGHT 30
+
+#define CURSOR_WIDTH 15
+#define CURSOR_HEIGHT 15
+
 enum PlayerDirection {
   Left,
   Right
@@ -20,6 +48,9 @@ typedef struct Player {
   short int dir; //current direction+-
   short int step; //step for the surrent sprite to use
 
+  int xGrid;
+  int yGrid;
+
   bool onGround; //is the player on a ground?
   int jumpPoint; //point from where you jumped
   int highPoint; //highest point of the jump (used for falling?)
@@ -35,6 +66,10 @@ typedef struct Player {
 } player_t;
 
 /* player_t.c */
+void player_update_grid_pos (player_t *player);
+void closest_out (player_t *player, int w, int h);
+bool collision (player_t player, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], int *width, int *height);
+void shooting (bool mouse_btn, player_t p, projectile_t proj[100], intpoint_t mouse_pos);
 void player_jumping (player_t *p);
 void player_gravity(player_t *p);
 void update_player (player_t *p, bool *quit);

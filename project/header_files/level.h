@@ -1,6 +1,25 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <stdbool.h>
+#include "2dpoint.h"
+#include "player.h"
+#include "blocks.h"
+#include "controls.h"
+
+#define PATH_SPRITES "./res/spritesheet.png"
+#define PATH_FONT "./res/font.ttf"
+#define PATH_CURSOR "./res/cursor.png"
+#define PATH_BLOCKS_SHEET "./res/blocks_spritesheet.png"
+#define PATH_BACKGROUND "./res/background.bmp"
+#define PATH_TXT_FILE "./res/arena.txt"
+#define PATH_YOU_DIED "./res/you_died.png"
+
+#define NB_BLOCKS_WIDTH 40
+#define NB_BLOCKS_HEIGHT 30
+
 typedef struct Level {
 
   block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]; //all the blocks of the level
@@ -11,9 +30,6 @@ typedef struct Level {
 } level_t;
 
 /* level.c */
-void closest_out (player_t *player, int w, int h);
-bool collision_intpoint (intpoint_t a, intpoint_t b);
-bool collision (player_t player, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], int *width, int *height);
 void game_over (SDL_Renderer *renderer);
 void rendering (player_t *player, player_t enemies[10], projectile_t bullets[100], projectile_t enemyProjectiles[100], SDL_Texture *cursor, level_t currLevel, intpoint_t *mouse_pos, SDL_Renderer *renderer);
 void render_foreground_level (level_t l, SDL_Renderer *renderer);

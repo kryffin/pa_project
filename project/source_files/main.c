@@ -1,24 +1,4 @@
-/* INCLUDES */
-
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL2_framerate.h>
-#include <SDL2/SDL_image.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
 #include "../header_files/header.h"
-#include "../header_files/2dpoint.h"
-#include "../header_files/blocks.h"
-#include "../header_files/vector.h"
-#include "../header_files/player.h"
-#include "../header_files/projectile.h"
-#include "../header_files/level.h"
-#include "../header_files/var_init.h"
-#include "../header_files/menu.h"
-#include "../header_files/controls.h"
 
 int main () {
 
@@ -223,21 +203,8 @@ int main () {
     player_gravity(player);
     update_player(player, quit);
 
-    //printf("%d :: real : %.2f \t sreen : %d \t hitbox : %d\n", SDL_GetTicks(), player->realPos.y, player->screenPos.y, player->hitbox.y);
-
-    //RAW vertical hyper space
-    /*if (player->realPos.x + (IMG_WIDTH / 2) > SCREEN_WIDTH) {
-      player->hp = 0;
-    }
-
-    if (player->realPos.x + (IMG_WIDTH / 2) < 0) {
-      player->realPos.x = SCREEN_WIDTH - IMG_WIDTH;
-    }
-
-    //RAW re-enabling double jump
-    if (player->dJump == false && player->realPos.y == SCREEN_HEIGHT - IMG_HEIGHT) {
-      player->dJump = true;
-    }*/
+    player_update_grid_pos(player);
+    printf("Tableau x : %d | y : %d\n", player->xGrid, player->yGrid);
 
     /* rendering */
     rendering(player, enemies, playerProjectiles, enemyProjectiles, cursor, *currLevel, mouse_pos, renderer);

@@ -1,6 +1,8 @@
 #ifndef BLOCKS_H
 #define BLOCKS_H
 
+#include <SDL2/SDL.h>
+
 enum BlockType {
   Solid,
   Background,
