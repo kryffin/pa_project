@@ -28,7 +28,6 @@ typedef struct Projectile {
 /* projectile.c */
 void delete_projectile (projectile_t *p);
 void update_projectiles (projectile_t p[100]);
-void render_projectile (projectile_t p[100], SDL_Renderer *renderer);
 projectile_t set_projectile (float x, float y, vector_t dir, SDL_Rect hitbox, SDL_Rect spritePos, SDL_Texture *img);
 void set_projectile_screen_position (projectile_t *p, int x, int y);
 void set_projectile_real_position (projectile_t *p, float x, float y);

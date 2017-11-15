@@ -56,27 +56,6 @@ void update_projectiles (projectile_t p[100]) {
 
 }
 
-void render_projectile (projectile_t p[100], SDL_Renderer *renderer) {
-
-  int i;
-
-  for (i = 0; i < 100; i += 1) {
-
-    //if the projectile_t exists
-    if (get_projectile_direction(p[i]).x != 0.0 || get_projectile_direction(p[i]).y != 0.0) {
-
-      SDL_Rect tempSpritePos = get_projectile_sprite_pos(p[i]);
-      SDL_Rect tempPos = get_projectile_hitbox(p[i]);
-
-      SDL_RenderCopy(renderer, get_projectile_image(p[i]), &tempSpritePos, &tempPos);
-
-    }
-  }
-
-  return;
-
-}
-
 /* * * * * * Set * * * * * */
 
 projectile_t set_projectile (float x, float y, vector_t dir, SDL_Rect hitbox, SDL_Rect spritePos, SDL_Texture *img) {

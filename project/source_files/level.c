@@ -1,118 +1,27 @@
 #include "../header_files/level.h"
 
-void game_over (SDL_Renderer *renderer) {
-  SDL_Surface *temp;
-  SDL_Texture *panel;
-
-  temp = IMG_Load(PATH_YOU_DIED);
-  panel = SDL_CreateTextureFromSurface(renderer, temp);
-  SDL_FreeSurface(temp);
-
-  SDL_RenderCopy(renderer, panel, NULL, NULL);
-
-  SDL_RenderPresent(renderer);
-
-  SDL_Delay(1000);
-  return;
-}
-
-void rendering (player_t *player, player_t enemies[10], projectile_t bullets[100], projectile_t enemyProjectiles[100], SDL_Texture *cursor, level_t currLevel, intpoint_t *mouse_pos, SDL_Renderer *renderer) {
-
-  SDL_RenderCopy(renderer, get_level_background(currLevel), NULL, NULL);
-
-  //render the background elements
-  render_background_level(currLevel, renderer);
-
-  //render the projectile
-  render_projectile(bullets, renderer);
-
-  //render the enemy projectile
-  render_projectile(enemyProjectiles, renderer);
-
-  //render the player_t
-  render_player(*player, renderer, *mouse_pos);
-  int i = 0;
-  for (i = 0; i < 10; i++) {
-    if (is_alive(enemies[i])) {
-      render_player(enemies[i], renderer, *mouse_pos);
-    }
-  }
-
-  //render the attack and process it
-  if (get_player_state(*player) == Attacking)  {
-    player_melee(*player, renderer);
-  }
-
-  //render the foreground
-  render_foreground_level(currLevel, renderer);
-
-  //render the cursor
-  render_cursor(cursor, renderer, *mouse_pos);
-
-  SDL_RenderPresent(renderer);
-
-  return;
-}
-
-void render_foreground_level (level_t l, SDL_Renderer *renderer) {
-
-  unsigned short int type;
-  SDL_Rect tempSpritePos = {0, 0, 16, 16};
-  SDL_Rect tempPos = {0, 0, 16, 16};
-  int i, j;
-  for (i = 0; i < NB_BLOCKS_WIDTH; i++) {
-    for (j = 0; j < NB_BLOCKS_HEIGHT; j++) {
-
-      type = get_block_type(get_level_block(l, i, j));
-      tempPos.x = i * 16;
-      tempPos.y = j * 16;
-
-      switch (type) {
-
-        case Solid:
-          tempSpritePos.x = 0;
-          SDL_RenderCopy(renderer, get_level_blocks_spritesheet(l), &tempSpritePos, &tempPos);
-          break;
-
-        case Foreground:
-          tempSpritePos.x = 32;
-          SDL_RenderCopy(renderer, get_level_blocks_spritesheet(l), &tempSpritePos, &tempPos);
-          break;
-
-        default:
-          break;
-
-      }
-    }
-  }
-
-  return;
-}
-
-void render_background_level (level_t l, SDL_Renderer *renderer) {
-
-  SDL_Rect tempSpritePos = {16, 0, 16, 16};
-  SDL_Rect tempPos = {0, 0, 16, 16};
-  int i, j;
-  for (i = 0; i < NB_BLOCKS_WIDTH; i++) {
-    for (j = 0; j < NB_BLOCKS_HEIGHT; j++) {
-
-      tempPos.x = i * 16;
-      tempPos.y = j * 16;
-
-      if (get_block_type(get_level_block(l, i, j)) == Background) {
-        SDL_RenderCopy(renderer, get_level_blocks_spritesheet(l), &tempSpritePos, &tempPos);
-      }
-    }
-  }
-
-  return;
-}
-
-level_t init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player_t *p, player_t enemies[10]) {
+level_t init_level (char *path_blocks, char *path_background, player_t *p, player_t enemies[10], SDL_Renderer *renderer) {
 
   level_t l;
   int i = 0;
+  SDL_Surface *temp;
+
+  temp = IMG_Load(path_blocks);
+  l.blocks_spritesheet = SDL_CreateTextureFromSurface(renderer, temp);
+  if (l.blocks_spritesheet == NULL) {
+    printf("Error during blocks_spritesheet image loading : %s\n", SDL_GetError());
+  }
+  //temp won't be used again
+  SDL_FreeSurface(temp);
+
+  //background image loading through the temp surface to a texture
+  temp = IMG_Load(path_background);
+  l.background = SDL_CreateTextureFromSurface(renderer, temp);
+  if (l.background == NULL) {
+    printf("Error during background image loading : %s\n", SDL_GetError());
+  }
+  //temp won't be used again
+  SDL_FreeSurface(temp);
 
   FILE *txtFile = fopen(PATH_TXT_FILE, "r");
   if (txtFile == NULL) {
@@ -183,7 +92,14 @@ level_t init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, pl
   }
   fclose(txtFile);
 
-  l = set_level(matrix, blocks_spritesheet, background);
+  int j;
+  for (i = 0; i < NB_BLOCKS_WIDTH; i++) {
+    for (j = 0; j < NB_BLOCKS_HEIGHT; j++) {
+
+      set_level_block(&l, i, j, matrix[i][j]);
+
+    }
+  }
 
   return l;
 }

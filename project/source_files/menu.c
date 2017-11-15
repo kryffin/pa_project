@@ -3,31 +3,19 @@
 
   /* FUNCTIONS */
 
-void render_text(char *string, SDL_Rect pos, TTF_Font *font, SDL_Color color, SDL_Renderer *renderer) {
-  SDL_Surface *tempSur;
-  SDL_Texture *tempTex;
-
-  tempSur = TTF_RenderText_Solid(font, string, color);
-  tempTex = SDL_CreateTextureFromSurface(renderer, tempSur);
-  SDL_QueryTexture(tempTex, NULL, NULL, &(pos.w), &(pos.h));
-  SDL_RenderCopy(renderer, tempTex, NULL, &pos);
-
-  return;
-}
-
 //function returning the state of the mouse :
 /* 0 : no motion
    1 : button down
    2 : button up
    10 : quit
 */
-int menu_controls(SDL_Event *event, intpoint_t *mouse_pos) {
+int menu_controls(game_t *game) {
   //controls
-  while (SDL_PollEvent(event)) {
-    switch(event->type) {
+  while (SDL_PollEvent(game->event)) {
+    switch(game->event->type) {
       case SDL_MOUSEMOTION:
-        mouse_pos->x = event->motion.x;
-        mouse_pos->y = event->motion.y;
+        game->mouse_pos.x = game->event->motion.x;
+        game->mouse_pos.y = game->event->motion.y;
         break;
 
       case SDL_MOUSEBUTTONDOWN:
@@ -39,7 +27,7 @@ int menu_controls(SDL_Event *event, intpoint_t *mouse_pos) {
         break;
 
       case SDL_KEYDOWN:
-        if (event->key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+        if (game->event->key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
           return 10;
         }
         break;
@@ -70,7 +58,7 @@ bool mouse_hover_menu (intpoint_t mouse_pos, int targetx, int targety, int width
   3 : Quit
 */
 
-int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint_t *mouse_pos, SDL_Texture *cursor) {
+int main_menu_display (game_t *game) {
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
@@ -86,7 +74,7 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
   SDL_Texture *background;
 
   temp = IMG_Load(PATH_BACKGROUND);
-  background = SDL_CreateTextureFromSurface(renderer, temp);
+  background = SDL_CreateTextureFromSurface(game->renderer, temp);
   SDL_FreeSurface(temp);
 
   //text strings
@@ -117,9 +105,9 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
   event = (SDL_Event*)malloc(sizeof(SDL_Event));
 
   //render the messages
-  surPlay = TTF_RenderText_Solid(font, strPlay, palette[14]);
-  surOptions = TTF_RenderText_Solid(font, strOptions, palette[0]);
-  surQuit = TTF_RenderText_Solid(font, strQuit, palette[0]);
+  surPlay = TTF_RenderText_Solid(game->font, strPlay, game->colorPalette[0]);
+  surOptions = TTF_RenderText_Solid(game->font, strOptions, game->colorPalette[0]);
+  surQuit = TTF_RenderText_Solid(game->font, strQuit, game->colorPalette[0]);
 
   //message positions
   posPlay->x = (SCREEN_WIDTH / 2) - (surPlay->clip_rect.w / 2);
@@ -132,67 +120,67 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
   while (1) {
 
     //fill the screen with white
-    SDL_RenderClear(renderer);
+    SDL_RenderClear(game->renderer);
 
     //controls
-    *control = menu_controls(event, mouse_pos);
+    *control = menu_controls(game);
 
-    if (mouse_hover_menu(*mouse_pos, posPlay->x, posPlay->y, surPlay->clip_rect.w, surPlay->clip_rect.h)) {
+    if (mouse_hover_menu(game->mouse_pos, posPlay->x, posPlay->y, surPlay->clip_rect.w, surPlay->clip_rect.h)) {
 
       if (*control == 0) {
 
         SDL_FreeSurface(surPlay);
-        surPlay = TTF_RenderText_Solid(font, strPlay, palette[3]);
+        surPlay = TTF_RenderText_Solid(game->font, strPlay, game->colorPalette[3]);
 
       } else if (*control == 1){
 
         SDL_FreeSurface(surPlay);
-        surPlay = TTF_RenderText_Solid(font, strPlay, palette[2]);
+        surPlay = TTF_RenderText_Solid(game->font, strPlay, game->colorPalette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surPlay);
-        surPlay = TTF_RenderText_Solid(font, strPlay, palette[3]);
+        surPlay = TTF_RenderText_Solid(game->font, strPlay, game->colorPalette[3]);
         option = 1;
 
       }
 
-    } else if (mouse_hover_menu(*mouse_pos, posOptions->x, posOptions->y, surOptions->clip_rect.w, surOptions->clip_rect.h)) {
+    } else if (mouse_hover_menu(game->mouse_pos, posOptions->x, posOptions->y, surOptions->clip_rect.w, surOptions->clip_rect.h)) {
 
       if (*control == 0) {
 
         SDL_FreeSurface(surOptions);
-        surOptions = TTF_RenderText_Solid(font, strOptions, palette[3]);
+        surOptions = TTF_RenderText_Solid(game->font, strOptions, game->colorPalette[3]);
 
       } else if (*control == 1){
 
         SDL_FreeSurface(surOptions);
-        surOptions = TTF_RenderText_Solid(font, strOptions, palette[2]);
+        surOptions = TTF_RenderText_Solid(game->font, strOptions, game->colorPalette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surOptions);
-        surOptions = TTF_RenderText_Solid(font, strOptions, palette[3]);
+        surOptions = TTF_RenderText_Solid(game->font, strOptions, game->colorPalette[3]);
         option = 2;
 
       }
 
-    } else if (mouse_hover_menu(*mouse_pos, posQuit->x, posQuit->y, surQuit->clip_rect.w, surQuit->clip_rect.h)) {
+    } else if (mouse_hover_menu(game->mouse_pos, posQuit->x, posQuit->y, surQuit->clip_rect.w, surQuit->clip_rect.h)) {
 
       if (*control == 0) {
 
         SDL_FreeSurface(surQuit);
-        surQuit = TTF_RenderText_Solid(font, strQuit, palette[3]);
+        surQuit = TTF_RenderText_Solid(game->font, strQuit, game->colorPalette[3]);
 
       } else if (*control == 1) {
 
         SDL_FreeSurface(surQuit);
-        surQuit = TTF_RenderText_Solid(font, strQuit, palette[2]);
+        surQuit = TTF_RenderText_Solid(game->font, strQuit, game->colorPalette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surPlay);
-        surPlay = TTF_RenderText_Solid(font, strPlay, palette[3]);
+        surPlay = TTF_RenderText_Solid(game->font, strPlay, game->colorPalette[3]);
         option = 3;
 
       }
@@ -200,32 +188,32 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
     } else {
       //render the messages
       SDL_FreeSurface(surPlay);
-      surPlay = TTF_RenderText_Solid(font, strPlay, palette[0]);
+      surPlay = TTF_RenderText_Solid(game->font, strPlay, game->colorPalette[0]);
       SDL_FreeSurface(surOptions);
-      surOptions = TTF_RenderText_Solid(font, strOptions, palette[0]);
+      surOptions = TTF_RenderText_Solid(game->font, strOptions, game->colorPalette[0]);
       SDL_FreeSurface(surQuit);
-      surQuit = TTF_RenderText_Solid(font, strQuit, palette[0]);
+      surQuit = TTF_RenderText_Solid(game->font, strQuit, game->colorPalette[0]);
 
     }
 
-    SDL_RenderCopy(renderer, background, NULL, NULL);
+    SDL_RenderCopy(game->renderer, background, NULL, NULL);
 
     //blitting the options on the window
-    tempT = SDL_CreateTextureFromSurface(renderer, surPlay);
+    tempT = SDL_CreateTextureFromSurface(game->renderer, surPlay);
     SDL_QueryTexture(tempT, NULL, NULL, &(posPlay->w), &(posPlay->h));
-    SDL_RenderCopy(renderer, tempT, NULL, posPlay);
+    SDL_RenderCopy(game->renderer, tempT, NULL, posPlay);
 
-    tempT = SDL_CreateTextureFromSurface(renderer, surOptions);
+    tempT = SDL_CreateTextureFromSurface(game->renderer, surOptions);
     SDL_QueryTexture(tempT, NULL, NULL, &(posOptions->w), &(posOptions->h));
-    SDL_RenderCopy(renderer, tempT, NULL, posOptions);
+    SDL_RenderCopy(game->renderer, tempT, NULL, posOptions);
 
-    tempT = SDL_CreateTextureFromSurface(renderer, surQuit);
+    tempT = SDL_CreateTextureFromSurface(game->renderer, surQuit);
     SDL_QueryTexture(tempT, NULL, NULL, &(posQuit->w), &(posQuit->h));
-    SDL_RenderCopy(renderer, tempT, NULL, posQuit);
+    SDL_RenderCopy(game->renderer, tempT, NULL, posQuit);
 
-    render_cursor(cursor, renderer, *mouse_pos);
+    render_cursor(*game);
 
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(game->renderer);
 
     SDL_Delay(1000 / SCREEN_FPS);
 
@@ -239,6 +227,8 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
       SDL_FreeSurface(surPlay);
       SDL_FreeSurface(surOptions);
       SDL_FreeSurface(surQuit);
+      SDL_DestroyTexture(background);
+      SDL_DestroyTexture(tempT);
       free(strPlay);
       free(strOptions);
       free(strQuit);
@@ -254,7 +244,7 @@ int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *rend
 /* resolution options menu */
 
 /* 1 : FullScreen | 2 : 4:3 | 3 : 16:10 | 4 : 16:9 | 5 : Ad | 6 : Back */
-int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint_t *mouse_pos, SDL_Texture *cursor) {
+int option_menu_display (game_t *game) {
 
   int *control = NULL;
   control = (int*)malloc(sizeof(int));
@@ -273,7 +263,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
   SDL_Texture *background;
 
   temp = IMG_Load(PATH_BACKGROUND);
-  background = SDL_CreateTextureFromSurface(renderer, temp);
+  background = SDL_CreateTextureFromSurface(game->renderer, temp);
   SDL_FreeSurface(temp);
 
   //text strings
@@ -325,12 +315,12 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
   event = (SDL_Event*)malloc(sizeof(SDL_Event));
 
   //render the messages
-  surFull = TTF_RenderText_Solid(font, strFull, palette[0]);
-  sur43 = TTF_RenderText_Solid(font, str43, palette[0]);
-  sur1610 = TTF_RenderText_Solid(font, str1610, palette[0]);
-  sur169 = TTF_RenderText_Solid(font, str169, palette[0]);
-  surAd = TTF_RenderText_Solid(font, strAd, palette[0]);
-  surBack = TTF_RenderText_Solid(font, strBack, palette[0]);
+  surFull = TTF_RenderText_Solid(game->font, strFull, game->colorPalette[0]);
+  sur43 = TTF_RenderText_Solid(game->font, str43, game->colorPalette[0]);
+  sur1610 = TTF_RenderText_Solid(game->font, str1610, game->colorPalette[0]);
+  sur169 = TTF_RenderText_Solid(game->font, str169, game->colorPalette[0]);
+  surAd = TTF_RenderText_Solid(game->font, strAd, game->colorPalette[0]);
+  surBack = TTF_RenderText_Solid(game->font, strBack, game->colorPalette[0]);
 
   int *span = NULL;
   span = (int*)malloc(sizeof(int));
@@ -355,127 +345,127 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
   while (1) {
 
     //fill the screen with white
-    SDL_RenderClear(renderer);
+    SDL_RenderClear(game->renderer);
 
     //controls
-    *control = menu_controls(event, mouse_pos);
+    *control = menu_controls(game);
 
-    if (mouse_hover_menu(*mouse_pos, posFull->x, posFull->y, surFull->clip_rect.w, surFull->clip_rect.h)) {
+    if (mouse_hover_menu(game->mouse_pos, posFull->x, posFull->y, surFull->clip_rect.w, surFull->clip_rect.h)) {
 
       if (*control == 0) {
 
         SDL_FreeSurface(surFull);
-        surFull = TTF_RenderText_Solid(font, strFull, palette[3]);
+        surFull = TTF_RenderText_Solid(game->font, strFull, game->colorPalette[3]);
 
       } else if (*control == 1){
 
         SDL_FreeSurface(surFull);
-        surFull = TTF_RenderText_Solid(font, strFull, palette[2]);
+        surFull = TTF_RenderText_Solid(game->font, strFull, game->colorPalette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surFull);
-        surFull = TTF_RenderText_Solid(font, strFull, palette[3]);
+        surFull = TTF_RenderText_Solid(game->font, strFull, game->colorPalette[3]);
         option = 1;
 
       }
 
-    } else if (mouse_hover_menu(*mouse_pos, pos43->x, pos43->y, sur43->clip_rect.w, sur43->clip_rect.h)) {
+    } else if (mouse_hover_menu(game->mouse_pos, pos43->x, pos43->y, sur43->clip_rect.w, sur43->clip_rect.h)) {
 
       if (*control == 0) {
 
         SDL_FreeSurface(sur43);
-        sur43 = TTF_RenderText_Solid(font, str43, palette[3]);
+        sur43 = TTF_RenderText_Solid(game->font, str43, game->colorPalette[3]);
 
       } else if (*control == 1){
 
         SDL_FreeSurface(sur43);
-        sur43 = TTF_RenderText_Solid(font, str43, palette[2]);
+        sur43 = TTF_RenderText_Solid(game->font, str43, game->colorPalette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(sur43);
-        sur43 = TTF_RenderText_Solid(font, str43, palette[3]);
+        sur43 = TTF_RenderText_Solid(game->font, str43, game->colorPalette[3]);
         option = 2;
 
       }
 
-    } else if (mouse_hover_menu(*mouse_pos, pos1610->x, pos1610->y, sur1610->clip_rect.w, sur1610->clip_rect.h)) {
+    } else if (mouse_hover_menu(game->mouse_pos, pos1610->x, pos1610->y, sur1610->clip_rect.w, sur1610->clip_rect.h)) {
 
       if (*control == 0) {
 
         SDL_FreeSurface(sur1610);
-        sur1610 = TTF_RenderText_Solid(font, str1610, palette[3]);
+        sur1610 = TTF_RenderText_Solid(game->font, str1610, game->colorPalette[3]);
 
       } else if (*control == 1) {
 
         SDL_FreeSurface(sur1610);
-        sur1610 = TTF_RenderText_Solid(font, str1610, palette[2]);
+        sur1610 = TTF_RenderText_Solid(game->font, str1610, game->colorPalette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(sur1610);
-        sur1610 = TTF_RenderText_Solid(font, str1610, palette[3]);
+        sur1610 = TTF_RenderText_Solid(game->font, str1610, game->colorPalette[3]);
         option = 3;
 
       }
 
-    } else if (mouse_hover_menu(*mouse_pos, pos169->x, pos169->y, sur169->clip_rect.w, sur169->clip_rect.h)) {
+    } else if (mouse_hover_menu(game->mouse_pos, pos169->x, pos169->y, sur169->clip_rect.w, sur169->clip_rect.h)) {
 
       if (*control == 0) {
 
         SDL_FreeSurface(sur169);
-        sur169 = TTF_RenderText_Solid(font, str169, palette[3]);
+        sur169 = TTF_RenderText_Solid(game->font, str169, game->colorPalette[3]);
 
       } else if (*control == 1) {
 
         SDL_FreeSurface(sur169);
-        sur169 = TTF_RenderText_Solid(font, str169, palette[2]);
+        sur169 = TTF_RenderText_Solid(game->font, str169, game->colorPalette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(sur169);
-        sur169 = TTF_RenderText_Solid(font, str169, palette[3]);
+        sur169 = TTF_RenderText_Solid(game->font, str169, game->colorPalette[3]);
         option = 4;
 
       }
 
-    } else if (mouse_hover_menu(*mouse_pos, posAd->x, posAd->y, surAd->clip_rect.w, surAd->clip_rect.h)) {
+    } else if (mouse_hover_menu(game->mouse_pos, posAd->x, posAd->y, surAd->clip_rect.w, surAd->clip_rect.h)) {
 
       if (*control == 0) {
 
         SDL_FreeSurface(surAd);
-        surAd = TTF_RenderText_Solid(font, strAd, palette[3]);
+        surAd = TTF_RenderText_Solid(game->font, strAd, game->colorPalette[3]);
 
       } else if (*control == 1) {
 
         SDL_FreeSurface(surAd);
-        surAd = TTF_RenderText_Solid(font, strAd, palette[2]);
+        surAd = TTF_RenderText_Solid(game->font, strAd, game->colorPalette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surAd);
-        surAd = TTF_RenderText_Solid(font, strAd, palette[3]);
+        surAd = TTF_RenderText_Solid(game->font, strAd, game->colorPalette[3]);
         option = 5;
 
       }
 
-    } else if (mouse_hover_menu(*mouse_pos, posBack->x, posBack->y, surBack->clip_rect.w, surBack->clip_rect.h)) {
+    } else if (mouse_hover_menu(game->mouse_pos, posBack->x, posBack->y, surBack->clip_rect.w, surBack->clip_rect.h)) {
 
       if (*control == 0) {
 
         SDL_FreeSurface(surBack);
-        surBack = TTF_RenderText_Solid(font, strBack, palette[3]);
+        surBack = TTF_RenderText_Solid(game->font, strBack, game->colorPalette[3]);
 
       } else if (*control == 1) {
 
         SDL_FreeSurface(surBack);
-        surBack = TTF_RenderText_Solid(font, strBack, palette[2]);
+        surBack = TTF_RenderText_Solid(game->font, strBack, game->colorPalette[2]);
 
       } else if (*control == 2) {
 
         SDL_FreeSurface(surBack);
-        surBack = TTF_RenderText_Solid(font, strBack, palette[3]);
+        surBack = TTF_RenderText_Solid(game->font, strBack, game->colorPalette[3]);
         option = 6;
 
       }
@@ -484,50 +474,50 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
 
       //reset the messages
       SDL_FreeSurface(surFull);
-      surFull = TTF_RenderText_Solid(font, strFull, palette[0]);
+      surFull = TTF_RenderText_Solid(game->font, strFull, game->colorPalette[0]);
       SDL_FreeSurface(sur43);
-      sur43 = TTF_RenderText_Solid(font, str43, palette[0]);
+      sur43 = TTF_RenderText_Solid(game->font, str43, game->colorPalette[0]);
       SDL_FreeSurface(sur1610);
-      sur1610 = TTF_RenderText_Solid(font, str1610, palette[0]);
+      sur1610 = TTF_RenderText_Solid(game->font, str1610, game->colorPalette[0]);
       SDL_FreeSurface(sur169);
-      sur169 = TTF_RenderText_Solid(font, str169, palette[0]);
+      sur169 = TTF_RenderText_Solid(game->font, str169, game->colorPalette[0]);
       SDL_FreeSurface(surAd);
-      surAd = TTF_RenderText_Solid(font, strAd, palette[0]);
+      surAd = TTF_RenderText_Solid(game->font, strAd, game->colorPalette[0]);
       SDL_FreeSurface(surBack);
-      surBack = TTF_RenderText_Solid(font, strBack, palette[0]);
+      surBack = TTF_RenderText_Solid(game->font, strBack, game->colorPalette[0]);
 
     }
 
-    SDL_RenderCopy(renderer, background, NULL, NULL);
+    SDL_RenderCopy(game->renderer, background, NULL, NULL);
 
     //blitting the options on the window
-    tempT = SDL_CreateTextureFromSurface(renderer, surFull);
+    tempT = SDL_CreateTextureFromSurface(game->renderer, surFull);
     SDL_QueryTexture(tempT, NULL, NULL, &(posFull->w), &(posFull->h));
-    SDL_RenderCopy(renderer, tempT, NULL, posFull);
+    SDL_RenderCopy(game->renderer, tempT, NULL, posFull);
 
-    tempT = SDL_CreateTextureFromSurface(renderer, sur43);
+    tempT = SDL_CreateTextureFromSurface(game->renderer, sur43);
     SDL_QueryTexture(tempT, NULL, NULL, &(pos43->w), &(pos43->h));
-    SDL_RenderCopy(renderer, tempT, NULL, pos43);
+    SDL_RenderCopy(game->renderer, tempT, NULL, pos43);
 
-    tempT = SDL_CreateTextureFromSurface(renderer, sur1610);
+    tempT = SDL_CreateTextureFromSurface(game->renderer, sur1610);
     SDL_QueryTexture(tempT, NULL, NULL, &(pos1610->w), &(pos1610->h));
-    SDL_RenderCopy(renderer, tempT, NULL, pos1610);
+    SDL_RenderCopy(game->renderer, tempT, NULL, pos1610);
 
-    tempT = SDL_CreateTextureFromSurface(renderer, sur169);
+    tempT = SDL_CreateTextureFromSurface(game->renderer, sur169);
     SDL_QueryTexture(tempT, NULL, NULL, &(pos169->w), &(pos169->h));
-    SDL_RenderCopy(renderer, tempT, NULL, pos169);
+    SDL_RenderCopy(game->renderer, tempT, NULL, pos169);
 
-    tempT = SDL_CreateTextureFromSurface(renderer, surAd);
+    tempT = SDL_CreateTextureFromSurface(game->renderer, surAd);
     SDL_QueryTexture(tempT, NULL, NULL, &(posAd->w), &(posAd->h));
-    SDL_RenderCopy(renderer, tempT, NULL, posAd);
+    SDL_RenderCopy(game->renderer, tempT, NULL, posAd);
 
-    tempT = SDL_CreateTextureFromSurface(renderer, surBack);
+    tempT = SDL_CreateTextureFromSurface(game->renderer, surBack);
     SDL_QueryTexture(tempT, NULL, NULL, &(posBack->w), &(posBack->h));
-    SDL_RenderCopy(renderer, tempT, NULL, posBack);
+    SDL_RenderCopy(game->renderer, tempT, NULL, posBack);
 
-    render_cursor(cursor, renderer, *mouse_pos);
+    render_cursor(*game);
 
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(game->renderer);
 
     SDL_Delay(1000 / SCREEN_FPS);
 
@@ -544,6 +534,8 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
       SDL_FreeSurface(sur169);
       SDL_FreeSurface(surAd);
       SDL_FreeSurface(surBack);
+      SDL_DestroyTexture(background);
+      SDL_DestroyTexture(tempT);
       free(strFull);
       free(str43);
       free(str1610);
@@ -562,7 +554,7 @@ int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *re
   }
 }
 
-int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint_t *mouse_pos, SDL_Texture *cursor) {
+int render_menu (game_t *game) {
 
   //keeps the option in the main menu
   int *mainMenuOption = NULL;
@@ -589,7 +581,7 @@ int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer
     *optionMenuOption = 0;
 
     //getting the option selected from the main menu
-    *mainMenuOption = main_menu_display (font, palette, renderer, mouse_pos, cursor);
+    *mainMenuOption = main_menu_display (game);
 
     //if we wanna enter the option menu
     if (*mainMenuOption == 2) {
@@ -598,7 +590,7 @@ int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer
       while (*optionMenuOption != 6) {
 
         //getting the option selected from the option menu
-        *optionMenuOption = option_menu_display (font, palette, renderer, mouse_pos, cursor);
+        *optionMenuOption = option_menu_display (game);
 
         //depending on the choice selected
         switch (*optionMenuOption) {
@@ -637,7 +629,7 @@ int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer
     //if we choose "quit" in the main menu
     if (*mainMenuOption == 3) {
       //quitting the game
-      *quit = true;
+      game->quit = true;
 
       free(mainMenuOption);
       free(optionMenuOption);

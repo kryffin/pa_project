@@ -18,6 +18,7 @@
 #include "var_init.h"
 #include "menu.h"
 #include "controls.h"
+#include "game.h"
 
 /* CONSTANTS */
 

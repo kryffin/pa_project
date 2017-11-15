@@ -156,7 +156,7 @@ int init_sdl (SDL_Window **window, SDL_Renderer **renderer) {
 
 }
 
-int init_images (SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, SDL_Texture **blocks_spritesheet, SDL_Texture **background, SDL_Renderer *renderer) {
+int init_images (SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, SDL_Renderer *renderer) {
 
   IMG_Init(IMG_INIT_PNG);
 
@@ -178,31 +178,6 @@ int init_images (SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture *
     printf("Error during cursor image loading : %s\n", SDL_GetError());
     return 0;
   }
-
-  //temp won't be used again
-  SDL_FreeSurface(*temp);
-
-  //blocks_spritesheet image loading through the temp surface to a texture
-  *temp = IMG_Load(PATH_BLOCKS_SHEET);
-  *blocks_spritesheet = SDL_CreateTextureFromSurface(renderer, *temp);
-  if (*blocks_spritesheet == NULL) {
-    printf("Error during blocks_spritesheet image loading : %s\n", SDL_GetError());
-    return 0;
-  }
-
-  //temp won't be used again
-  SDL_FreeSurface(*temp);
-
-  //background image loading through the temp surface to a texture
-  *temp = IMG_Load(PATH_BACKGROUND);
-  *background = SDL_CreateTextureFromSurface(renderer, *temp);
-  if (*background == NULL) {
-    printf("Error during background image loading : %s\n", SDL_GetError());
-    return 0;
-  }
-
-  //temp won't be used again
-  SDL_FreeSurface(*temp);
 
   IMG_Quit();
 
@@ -252,7 +227,7 @@ int init_projectiles (projectile_t *projectiles[100], SDL_Texture *img, int x, i
   return 1;
 }
 
-int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint_t **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player_t **p, projectile_t **projectiles, int **stepDelay, bool **quit, SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, Uint32 **timeN_A, Uint32 **timeN_B, level_t **currLevel, SDL_Texture **blocks_spritesheet, SDL_Texture **background, player_t **enemies, projectile_t **enemyProjectiles) {
+int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **window, SDL_Renderer **renderer, intpoint_t **mouse_pos, SDL_Event **event, bool **jumped, bool **mouse_btn, int **i, TTF_Font **font, SDL_Color **palette, player_t **p, projectile_t **projectiles, bool **quit, SDL_Surface **temp, SDL_Texture **player_tSprite, SDL_Texture **cursor, level_t **currLevel, player_t **enemies, projectile_t **enemyProjectiles) {
 
   //used to print the initialization time
   *initTimer = (Uint32*)malloc(sizeof(Uint32));
@@ -339,14 +314,6 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
     return 0;
   }
 
-  //delay between each sprite step
-  *stepDelay = (int*)malloc(sizeof(int));
-  if (*stepDelay == NULL) {
-    printf("Error allocating memory for the stepDelay\n");
-    return 0;
-  }
-  **stepDelay = 0;
-
   //main boolean running the game
   *quit = (bool*)malloc(sizeof(bool));
   if (*quit == NULL) {
@@ -356,7 +323,7 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
   **quit = false;
 
   //initialization of the sprite sheet and cursor
-  if (init_images(temp, player_tSprite, cursor, blocks_spritesheet, background, *renderer) == 0) {
+  if (init_images(temp, player_tSprite, cursor, *renderer) == 0) {
     return 0;
   }
 
@@ -365,18 +332,6 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
   }
 
   if (init_projectiles(enemyProjectiles, *player_tSprite, 144, 64) == 0) {
-    return 0;
-  }
-
-  *timeN_A = (Uint32*)malloc(sizeof(Uint32));
-  if (*timeN_A == NULL) {
-    printf("Error allocating memory for the timeN_A\n");
-    return 0;
-  }
-
-  *timeN_B = (Uint32*)malloc(sizeof(Uint32));
-  if (*timeN_B == NULL) {
-    printf("Error allocating memory for the timeN_B\n");
     return 0;
   }
 
@@ -390,11 +345,9 @@ int init_variables (Uint32 **initTimer, FPSmanager **manager, SDL_Window **windo
 
 }
 
-void free_variables (SDL_Texture *player_tSprite, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile_t *projectiles, player_t *p, FPSmanager *manager, SDL_Color *colorPalette, SDL_Event *event, bool *quit, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, Uint32 *timeN_A, Uint32 *timeN_B, level_t *currLevel, SDL_Texture *blocks_spritesheet, SDL_Texture *background, int *stepDelay, player_t *enemies, projectile_t *enemyProjectiles) {
+void free_variables (SDL_Texture *player_tSprite, SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, int *i, projectile_t *projectiles, player_t *p, FPSmanager *manager, SDL_Color *colorPalette, SDL_Event *event, bool *quit, bool *jumped, intpoint_t *mouse_pos, bool *mouse_btn, level_t *currLevel, player_t *enemies, projectile_t *enemyProjectiles) {
 
   SDL_DestroyTexture(player_tSprite);
-  SDL_DestroyTexture(blocks_spritesheet);
-  SDL_DestroyTexture(background);
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
   TTF_CloseFont(font);
@@ -412,10 +365,7 @@ void free_variables (SDL_Texture *player_tSprite, SDL_Renderer *renderer, SDL_Wi
   free(jumped);
   free(mouse_pos);
   free(mouse_btn);
-  free(timeN_A);
-  free(timeN_B);
   free(currLevel);
-  free(stepDelay);
   free(enemies);
   free(enemyProjectiles);
 

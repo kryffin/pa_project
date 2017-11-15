@@ -7,59 +7,6 @@ void player_update_grid_pos (player_t *player) {
   return;
 }
 
-void closest_out (player_t *player, int w, int h) {
-
-  intpoint_t playerPos, block;
-  vector_t tempVel;
-  playerPos = set_intpoint((int)get_player_real_position(*player).x, (int)get_player_real_position(*player).y);
-  block = set_intpoint(w, h);
-  tempVel = set_vector(get_player_velocity(*player).x, get_player_velocity(*player).y);
-  tempVel = normalize(tempVel);
-
-  while (collision_intpoint(block, playerPos)) {
-
-    set_player_real_position(player, get_player_real_position(*player).x - get_vector_x(tempVel), get_player_real_position(*player).y - get_vector_y(tempVel));
-    playerPos = set_intpoint((int)get_player_real_position(*player).x, (int)get_player_real_position(*player).y);
-
-  }
-
-  return;
-
-}
-
-bool collision (player_t player, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], int *width, int *height) {
-  int w,h;
-  intpoint_t posBlock;
-
-  set_player_real_position(&player, get_player_real_position(player).x + get_player_velocity(player).x, get_player_real_position(player).y + get_player_velocity(player).y);
-
-  for (w = 0; w < NB_BLOCKS_WIDTH; w++) {
-    for (h = 0; h < NB_BLOCKS_HEIGHT; h++) {
-
-      if (get_block_type(blocks[w][h]) == Solid) {
-
-        posBlock = set_intpoint(w*16, h*16);
-
-        if ((get_intpoint_x(posBlock) >= get_player_real_position(player).x && get_intpoint_x(posBlock) <= get_player_real_position(player).x + IMG_WIDTH) || (get_intpoint_x(posBlock) + 16 >= get_player_real_position(player).x && get_intpoint_x(posBlock) + 16 <= get_player_real_position(player).x + IMG_WIDTH)) {
-
-          if ((get_intpoint_y(posBlock) >= get_player_real_position(player).y && get_intpoint_y(posBlock) <= get_player_real_position(player).y + IMG_HEIGHT) || (get_intpoint_y(posBlock) + 16 >= get_player_real_position(player).y && get_intpoint_y(posBlock) + 16 <= get_player_real_position(player).y + IMG_HEIGHT)) {
-
-            *width = w * 16;
-            *height = h * 16;
-            return true;
-
-          }
-
-        }
-
-      }
-
-    }
-  }
-
-  return false;
-}
-
 void shooting (bool mouse_btn, player_t p, projectile_t proj[100], intpoint_t mouse_pos) {
 
   vector_t dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2)));
@@ -100,7 +47,11 @@ void update_player (player_t *p, bool *quit) {
     return;
   }
 
-  set_player_screen_position(p, (int)get_player_real_position(*p).x, (int)get_player_real_position(*p).y);
+  set_player_screen_position(p, floor(get_player_real_position(*p).x), floor(get_player_real_position(*p).y));
+
+  if (p->onGround && p->yGrid * 16 != p->screenPos.y) {
+    p->screenPos.y = p->yGrid * 16;
+  }
 
   SDL_Rect temp;
   temp.x = get_player_screen_position(*p).x;
@@ -132,199 +83,6 @@ void update_enemy (player_t *p) {
   temp.h = get_player_hitbox(*p).h;
 
   set_player_hitbox(p, temp);
-
-  return;
-}
-
-void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
-
-  SDL_Rect *temp = NULL;
-  temp = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  temp->w = 32;
-  temp->h = 64;
-  short int step = get_player_step(p);
-  short int state = get_player_state(p);
-
-  if (get_player_dir(p) == Right) {
-    //player facing right
-
-    switch (state) {
-
-      //stand-by/walking
-      case Walking:
-
-        if (get_player_velocity(p).x == 0) {
-
-          //stand by sprite
-          temp->x = 0;
-          temp->y = 0;
-          set_player_sprite_pos(&p, *temp);
-
-        } else {
-
-          //sprite moving
-          switch (step) {
-
-            case 0:
-              temp->x = 32;
-              temp->y = 0;
-              set_player_sprite_pos(&p, *temp);
-              break;
-
-            case 1:
-              temp->x = 0;
-              temp->y = 0;
-              set_player_sprite_pos(&p, *temp);
-              break;
-
-            case 2:
-              temp->x = 64;
-              temp->y = 0;
-              set_player_sprite_pos(&p, *temp);
-              break;
-
-            case 3:
-              temp->x = 0;
-              temp->y = 0;
-              set_player_sprite_pos(&p, *temp);
-              break;
-
-            default:
-              break;
-
-          }
-
-        }
-
-        break;
-
-      //jumping or double-jumping
-      case Jumping:
-      case nouse:
-
-      temp->x = 96;
-      temp->y = 0;
-      set_player_sprite_pos(&p, *temp);
-
-        break;
-
-      //attacking
-      case Attacking:
-
-      temp->x = 64;
-      temp->y = 128;
-      set_player_sprite_pos(&p, *temp);
-
-        break;
-
-      //crouching
-      case Crouching:
-
-        temp->x = 128;
-        temp->y = 0;
-        temp->h = 32;
-        set_player_sprite_pos(&p, *temp);
-
-        break;
-
-      default:
-        break;
-    }
-
-  } else {
-    //player facing left
-
-    switch (state) {
-
-      //stand-by/walking
-      case Walking:
-
-        if (get_player_velocity(p).x == 0) {
-
-          //stand by sprite
-          temp->x = 0;
-          temp->y = 64;
-          set_player_sprite_pos(&p, *temp);
-
-        } else {
-
-          //sprite moving
-          switch (step) {
-
-            case 0:
-              temp->x = 32;
-              temp->y = 64;
-              set_player_sprite_pos(&p, *temp);
-              break;
-
-            case 1:
-              temp->x = 0;
-              temp->y = 64;
-              set_player_sprite_pos(&p, *temp);
-              break;
-
-            case 2:
-              temp->x = 64;
-              temp->y = 64;
-              set_player_sprite_pos(&p, *temp);
-              break;
-
-            case 3:
-              temp->x = 0;
-              temp->y = 64;
-              set_player_sprite_pos(&p, *temp);
-              break;
-
-            default:
-              break;
-
-          }
-
-        }
-
-        break;
-
-      //jumping or double-jumping
-      case Jumping:
-      case nouse:
-
-      temp->x = 96;
-      temp->y = 64;
-      set_player_sprite_pos(&p, *temp);
-
-        break;
-
-      //attacking
-      case Attacking:
-
-      temp->x = 96;
-      temp->y = 128;
-      set_player_sprite_pos(&p, *temp);
-
-        break;
-
-      //crouching
-      case Crouching:
-
-        temp->x = 128;
-        temp->y = 32;
-        temp->h = 32;
-        set_player_sprite_pos(&p, *temp);
-
-        break;
-
-      default:
-        break;
-    }
-
-  }
-
-  SDL_Rect tempSpritePos = get_player_sprite_pos(p);
-  SDL_Rect tempPos = get_player_hitbox(p);
-
-  SDL_RenderCopy(renderer, get_player_img(p), &tempSpritePos, &tempPos);
-
-  free(temp);
 
   return;
 }
@@ -397,24 +155,45 @@ void player_update_dir (player_t *p, intpoint_t mouse_pos) {
 
 void player_apply_velocity (player_t *p, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
 
-  set_player_real_position(p, get_player_real_position(*p).x + get_player_velocity(*p).x, get_player_real_position(*p).y + get_player_velocity(*p).y);
+  if (p->yGrid == NB_BLOCKS_HEIGHT - 4 || blocks[p->xGrid][p->yGrid + 4].type == 0 || blocks[p->xGrid + 1][p->yGrid + 4].type == 0) {
+    p->onGround = true;
+  } else {
+    p->onGround = false;
+  }
 
-  int w, h;
-  if (collision(*p, blocks, &w, &h)) {
-    closest_out(p, w, h);
-    if (h >= get_player_real_position(*p).y + IMG_HEIGHT) {
-      p->onGround = true;
+
+  if (p->vel.x < 0.0) {
+    if (p->xGrid != 0 && (blocks[p->xGrid - 1][p->yGrid].type != 0 && blocks[p->xGrid - 1][p->yGrid + 1].type != 0 && blocks[p->xGrid - 1][p->yGrid + 2].type != 0 && blocks[p->xGrid - 1][p->yGrid + 3].type != 0)) {
+      p->realPos.x += p->vel.x;
+    }
+  }
+  if (p->vel.x > 0.0 && (blocks[p->xGrid + 2][p->yGrid].type != 0 && blocks[p->xGrid + 2][p->yGrid + 1].type != 0 && blocks[p->xGrid + 2][p->yGrid + 2].type != 0 && blocks[p->xGrid + 2][p->yGrid + 3].type != 0)) {
+    if (p->xGrid != NB_BLOCKS_WIDTH - 2) {
+      p->realPos.x += p->vel.x;
     }
   }
 
-  set_player_real_position(p, get_player_real_position(*p).x + get_player_velocity(*p).x, get_player_real_position(*p).y);
+  if (blocks[p->xGrid][p->yGrid - 1].type == 0 || blocks[p->xGrid + 1][p->yGrid - 1].type == 0) {
+    p->vel.y = 4.0;
+  }
+
+  if (p->vel.y < 0.0 && (blocks[p->xGrid][p->yGrid - 1].type != 0 && blocks[p->xGrid + 1][p->yGrid - 1].type != 0)) {
+    if (p->yGrid != 0) {
+      p->realPos.y += p->vel.y;
+    }
+  }
+  if (p->vel.y > 0.0 && (blocks[p->xGrid][p->yGrid + 4].type != 0 && blocks[p->xGrid + 1][p->yGrid + 4].type != 0)) {
+    if (p->yGrid != NB_BLOCKS_HEIGHT - 4) {
+      p->realPos.y += p->vel.y;
+    }
+  }
 
   return;
 }
 
 void player_gravity(player_t *p) {
 
-  if (!(p->onGround)) {
+  if (!p->onGround && p->vel.y < 12.0) {
     set_player_vel_y(p, get_player_velocity(*p).y + GRAVITY);
   }
 
@@ -438,9 +217,18 @@ bool is_alive(player_t p) {
 /* SET */
 
 //create a new player
-player_t set_player (short int maxHealthPoints, floatpoint_t position, vector_t velocity, SDL_Texture *image, SDL_Rect posSprite, SDL_Rect hitbox) {
+player_t set_player (short int maxHealthPoints, floatpoint_t position, vector_t velocity, char *path_sprites, SDL_Rect posSprite, SDL_Rect hitbox, SDL_Renderer *renderer) {
 
+  SDL_Surface *temp;
   player_t p;
+
+  temp = IMG_Load(path_sprites);
+  p.img = SDL_CreateTextureFromSurface(renderer, temp);
+  if (p.img == NULL) {
+    printf("Error during bullet image loading : %s\n", SDL_GetError());
+  }
+  SDL_FreeSurface(temp);
+
   set_player_maxhp(&p, maxHealthPoints);
   set_player_hp(&p, maxHealthPoints);
   set_player_dir(&p, Left);
@@ -453,9 +241,11 @@ player_t set_player (short int maxHealthPoints, floatpoint_t position, vector_t 
   set_player_screen_position(&p, (int)get_floatpoint_x(position), (int)get_floatpoint_y(position));
   set_player_vel_x(&p, get_vector_x(velocity));
   set_player_vel_y(&p, get_vector_y(velocity));
-  set_player_img(&p, image);
   set_player_sprite_pos(&p, posSprite);
   set_player_hitbox(&p, hitbox);
+  p.stepDelay = 0;
+  p.shootDelay = 0;
+  p.jumpDelay = 0;
 
   return p;
 }

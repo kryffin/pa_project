@@ -7,6 +7,8 @@
 #include <stdbool.h>
 #include "2dpoint.h"
 #include "controls.h"
+#include "game.h"
+#include "rendering.h"
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
@@ -25,11 +27,10 @@
 #define IMG_HEIGHT 64
 
 /* menu.c */
-void render_text(char *string, SDL_Rect pos, TTF_Font *font, SDL_Color color, SDL_Renderer *renderer);
-int menu_controls(SDL_Event *event, intpoint_t *mouse_pos);
-int main_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint_t *mouse_pos, SDL_Texture *player_tSprite);
+int menu_controls(game_t *game);
+int main_menu_display (game_t *game);
 bool mouse_hover_menu (intpoint_t mouse_pos, int targetx, int targety, int width, int height);
-int option_menu_display (TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint_t *mouse_pos, SDL_Texture *player_tSprite);
-int render_menu (bool *quit, TTF_Font *font, SDL_Color palette[15], SDL_Renderer *renderer, intpoint_t *mouse_pos, SDL_Texture *cursor);
+int option_menu_display (game_t *game);
+int render_menu (game_t *game);
 
 #endif
