@@ -56,7 +56,7 @@ void render_cursor (SDL_Texture *img, SDL_Renderer *renderer, intpoint mouse_pos
 void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped) {
 
   //keys :: left, right, jump, melee
-  SDL_Keycode keysTab[8] = {SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_SPACE, SDL_SCANCODE_F, SDL_SCANCODE_S, SDL_SCANCODE_1, SDL_SCANCODE_2, SDL_SCANCODE_3};
+  SDL_Keycode keysTab[9] = {SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_SPACE, SDL_SCANCODE_F, SDL_SCANCODE_S, SDL_SCANCODE_1, SDL_SCANCODE_2, SDL_SCANCODE_C, SDL_SCANCODE_N};
 
   /* KEYDOWN Controls */
 
@@ -131,9 +131,16 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped) {
   if (keys[keysTab[6]] == 1) {
     p->gunType = 2;
   }
-  //'3' key
+  //'C' key
   if (keys[keysTab[7]] == 1) {
-    p->gunType = 3;
+    
+  }
+  //'N' key
+  if (keys[keysTab[8]] == 1 && keys[keysTab[7]] == 1){
+    keys[keysTab[7]] == 0;
+    p->currLevel +=1;
+    printf("level %d\n", p->currLevel);
+
   }
 
 }

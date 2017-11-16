@@ -104,6 +104,26 @@ int main () {
   Uint32 *timeN_B = NULL;
 
   level *currLevel = NULL;
+  /**********************************************/
+  /* testlist_level*/
+
+
+  level *lvl1 = malloc(sizeof(level));
+  level *lvl2 = malloc(sizeof(level));
+  level *nextLevel = malloc(sizeof(level));
+
+
+  //temp won't be used again
+  SDL_FreeSurface(temp);
+
+  list_l LISTElvl = cons_list_l(lvl2, cons_list_l(lvl1, list_l_empty()));
+  nextLevel = head_list_l(next_list_l (LISTElvl));
+  currLevel = head_list_l (LISTElvl);
+
+
+
+  /**********************************************/
+  /*************************************************/
   SDL_Texture *blocks_spritesheet = NULL;
   SDL_Texture *background = NULL;
 
@@ -168,7 +188,10 @@ int main () {
     return EXIT_FAILURE;
   }
 
-  *currLevel = init_level(blocks_spritesheet, background, p);
+
+
+  *currLevel = init_level(blocks_spritesheet, background, p, 1);
+  *nextLevel = init_level(blocks_spritesheet, background, p, 2);
 
   *timeN_A = SDL_GetTicks();
 

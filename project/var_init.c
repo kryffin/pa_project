@@ -155,8 +155,8 @@ int init_sdl (SDL_Window **window, SDL_Renderer **renderer) {
   return 1;
 
 }
-
 int init_images (SDL_Surface **temp, SDL_Texture **playerSprite, SDL_Texture **cursor, SDL_Texture **blocks_spritesheet, SDL_Texture **background, SDL_Renderer *renderer) {
+
 
   IMG_Init(IMG_INIT_PNG);
 

@@ -14,8 +14,8 @@ void delete_projectile (projectile *p) {
 void shooting (bool mouse_btn, player p, projectile proj[100], intpoint mouse_pos) {
 
   vector dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2)));
-  vector dir2 = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)) +10, (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2))+10);
-  vector dir3 = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)) -10, (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2))-10);
+  vector dir2 = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)) +20, (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2))+20);
+  vector dir3 = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_player_real_position(p).x + (IMG_WIDTH / 2)) -20, (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_player_real_position(p).y + (IMG_HEIGHT / 2))-20);
   int i;
 
   switch (p.gunType){
@@ -82,32 +82,41 @@ void shooting (bool mouse_btn, player p, projectile proj[100], intpoint mouse_po
 
     case 3:
 
-      dir = normalize(dir);
+      /*dir = normalize(dir);
       dir = set_vector(get_vector_x(dir) * BULLET_SPEED, get_vector_y(dir) * BULLET_SPEED);
 
-        if (mouse_btn) {
           //if clicking we shoot
           for (i = 0; i < 100; i += 1) {
             //if a projectile has no direction it doesn't exists
-            if (get_projectile_direction(proj[0]).x == 0.0 && get_projectile_direction(proj[0]).y == 0.0) {
+            //if (get_projectile_direction(proj[0]).x == 0.0 && get_projectile_direction(proj[0]).y == 0.0) {
 
               set_projectile_real_position(&proj[0], (get_player_real_position(p).x + (IMG_WIDTH / 2)) - (BULLET_WIDTH / 2), (get_player_real_position(p).y + (IMG_HEIGHT / 2)) - (BULLET_HEIGHT / 2));
               set_projectile_direction(&proj[0], dir);
-              dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) );
 
-              return;
-            }
+            //}
+
+            dir2 = calcul_vector_p_m(dir, mouse_pos);
+            set_projectile_real_position(&proj[0], get_projectile_real_position(proj[0]).x + dir2.x, get_projectile_real_position(proj[0]).y + dir2.y);
+            set_projectile_direction(&proj[0], dir);
+
 
           }
+*/
 
-        }
       break;
+
     } //end switch
   //security check
   return;
 
 }
 
+vector calcul_vector_p_m (vector dir, intpoint mouse_pos)
+{
+    vector dir2 = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - dir.x, (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - dir.y);
+    return dir2;
+
+}
 void update_projectiles (projectile p[100]) {
 
   int i;

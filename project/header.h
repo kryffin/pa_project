@@ -39,7 +39,8 @@
 #define PATH_CURSOR "./res/cursor.png"
 #define PATH_BLOCKS_SHEET "./res/blocks_spritesheet.png"
 #define PATH_BACKGROUND "./res/background.bmp"
-#define PATH_TXT_FILE "./res/arena.txt"
+#define PATH_TXT_FILE1 "./res/arena2.txt"
+#define PATH_TXT_FILE2 "./res/arena3.txt"
 
 #define DELAY_STEP 150 //delay for the step updating
 
@@ -81,6 +82,7 @@ typedef struct Player {
   short int gunType; //type of the gun the player holds
 
   bool dJump; //is double jump available?
+  int currLevel;
   int jumpPoint; //point from where you jumped
   int highPoint; //highest point of the jump (used for falling?)
 
@@ -108,7 +110,6 @@ typedef struct Player {
 */
 
 /* * * * * * Projectile Structure * * * * * */
-
 typedef struct Projectile {
   floatpoint realPos;
 
@@ -147,6 +148,14 @@ typedef struct Level {
 
 } level;
 
+typedef struct list_level *list_l;
+
+struct list_level {
+  level* head;
+  list_l next;
+
+};
+
 /* blocks.c */
 block set_block (SDL_Rect hitbox, SDL_Rect spritesheet_pos, unsigned short int type);
 void set_block_hitbox (block *b, int x, int y, int w, int h);
@@ -166,7 +175,7 @@ void controls (SDL_Event *event, bool *quit, player *p, bool *jumped, SDL_Render
 void rendering (player *player, projectile bullets[100], SDL_Texture *cursor, level currLevel, intpoint *mouse_pos, SDL_Renderer *renderer);
 void render_foreground_level (level l, SDL_Renderer *renderer);
 void render_background_level (level l, SDL_Renderer *renderer);
-level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player *p);
+level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player *p, int X);
 level set_level (block blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], SDL_Texture *blocks_spritesheet, SDL_Texture *background);
 void set_level_block (level *l, int x, int y, block b);
 void set_level_blocks_spritesheet (level *l, SDL_Texture *blocks_spritesheet);
@@ -193,6 +202,8 @@ vector get_projectile_direction (projectile p);
 SDL_Rect get_projectile_hitbox (projectile p);
 SDL_Rect get_projectile_sprite_pos (projectile p);
 SDL_Texture* get_projectile_image (projectile p);
+
+vector calcul_vector_p_m (vector dir, intpoint mouse_pos);
 
 /* player.c */
 //temporaire a enlever
@@ -303,4 +314,13 @@ bool is_colision(player *p, level* l);
 void player_colision (player *p, level* l);
 bool point_dans_aabb (floatpoint realpos, AABB world);
 void adjust_vector_collision(vector V, player *hero, AABB box, double eps);
+
+
+
+//list_level.c
+list_l list_l_empty();
+list_l cons_list_l (level* lvl, list_l liste);
+level* head_list_l (list_l liste);
+list_l next_list_l (list_l liste);
+bool is_empty_list_l (list_l L);
 #endif
