@@ -5,7 +5,7 @@
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include "2dpoint.h"
-#include "player.h"
+#include "character.h"
 #include "blocks.h"
 
 #define PATH_SPRITES "./res/spritesheet.png"
@@ -29,7 +29,7 @@ typedef struct Level {
 } level_t;
 
 /* level.c */
-level_t init_level (char *blocks, char *path_background, player_t *p, player_t enemies[10], SDL_Renderer *renderer);
+level_t init_level (char *blocks, char *path_background, character_t *p, character_list_t *enemies, SDL_Renderer *renderer);
 level_t set_level (block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], SDL_Texture *blocks_spritesheet, SDL_Texture *background);
 void set_level_block(level_t *l, int x, int y,  block_t b);
 void set_level_blocks_spritesheet (level_t *l, SDL_Texture *blocks_spritesheet);

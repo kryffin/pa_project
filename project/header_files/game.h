@@ -7,7 +7,7 @@
 #include <SDL2/SDL_image.h>
 #include "2dpoint.h"
 #include "vector.h"
-#include "player.h"
+#include "character.h"
 #include "projectile.h"
 #include "level.h"
 
@@ -50,13 +50,11 @@ typedef struct Game {
   //palette of 15 colors
   SDL_Color *colorPalette;
 
-  //the main player_t
-  player_t player;
-  player_t enemies[10];
+  //the main character_t
+  character_t player;
+  character_list_t enemies;
 
-  //projectiles of the player_t : array of 100
-  projectile_t playerProjectiles[100];
-  projectile_t enemyProjectiles[100];
+  SDL_Texture *spriteSheet;
 
   //variable running the main loop and quitting the game if desired
   bool quit;

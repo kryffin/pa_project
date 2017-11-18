@@ -41,6 +41,12 @@ game_t *create_game () {
     printf("Error during cursor image loading : %s\n", SDL_GetError());
   }
   SDL_FreeSurface(temp);
+  temp = IMG_Load(PATH_SPRITES);
+  g->spriteSheet = SDL_CreateTextureFromSurface(g->renderer, temp);
+  if (g->spriteSheet == NULL) {
+    printf("Error during sprite sheet image loading : %s\n", SDL_GetError());
+  }
+  SDL_FreeSurface(temp);
   IMG_Quit();
 
   g->mouse_pos = set_intpoint(0, 0);
@@ -60,36 +66,22 @@ game_t *create_game () {
   floatpoint_t basePosition = set_floatpoint(0.0, 0.0);
   vector_t baseVelocity = set_vector(0.0, 0.0);
   SDL_Rect desRec = {0, 0, IMG_WIDTH, IMG_HEIGHT};
-  g->player = set_player(10, basePosition, baseVelocity, PATH_SPRITES, desRec, desRec, g->renderer);
+  g->player = set_character(10, basePosition, baseVelocity, desRec, desRec, Player);
 
-  int i;
-  for (i = 0; i < 10; i ++) {
-    g->enemies[i] = set_player(0, basePosition, baseVelocity, PATH_SPRITES, desRec, desRec, g->renderer);
-  }
+  g->enemies = character_list_empty();
 
-  vector_t dir = set_vector(0.0, 0.0);
   desRec.w = BULLET_WIDTH;
   desRec.h = BULLET_HEIGHT;
-  SDL_Rect tempR = {128, 64, BULLET_WIDTH, BULLET_HEIGHT};
   temp = IMG_Load(PATH_SPRITES);
   texture = SDL_CreateTextureFromSurface(g->renderer, temp);
   if (texture == NULL) {
     printf("Error during bullet image loading : %s\n", SDL_GetError());
   }
   SDL_FreeSurface(temp);
-  for (i = 0; i < 100; i ++) {
-    g->playerProjectiles[i] = set_projectile(0.0, 0.0, dir, desRec, tempR, texture);
-  }
-
-  tempR.x = 144;
-  tempR.y = 64;
-  for (i = 0; i < 100; i ++) {
-    g->enemyProjectiles[i] = set_projectile(0.0, 0.0, dir, desRec, tempR, texture);
-  }
 
   g->quit = false;
 
-  g->currLevel = init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND, &g->player, g->enemies, g->renderer);
+  g->currLevel = init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND, &g->player, &g->enemies, g->renderer);
 
   g->keys[SDL_SCANCODE_A] = 0;
   g->keys[SDL_SCANCODE_D] = 0;

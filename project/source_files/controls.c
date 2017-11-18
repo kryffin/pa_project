@@ -49,78 +49,78 @@ void keyboard_control (game_t *game) {
 
   //'q' or 'a' key
   if (game->keys[keysTab[0]] == 1) {
-    if(get_player_state(game->player) != Crouching) {
-      set_player_vel_x(&game->player, -3); //set a left velocity
+    if(get_character_state(game->player) != Crouching) {
+      set_character_vel_x(&game->player, -3); //set a left velocity
     }
   }
 
   //'d' key
   if (game->keys[keysTab[1]] == 1) {
-    if(get_player_state(game->player) != Crouching) {
-      set_player_vel_x(&game->player, 3); //set a left velocity
+    if(get_character_state(game->player) != Crouching) {
+      set_character_vel_x(&game->player, 3); //set a left velocity
     }
   }
 
   //'space' key
   if (game->keys[keysTab[2]] == 1) {
     if (!(game->player.onGround)) {
-      set_player_state(&game->player, Walking);
+      set_character_state(&game->player, Walking);
     } else {
-      set_player_state(&game->player, Jumping);
+      set_character_state(&game->player, Jumping);
       game->player.onGround = false;
     }
     if (SDL_GetTicks() > game->player.jumpDelay + JUMP_DURATION) {
-      set_player_state(&game->player, Walking);
+      set_character_state(&game->player, Walking);
     }
   }
 
   //'f' key
   if (game->keys[keysTab[3]] == 1) {
-    set_player_state(&game->player, Attacking);
+    set_character_state(&game->player, Attacking);
   }
 
   //'s' key
   if (game->keys[keysTab[4]] == 1) {
-    set_player_state(&game->player, Crouching);
-    set_player_vel_x(&game->player, 0); //set a left velocity
+    set_character_state(&game->player, Crouching);
+    set_character_vel_x(&game->player, 0); //set a left velocity
   }
 
   /* KEYUP Controls */
 
   //'q' or 'a' key
   if (game->keys[keysTab[0]] == 0) {
-    if (get_player_velocity(game->player).x < 0) {
-      set_player_vel_x(&game->player, 0);
+    if (get_character_velocity(game->player).x < 0) {
+      set_character_vel_x(&game->player, 0);
     }
   }
 
   //'d' key
   if (game->keys[keysTab[1]] == 0) {
-    if (get_player_velocity(game->player).x > 0) {
-      set_player_vel_x(&game->player, 0);
+    if (get_character_velocity(game->player).x > 0) {
+      set_character_vel_x(&game->player, 0);
     }
   }
 
   //'space' key
   if (game->keys[keysTab[2]] == 0) {
-    if (get_player_state(game->player) == Jumping) {
-      set_player_state(&game->player, Walking);
-      set_player_vel_y(&game->player, 0);
+    if (get_character_state(game->player) == Jumping) {
+      set_character_state(&game->player, Walking);
+      set_character_vel_y(&game->player, 0);
     }
     game->player.jumpDelay = SDL_GetTicks();
   }
 
   //'f' key
   if (game->keys[keysTab[3]] == 0) {
-    if (get_player_state(game->player) == Attacking) {
-      set_player_state(&game->player, Walking);
+    if (get_character_state(game->player) == Attacking) {
+      set_character_state(&game->player, Walking);
     }
   }
 
   //'s' key
   if (game->keys[keysTab[4]] == 0) {
-    if (get_player_state(game->player) == Crouching) {
-      set_player_state(&game->player, Walking);
+    if (get_character_state(game->player) == Crouching) {
+      set_character_state(&game->player, Walking);
     }
   }
 

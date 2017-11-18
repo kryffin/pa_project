@@ -1,6 +1,6 @@
 #include "../header_files/level.h"
 
-level_t init_level (char *path_blocks, char *path_background, player_t *p, player_t enemies[10], SDL_Renderer *renderer) {
+level_t init_level (char *path_blocks, char *path_background, character_t *p, character_list_t *enemies, SDL_Renderer *renderer) {
 
   level_t l;
   int i = 0;
@@ -34,6 +34,9 @@ level_t init_level (char *path_blocks, char *path_background, player_t *p, playe
   block_t b;
   SDL_Rect hitbox = {0, 0, 16, 16};
   SDL_Rect spritesheet_pos = {0, 0, 16, 16};
+
+  SDL_Rect cHitbox = {0, 0, IMG_WIDTH, IMG_HEIGHT};
+  SDL_Rect cSpritePos = {0, 0, IMG_WIDTH, IMG_HEIGHT};
 
   int x = 0, y = 0;
   while ((curr = getc(txtFile)) != EOF && y < NB_BLOCKS_HEIGHT) {
@@ -71,12 +74,13 @@ level_t init_level (char *path_blocks, char *path_background, player_t *p, playe
           break;
 
         case 'p':
-          set_player_real_position(p, x * 16, (y * 16) - 48);
+          set_character_real_position(p, x * 16, (y * 16) - IMG_HEIGHT);
           break;
 
         case 'e':
-          set_player_real_position(&(enemies)[i], x * 16, (y * 16) - 48);
-          set_player_hp(&(enemies)[i], 10);
+          cHitbox.x = x * 16;
+          cHitbox.y = (y * 16) - IMG_HEIGHT;
+          *enemies = character_list_build(set_character(10, set_floatpoint(x * 16, (y * 16) - IMG_HEIGHT), set_vector(0.0, 0.0), cSpritePos, cHitbox, Enemy), *enemies);
           i++;
           break;
 

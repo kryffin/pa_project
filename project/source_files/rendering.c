@@ -37,20 +37,21 @@ void rendering (game_t *game) {
   render_background_level(*game);
 
   //render the enemy projectile
-  render_projectiles(*game);
-
-  //render the player_t
-  render_player(game->player, game->renderer, game->mouse_pos);
-  int i = 0;
-  for (i = 0; i < 10; i++) {
-    if (is_alive(game->enemies[i])) {
-      render_player(game->enemies[i], game->renderer, game->mouse_pos);
-    }
+  character_list_t c;
+  c = game->enemies;
+  while (!character_list_is_empty(c)) {
+    render_character(character_list_head(c), game->renderer, game->spriteSheet);
+    render_projectiles(character_list_head(c).projectiles, game->renderer, game->spriteSheet);
+    c = c->next;
   }
 
+  //render the character_t
+  render_character(game->player, game->renderer, game->spriteSheet);
+  render_projectiles(game->player.projectiles, game->renderer, game->spriteSheet);
+
   //render the attack and process it
-  if (get_player_state(game->player) == Attacking)  {
-    player_melee(game->player, game->renderer);
+  if (get_character_state(game->player) == Attacking)  {
+    character_melee(game->player, game->renderer, game->spriteSheet);
   }
 
   //render the foreground
@@ -59,26 +60,27 @@ void rendering (game_t *game) {
   //render the cursor
   render_cursor(*game);
 
-  SDL_Rect tempRect = {game->player.xGrid * 16, game->player.yGrid * 16, 16, 16};
+  //DEBUG
+  /*SDL_Rect tempRect = {game->player.xGrid * 16, game->player.yGrid * 16, 16, 16};
 
-  SDL_RenderCopy(game->renderer, game->playerProjectiles[0].img, NULL, &tempRect);
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
   tempRect.x+=16;
-  SDL_RenderCopy(game->renderer, game->playerProjectiles[0].img, NULL, &tempRect);
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
   tempRect.x-=16;
   tempRect.y+=16;
-  SDL_RenderCopy(game->renderer, game->playerProjectiles[0].img, NULL, &tempRect);
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
   tempRect.x+=16;
-  SDL_RenderCopy(game->renderer, game->playerProjectiles[0].img, NULL, &tempRect);
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
   tempRect.x-=16;
   tempRect.y+=16;
-  SDL_RenderCopy(game->renderer, game->playerProjectiles[0].img, NULL, &tempRect);
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
   tempRect.x+=16;
-  SDL_RenderCopy(game->renderer, game->playerProjectiles[0].img, NULL, &tempRect);
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
   tempRect.x-=16;
   tempRect.y+=16;
-  SDL_RenderCopy(game->renderer, game->playerProjectiles[0].img, NULL, &tempRect);
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
   tempRect.x+=16;
-  SDL_RenderCopy(game->renderer, game->playerProjectiles[0].img, NULL, &tempRect);
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);*/
 
   SDL_RenderPresent(game->renderer);
 
@@ -140,60 +142,46 @@ void render_background_level (game_t game) {
   return;
 }
 
-void render_projectiles (game_t game) {
+void render_projectiles (projectile_list_t p, SDL_Renderer *renderer, SDL_Texture *img) {
 
-  int i;
-
-  for (i = 0; i < 100; i += 1) {
-
-    //if the projectile_t exists
-    if (get_projectile_direction(game.playerProjectiles[i]).x != 0.0 || get_projectile_direction(game.playerProjectiles[i]).y != 0.0) {
-
-      SDL_Rect tempSpritePos = get_projectile_sprite_pos(game.playerProjectiles[i]);
-      SDL_Rect tempPos = get_projectile_hitbox(game.playerProjectiles[i]);
-
-      SDL_RenderCopy(game.renderer, get_projectile_image(game.playerProjectiles[i]), &tempSpritePos, &tempPos);
-
-    }
-
-    //if the projectile_t exists
-    if (get_projectile_direction(game.enemyProjectiles[i]).x != 0.0 || get_projectile_direction(game.enemyProjectiles[i]).y != 0.0) {
-
-      SDL_Rect tempSpritePos = get_projectile_sprite_pos(game.enemyProjectiles[i]);
-      SDL_Rect tempPos = get_projectile_hitbox(game.enemyProjectiles[i]);
-
-      SDL_RenderCopy(game.renderer, get_projectile_image(game.enemyProjectiles[i]), &tempSpritePos, &tempPos);
-
-    }
+  if (projectile_list_is_empty(p)) {
+    return;
   }
+
+  SDL_Rect tempPos = {get_intpoint_x(get_projectile_screen_position(projectile_list_head(p))), get_intpoint_y(get_projectile_screen_position(projectile_list_head(p))), BULLET_WIDTH, BULLET_HEIGHT};
+  SDL_Rect tempSpritePos = get_projectile_sprite_pos(projectile_list_head(p));
+
+  SDL_RenderCopy(renderer, img, &tempSpritePos, &tempPos);
+
+  render_projectiles(projectile_list_rest(p), renderer, img);
 
   return;
 
 }
 
-void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
+void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) {
 
   SDL_Rect *temp = NULL;
   temp = (SDL_Rect*)malloc(sizeof(SDL_Rect));
   temp->w = 32;
   temp->h = 64;
-  short int step = get_player_step(p);
-  short int state = get_player_state(p);
+  short int step = get_character_step(p);
+  short int state = get_character_state(p);
 
-  if (get_player_dir(p) == Right) {
-    //player facing right
+  if (get_character_dir(p) == Right) {
+    //character facing right
 
     switch (state) {
 
       //stand-by/walking
       case Walking:
 
-        if (get_player_velocity(p).x == 0) {
+        if (get_character_velocity(p).x == 0) {
 
           //stand by sprite
           temp->x = 0;
           temp->y = 0;
-          set_player_sprite_pos(&p, *temp);
+          set_character_sprite_pos(&p, *temp);
 
         } else {
 
@@ -203,25 +191,25 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
             case 0:
               temp->x = 32;
               temp->y = 0;
-              set_player_sprite_pos(&p, *temp);
+              set_character_sprite_pos(&p, *temp);
               break;
 
             case 1:
               temp->x = 0;
               temp->y = 0;
-              set_player_sprite_pos(&p, *temp);
+              set_character_sprite_pos(&p, *temp);
               break;
 
             case 2:
               temp->x = 64;
               temp->y = 0;
-              set_player_sprite_pos(&p, *temp);
+              set_character_sprite_pos(&p, *temp);
               break;
 
             case 3:
               temp->x = 0;
               temp->y = 0;
-              set_player_sprite_pos(&p, *temp);
+              set_character_sprite_pos(&p, *temp);
               break;
 
             default:
@@ -239,7 +227,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
 
       temp->x = 96;
       temp->y = 0;
-      set_player_sprite_pos(&p, *temp);
+      set_character_sprite_pos(&p, *temp);
 
         break;
 
@@ -248,7 +236,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
 
       temp->x = 64;
       temp->y = 128;
-      set_player_sprite_pos(&p, *temp);
+      set_character_sprite_pos(&p, *temp);
 
         break;
 
@@ -258,7 +246,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
         temp->x = 128;
         temp->y = 0;
         temp->h = 32;
-        set_player_sprite_pos(&p, *temp);
+        set_character_sprite_pos(&p, *temp);
 
         break;
 
@@ -267,19 +255,19 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
     }
 
   } else {
-    //player facing left
+    //character facing left
 
     switch (state) {
 
       //stand-by/walking
       case Walking:
 
-        if (get_player_velocity(p).x == 0) {
+        if (get_character_velocity(p).x == 0) {
 
           //stand by sprite
           temp->x = 0;
           temp->y = 64;
-          set_player_sprite_pos(&p, *temp);
+          set_character_sprite_pos(&p, *temp);
 
         } else {
 
@@ -289,25 +277,25 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
             case 0:
               temp->x = 32;
               temp->y = 64;
-              set_player_sprite_pos(&p, *temp);
+              set_character_sprite_pos(&p, *temp);
               break;
 
             case 1:
               temp->x = 0;
               temp->y = 64;
-              set_player_sprite_pos(&p, *temp);
+              set_character_sprite_pos(&p, *temp);
               break;
 
             case 2:
               temp->x = 64;
               temp->y = 64;
-              set_player_sprite_pos(&p, *temp);
+              set_character_sprite_pos(&p, *temp);
               break;
 
             case 3:
               temp->x = 0;
               temp->y = 64;
-              set_player_sprite_pos(&p, *temp);
+              set_character_sprite_pos(&p, *temp);
               break;
 
             default:
@@ -325,7 +313,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
 
       temp->x = 96;
       temp->y = 64;
-      set_player_sprite_pos(&p, *temp);
+      set_character_sprite_pos(&p, *temp);
 
         break;
 
@@ -334,7 +322,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
 
       temp->x = 96;
       temp->y = 128;
-      set_player_sprite_pos(&p, *temp);
+      set_character_sprite_pos(&p, *temp);
 
         break;
 
@@ -344,7 +332,7 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
         temp->x = 128;
         temp->y = 32;
         temp->h = 32;
-        set_player_sprite_pos(&p, *temp);
+        set_character_sprite_pos(&p, *temp);
 
         break;
 
@@ -354,10 +342,10 @@ void render_player (player_t p, SDL_Renderer *renderer, intpoint_t mouse_pos) {
 
   }
 
-  SDL_Rect tempSpritePos = get_player_sprite_pos(p);
-  SDL_Rect tempPos = get_player_hitbox(p);
+  SDL_Rect tempSpritePos = get_character_sprite_pos(p);
+  SDL_Rect tempPos = get_character_hitbox(p);
 
-  SDL_RenderCopy(renderer, get_player_img(p), &tempSpritePos, &tempPos);
+  SDL_RenderCopy(renderer, img, &tempSpritePos, &tempPos);
 
   free(temp);
 

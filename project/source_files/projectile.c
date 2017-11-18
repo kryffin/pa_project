@@ -1,73 +1,80 @@
 #include "../header_files/projectile.h"
 
-void delete_projectile (projectile_t *p) {
+projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
 
-  vector_t dir = set_vector(0.0, 0.0);
-
-  set_projectile_direction(p, dir);
-  set_projectile_real_position(p, 0.0, 0.0);
-
-  return;
-
-}
-
-void update_projectiles (projectile_t p[100]) {
-
-  int i;
-
-  for (i = 0; i < 100; i += 1) {
-
-    //if the projectile_t exists
-    if (get_projectile_direction(p[i]).x != 0.0 || get_projectile_direction(p[i]).y != 0.0) {
-
-      //if the projectile_t is not in the screen
-      if ((get_projectile_real_position(p[i]).x + BULLET_WIDTH < 0.0 || get_projectile_real_position(p[i]).x > SCREEN_WIDTH) || (get_projectile_real_position(p[i]).y + BULLET_HEIGHT < 0.0 || get_projectile_real_position(p[i]).y > SCREEN_HEIGHT)) {
-
-        //delete the projectile
-        delete_projectile(&p[i]);
-
-      //if it is in the screen
-      } else {
-
-        //update the position of the projectile_t following the direction
-        set_projectile_real_position(&p[i], get_projectile_real_position(p[i]).x + get_projectile_direction(p[i]).x, get_projectile_real_position(p[i]).y + get_projectile_direction(p[i]).y);
-
-        //updating the screen position
-        set_projectile_screen_position(&p[i], (int)get_projectile_real_position(p[i]).x, (int)get_projectile_real_position(p[i]).y);
-        //printf("%d : %d\n----------------%d\n", i, p[i].screenPos.x, SDL_GetTicks());
-
-        //temp rectangle used for the hitbox
-        SDL_Rect temp;
-        temp.x = get_projectile_screen_position(p[i]).x - (BULLET_WIDTH / 2);
-        temp.y = get_projectile_screen_position(p[i]).y - (BULLET_HEIGHT / 2);
-        temp.w = get_projectile_hitbox(p[i]).w;
-        temp.h = get_projectile_hitbox(p[i]).h;
-
-        //applying the hitbox on the projectile
-        set_projectile_hitbox(&p[i], temp);
-
-      }
-
-    }
-
+  if (projectile_list_is_empty(projectiles)) {
+    return projectile_list_empty();
   }
 
-  return;
+  if ((get_projectile_real_position(projectile_list_head(projectiles)).x + BULLET_WIDTH < 0.0
+        || get_projectile_real_position(projectile_list_head(projectiles)).x > SCREEN_WIDTH)
+        || (get_projectile_real_position(projectile_list_head(projectiles)).y + BULLET_HEIGHT < 0.0
+        || get_projectile_real_position(projectile_list_head(projectiles)).y > SCREEN_HEIGHT)) {
 
+    //projectile isn't in the screen
+    return projectile_list_rest(projectiles);
+  }
+
+  if (get_block_type(blocks[(int)floor((get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) + (BULLET_WIDTH / 2)) / 16)][(int)floor((get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) + (BULLET_HEIGHT / 2)) / 16)]) != Blank) {
+    return projectile_list_rest(projectiles);
+  }
+
+  projectile_t p;
+  floatpoint_t newPos = set_floatpoint(get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) + get_vector_x(get_projectile_direction(projectile_list_head(projectiles))), get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) + get_vector_y(get_projectile_direction(projectile_list_head(projectiles))));
+  SDL_Rect hitbox = {floor(get_floatpoint_x(newPos)), floor(get_floatpoint_y(newPos)), BULLET_WIDTH, BULLET_HEIGHT};
+
+  p = set_projectile(newPos, get_projectile_direction(projectile_list_head(projectiles)), hitbox, get_projectile_sprite_pos(projectile_list_head(projectiles)));
+
+  return projectile_list_build(p, update_projectiles(projectile_list_rest(projectiles), blocks));
+}
+
+projectile_list_t projectile_list_build (projectile_t p, projectile_list_t pl) {
+  projectile_list_t tmp;
+  tmp = malloc(sizeof(*tmp));
+  tmp->head = p;
+  tmp->next = pl;
+  return tmp;
+}
+
+projectile_t projectile_list_head (projectile_list_t p) {
+  if (projectile_list_is_empty(p)) {
+    printf("Reading head of an empty projectile list!");
+    exit(0);
+  }
+  return p->head;
+}
+
+projectile_list_t projectile_list_rest (projectile_list_t p) {
+  return p->next;
+}
+
+bool projectile_list_is_empty (projectile_list_t p) {
+  return p == NULL;
+}
+
+projectile_list_t projectile_list_empty () {
+  return NULL;
+}
+
+void projectile_list_free (projectile_list_t p) {
+  if (projectile_list_is_empty(p)) {
+    return;
+  }
+  projectile_list_free(projectile_list_rest(p));
+  free(p);
 }
 
 /* * * * * * Set * * * * * */
 
-projectile_t set_projectile (float x, float y, vector_t dir, SDL_Rect hitbox, SDL_Rect spritePos, SDL_Texture *img) {
+projectile_t set_projectile (floatpoint_t pos, vector_t dir, SDL_Rect hitbox, SDL_Rect spritePos) {
 
   projectile_t p;
 
-  set_projectile_real_position(&p, x, y);
-  set_projectile_screen_position(&p, (int)x, (int)y);
+  set_projectile_real_position(&p, pos);
+  set_projectile_screen_position(&p, floor(get_floatpoint_x(pos)), floor(get_floatpoint_y(pos)));
   set_projectile_direction(&p, dir);
   set_projectile_hitbox(&p, hitbox);
   set_projectile_sprite_pos(&p, spritePos);
-  set_projectile_image(&p, img);
 
   return p;
 
@@ -79,9 +86,9 @@ void set_projectile_screen_position (projectile_t *p, int x, int y) {
   return;
 }
 
-void set_projectile_real_position (projectile_t *p, float x, float y) {
-  p->realPos.x = x;
-  p->realPos.y = y;
+void set_projectile_real_position (projectile_t *p, floatpoint_t pos) {
+  p->realPos.x = get_floatpoint_x(pos);
+  p->realPos.y = get_floatpoint_y(pos);
   return;
 }
 
@@ -107,11 +114,6 @@ void set_projectile_sprite_pos (projectile_t *p, SDL_Rect spritePos) {
   return;
 }
 
-void set_projectile_image (projectile_t *p, SDL_Texture *img) {
-  p->img = img;
-  return;
-}
-
 /* * * * * * Get * * * * * */
 
 floatpoint_t get_projectile_real_position (projectile_t p) {
@@ -132,8 +134,4 @@ SDL_Rect get_projectile_hitbox (projectile_t p) {
 
 SDL_Rect get_projectile_sprite_pos (projectile_t p) {
   return p.spritePos;
-}
-
-SDL_Texture* get_projectile_image (projectile_t p) {
-  return p.img;
 }

@@ -6,7 +6,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include "2dpoint.h"
-#include "player.h"
+#include "character.h"
 #include "game.h"
 
 #define IMG_WIDTH 32

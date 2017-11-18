@@ -12,10 +12,9 @@
 #include "2dpoint.h"
 #include "blocks.h"
 #include "vector.h"
-#include "player.h"
+#include "character.h"
 #include "projectile.h"
 #include "level.h"
-#include "var_init.h"
 #include "menu.h"
 #include "controls.h"
 #include "game.h"
@@ -30,7 +29,6 @@
 
 //delays
 #define PLAYER_SHOOT_DELAY 100
-#define ENEMY_SHOOT_DELAY 500
 
 #define DELAY_STEP 150 //delay for the step updating
 
