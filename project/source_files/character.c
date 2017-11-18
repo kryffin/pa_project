@@ -29,8 +29,8 @@ void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos) {
 }
 
 void character_update_grid_pos (character_t *character) {
-  character->xGrid = floor(get_floatpoint_x(get_character_real_position(*character))) / 16;
-  character->yGrid = floor(get_floatpoint_y(get_character_real_position(*character))) / 16;
+  character->xGrid = (int)floor((get_floatpoint_x(get_character_real_position(*character)) + (IMG_WIDTH / 2)) / 16);
+  character->yGrid = (int)floor((get_floatpoint_y(get_character_real_position(*character)) + (IMG_HEIGHT / 2)) / 16);
 
   return;
 }
@@ -176,22 +176,22 @@ void character_apply_velocity (character_t *p, block_t blocks[NB_BLOCKS_WIDTH][N
       p->realPos.x += p->vel.x;
     }
   }
-  if (p->vel.x > 0.0 && (blocks[p->xGrid + 2][p->yGrid].type != 0 && blocks[p->xGrid + 2][p->yGrid + 1].type != 0 && blocks[p->xGrid + 2][p->yGrid + 2].type != 0 && blocks[p->xGrid + 2][p->yGrid + 3].type != 0)) {
-    if (p->xGrid != NB_BLOCKS_WIDTH - 2) {
+  if (p->vel.x > 0.0 && (blocks[p->xGrid + 1][p->yGrid].type != 0 && blocks[p->xGrid + 1][p->yGrid + 1].type != 0 && blocks[p->xGrid + 1][p->yGrid + 2].type != 0 && blocks[p->xGrid + 1][p->yGrid + 3].type != 0)) {
+    if (p->xGrid != NB_BLOCKS_WIDTH - 1) {
       p->realPos.x += p->vel.x;
     }
   }
 
-  if (blocks[p->xGrid][p->yGrid - 1].type == 0 || blocks[p->xGrid + 1][p->yGrid - 1].type == 0) {
+  if (blocks[p->xGrid][p->yGrid - 1].type == 0) {
     p->vel.y = 4.0;
   }
 
-  if (p->vel.y < 0.0 && (blocks[p->xGrid][p->yGrid - 1].type != 0 && blocks[p->xGrid + 1][p->yGrid - 1].type != 0)) {
+  if (p->vel.y < 0.0 && blocks[p->xGrid][p->yGrid - 1].type != 0) {
     if (p->yGrid != 0) {
       p->realPos.y += p->vel.y;
     }
   }
-  if (p->vel.y > 0.0 && (blocks[p->xGrid][p->yGrid + 4].type != 0 && blocks[p->xGrid + 1][p->yGrid + 4].type != 0)) {
+  if (p->vel.y > 0.0 && blocks[p->xGrid][p->yGrid + 4].type != 0) {
     if (p->yGrid != NB_BLOCKS_HEIGHT - 4) {
       p->realPos.y += p->vel.y;
     }
