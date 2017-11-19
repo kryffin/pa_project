@@ -131,14 +131,11 @@ void keyboard_control (player *p, SDL_Keycode *keys, bool *jumped) {
   if (keys[keysTab[6]] == 1) {
     p->gunType = 2;
   }
+
   //'C' key
-  if (keys[keysTab[7]] == 1) {
-    
-  }
-  //'N' key
-  if (keys[keysTab[8]] == 1 && keys[keysTab[7]] == 1){
+  if (keys[keysTab[7]] == 1){
     keys[keysTab[7]] == 0;
-    p->currLevel +=1;
+    p->currLevel =1;
     printf("level %d\n", p->currLevel);
 
   }

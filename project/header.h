@@ -41,6 +41,9 @@
 #define PATH_BACKGROUND "./res/background.bmp"
 #define PATH_TXT_FILE1 "./res/arena2.txt"
 #define PATH_TXT_FILE2 "./res/arena3.txt"
+#define PATH_TXT_FILE3 "./res/arena4.txt"
+#define PATH_TXT_FILE4 "./res/arena5.txt"
+#define PATH_TXT_FILE5 "./res/arena6.txt"
 
 #define DELAY_STEP 150 //delay for the step updating
 

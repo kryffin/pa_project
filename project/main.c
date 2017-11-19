@@ -110,13 +110,16 @@ int main () {
 
   level *lvl1 = malloc(sizeof(level));
   level *lvl2 = malloc(sizeof(level));
+  level *lvl3 = malloc(sizeof(level));
+  level *lvl4 = malloc(sizeof(level));
+  level *lvl5 = malloc(sizeof(level));
   level *nextLevel = malloc(sizeof(level));
 
 
   //temp won't be used again
   SDL_FreeSurface(temp);
 
-  list_l LISTElvl = cons_list_l(lvl2, cons_list_l(lvl1, list_l_empty()));
+  list_l LISTElvl = cons_list_l(lvl1, cons_list_l(lvl2, cons_list_l(lvl3, cons_list_l(lvl4, cons_list_l(lvl5, list_l_empty())))));
   nextLevel = head_list_l(next_list_l (LISTElvl));
   currLevel = head_list_l (LISTElvl);
 
@@ -188,11 +191,11 @@ int main () {
     return EXIT_FAILURE;
   }
 
-
-
-  *currLevel = init_level(blocks_spritesheet, background, p, 1);
-  *nextLevel = init_level(blocks_spritesheet, background, p, 2);
-
+  *head_list_l(LISTElvl) = init_level(blocks_spritesheet, background, p, 1);
+  *head_list_l(next_list_l(LISTElvl)) = init_level(blocks_spritesheet, background, p, 2);
+  *head_list_l(next_list_l(next_list_l(LISTElvl))) = init_level (blocks_spritesheet, background, p, 3);
+  *head_list_l(next_list_l(next_list_l(next_list_l(LISTElvl)))) = init_level (blocks_spritesheet, background, p, 4);
+  *head_list_l(next_list_l(next_list_l(next_list_l(next_list_l(LISTElvl))))) = init_level (blocks_spritesheet, background, p, 5);
   *timeN_A = SDL_GetTicks();
 
   /* * * * * * main game loop * * * * * */
@@ -213,7 +216,15 @@ int main () {
 
     controls(event, quit, p, jumped, renderer, mouse_pos, mouse_btn, cursor, key);
 
-    if (!is_colision(p, currLevel) & p->enableGravity){
+    if (p->currLevel!=0){
+      p->currLevel = 0;
+      if (is_empty_list_l(next_list_l(LISTElvl))){
+        LISTElvl = LISTElvl;
+      } else {
+      LISTElvl = next_list_l(LISTElvl);
+      }
+    }
+    if (!is_colision(p, head_list_l(LISTElvl)) & p->enableGravity){
       //printf("\tgravity\n");
       player_gravity(p);
     }
@@ -298,7 +309,7 @@ int main () {
     SDL_RenderCopy(renderer, tempTxt, NULL, posMsgJump);
 
     /* rendering */
-    rendering(p, projectiles, cursor, *currLevel, mouse_pos, renderer);
+    rendering(p, projectiles, cursor, *head_list_l(LISTElvl), mouse_pos, renderer);
 
     SDL_framerateDelay(manager);
 

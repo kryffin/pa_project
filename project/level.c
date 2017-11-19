@@ -94,28 +94,40 @@ void render_background_level (level l, SDL_Renderer *renderer) {
   return;
 }
 
+char* path_leveling (int X)
+{
+  switch (X) {
+    case 1:
+      return PATH_TXT_FILE1;
+      break;
+
+    case 2:
+      return PATH_TXT_FILE2;
+      break;
+
+    case 3:
+      return PATH_TXT_FILE3;
+      break;
+
+    case 4:
+      return PATH_TXT_FILE4;
+      break;
+
+    case 5:
+      return PATH_TXT_FILE5;
+      break;
+  }
+}
 level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, player *p, int X) {
 
   level l;
 
-  FILE *txtFile = malloc(sizeof(FILE));
-  if (X == 1){
-    FILE *txtFile = fopen(PATH_TXT_FILE1, "r");
-    printf("here1\n");
-    if (txtFile == NULL) {
-      printf("Error opening the txt file\n");
-      exit(0);
-    }
+  FILE *txtFile = fopen(path_leveling(X), "r");
+  printf("here1\n");
+  if (txtFile == NULL) {
+    printf("Error opening the txt file\n");
+    exit(0);
   }
-  else if (X == 2){
-    FILE *txtFile = fopen(PATH_TXT_FILE2, "r");
-    printf("here2\n");
-    if (txtFile == NULL) {
-      printf("Error opening the txt file\n");
-      exit(0);
-    }
-  }
-
 
   block matrix[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT];
   char curr;
@@ -126,7 +138,7 @@ level init_level (SDL_Texture *blocks_spritesheet, SDL_Texture *background, play
   int x = 0, y = 0;
   printf("here3\n");
   curr = getc(txtFile); /*l'erreur de segmentation vient d'ici l'affectation de curr = getc(txtfile) produit l'erreur
-                          peut etre parce que j'ai mis en condition l'ouverture de PATH différent pour le FILE *txtFiLe*/ 
+                          peut etre parce que j'ai mis en condition l'ouverture de PATH différent pour le FILE *txtFiLe*/
   printf("here4\n");
   while ((curr = getc(txtFile)) != EOF && y < NB_BLOCKS_HEIGHT) {
 
