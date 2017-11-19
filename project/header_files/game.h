@@ -1,6 +1,10 @@
 #ifndef GAME_H
 #define GAME_H
 
+/************/
+/* INCLUDES */
+/************/
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL2_framerate.h>
@@ -10,6 +14,10 @@
 #include "character.h"
 #include "projectile.h"
 #include "level.h"
+
+/*************/
+/* CONSTANTS */
+/*************/
 
 #define PATH_FONT "./res/font.ttf"
 #define PATH_CURSOR "./res/cursor.png"
@@ -24,46 +32,46 @@
 #define BULLET_WIDTH 16
 #define BULLET_HEIGHT 16
 
+/**************/
+/* STRUCTURES */
+/**************/
+
+
 typedef struct Game {
-  FPSmanager *manager;
-  SDL_Window *window;
-  SDL_Renderer *renderer;
+  FPSmanager *manager; //manages the fps
+  SDL_Window *window; //game window
+  SDL_Renderer *renderer; //renderer of the window
 
-  //texture of the cursor
-  SDL_Texture *cursor;
+  bool mouse_btn; //actual state of the mouse button
+  intpoint_t mouse_pos; //mouse position
+  SDL_Keycode keys[SDL_NUM_SCANCODES]; //array for the keys pressed
+  SDL_Texture *cursor; //cursor's image
 
-  //mouse position
-  intpoint_t mouse_pos;
+  SDL_Event *event; //event running the controls
 
-  //array for the keys pressed
-  SDL_Keycode keys[SDL_NUM_SCANCODES];
+  TTF_Font *font; //font used in the game
 
-  //event running the controls
-  SDL_Event *event;
+  SDL_Color *colorPalette; //palette of 15 colors
 
-  //actual state of the mouse button
-  bool mouse_btn;
+  character_t player; //player
+  character_list_t enemies; //list of enemies
 
-  //font used in the game
-  TTF_Font *font;
+  SDL_Texture *spriteSheet; //sprite sheet
 
-  //palette of 15 colors
-  SDL_Color *colorPalette;
+  bool quit; //variable running the main loop and quitting the game if desired
 
-  //the main character_t
-  character_t player;
-  character_list_t enemies;
-
-  SDL_Texture *spriteSheet;
-
-  //variable running the main loop and quitting the game if desired
-  bool quit;
-
-  level_t currLevel;
+  level_t currLevel; //current level in which we are playing, hopefully a list one day
 
 } game_t;
 
+/*************/
+/* FUNCTIONS */
+/*************/
+
+//create a new game
 game_t *create_game ();
+
+//initialize the palatte of colors
 void init_palette2 (game_t *game);
 
 #endif

@@ -1,5 +1,12 @@
+/*
+
+game.c : contain every functions for the game creation
+
+*/
+
 #include "../header_files/game.h"
 
+//create a new game
 game_t *create_game () {
   SDL_Surface *temp;
   SDL_Texture *texture;
@@ -92,6 +99,7 @@ game_t *create_game () {
   return g;
 }
 
+//initialize the palatte of colors
 void init_palette2 (game_t *game) {
 
   game->colorPalette = (SDL_Color*)malloc(15 * sizeof(SDL_Color));
@@ -176,5 +184,4 @@ void init_palette2 (game_t *game) {
   game->colorPalette[14].b = 255;
 
   return;
-
 }

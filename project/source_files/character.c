@@ -1,5 +1,12 @@
+/*
+
+character.c : contain every functions for the characters
+
+*/
+
 #include "../header_files/character.h"
 
+//create a new projectile and add it in the list
 void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos) {
 
   if (!mouse_btn) {
@@ -10,7 +17,7 @@ void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos) {
   dir = normalize(dir);
   dir = set_vector(get_vector_x(dir) * BULLET_SPEED, get_vector_y(dir) * BULLET_SPEED);
 
-  SDL_Rect temp = {floor(get_floatpoint_x(get_character_real_position(*p))), floor(get_floatpoint_x(get_character_real_position(*p))), BULLET_WIDTH, BULLET_HEIGHT};
+  SDL_Rect temp = {get_intpoint_x(get_character_screen_position(*p)), get_intpoint_x(get_character_screen_position(*p)), BULLET_WIDTH, BULLET_HEIGHT};
   SDL_Rect tempSprite;
   if (p->type == Player) {
     tempSprite.x = 128;
@@ -22,19 +29,21 @@ void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos) {
   tempSprite.w = BULLET_WIDTH;
   tempSprite.h = BULLET_HEIGHT;
 
-  p->projectiles = projectile_list_build(set_projectile(set_floatpoint(get_floatpoint_x(get_character_real_position(*p)) + (IMG_WIDTH / 2), get_floatpoint_y(get_character_real_position(*p)) + (IMG_HEIGHT / 4)), dir, temp, tempSprite), p->projectiles);
+  p->projectiles = projectile_list_build(set_projectile(set_floatpoint(get_intpoint_x(get_character_screen_position(*p)) + (IMG_WIDTH / 2), get_intpoint_y(get_character_screen_position(*p)) + (IMG_HEIGHT / 4)), dir, temp, tempSprite), p->projectiles);
 
   return;
 
 }
 
+//update the grid position
 void character_update_grid_pos (character_t *character) {
-  character->xGrid = (int)floor((get_floatpoint_x(get_character_real_position(*character)) + (IMG_WIDTH / 2)) / 16);
-  character->yGrid = (int)floor((get_floatpoint_y(get_character_real_position(*character)) + (IMG_HEIGHT / 2)) / 16);
+  character->gridPos.x = (int)floor((get_floatpoint_x(get_character_real_position(*character)) + (IMG_WIDTH / 2)) / 16);
+  character->gridPos.y = (int)floor((get_floatpoint_y(get_character_real_position(*character)) + (IMG_HEIGHT / 2)) / 16);
 
   return;
 }
 
+//update the positions and hitbox
 void update_character (character_t *p, bool *quit) {
 
   if (!is_alive(*p)) {
@@ -42,10 +51,10 @@ void update_character (character_t *p, bool *quit) {
     return;
   }
 
-  set_character_screen_position(p, floor(get_character_real_position(*p).x), floor(get_character_real_position(*p).y));
+  set_character_screen_position(p, (int)floor(get_character_real_position(*p).x), (int)floor(get_character_real_position(*p).y));
 
-  if (p->onGround && p->yGrid * 16 != p->screenPos.y) {
-    p->screenPos.y = p->yGrid * 16;
+  if (p->onGround && p->gridPos.y * 16 != p->screenPos.y) {
+    p->screenPos.y = p->gridPos.y * 16;
   }
 
   SDL_Rect temp;
@@ -67,6 +76,7 @@ void update_character (character_t *p, bool *quit) {
   return;
 }
 
+//update the enemies' shots and directions
 character_list_t update_enemies (character_list_t c, character_t p, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
 
   if (character_list_is_empty(c)) {
@@ -81,8 +91,8 @@ character_list_t update_enemies (character_list_t c, character_t p, block_t bloc
   character_t e = character_list_head(c);
   e.projectiles = character_list_head(c).projectiles;
 
-  if (e.onGround && e.yGrid * 16 != e.screenPos.y) {
-    e.screenPos.y = e.yGrid * 16;
+  if (e.onGround && e.gridPos.y * 16 != e.screenPos.y) {
+    e.screenPos.y = e.gridPos.y * 16;
   }
 
   if (SDL_GetTicks() > e.shootDelay + ENEMY_SHOOT_DELAY) {
@@ -96,44 +106,7 @@ character_list_t update_enemies (character_list_t c, character_t p, block_t bloc
   return character_list_build(e, update_enemies(character_list_rest(c), p, blocks));
 }
 
-/* BEHAVIOR */
-
-void character_melee (character_t p, SDL_Renderer *renderer, SDL_Texture *img) {
-
-  SDL_Rect *target = NULL;
-  target = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  target->x = get_character_screen_position(p).x;
-  target->y = get_character_screen_position(p).y;
-  target->w = get_character_hitbox(p).w;
-  target->h = get_character_hitbox(p).h;
-
-  SDL_Rect *effect = NULL;
-  effect = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  effect->y = 128;
-  effect->w = 32;
-  effect->h = 64;
-
-  if (get_character_dir(p) == Left) {
-    //facing left
-    target->x -= IMG_WIDTH;
-    effect->x = 32;
-
-  } else {
-    //facing right
-    target->x += IMG_WIDTH;
-    effect->x = 0;
-
-  }
-
-  SDL_RenderCopy(renderer, img, effect, target);
-
-  free(target);
-  free(effect);
-
-  return;
-
-}
-
+//update the step used for the walking animation
 void character_update_step (character_t *p) {
 
   if(get_character_velocity(*p).x != 0) {
@@ -152,9 +125,10 @@ void character_update_step (character_t *p) {
 
 }
 
-void character_update_dir (character_t *p, intpoint_t mouse_pos) {
+//update the character direction to look towards the target
+void character_update_dir (character_t *p, intpoint_t target) {
 
-  if(get_character_real_position(*p).x + (IMG_WIDTH / 2) < mouse_pos.x) {
+  if(get_character_real_position(*p).x + (IMG_WIDTH / 2) < target.x) {
     set_character_dir(p, Right); //right
   } else {
     set_character_dir(p, Left); //left
@@ -162,9 +136,10 @@ void character_update_dir (character_t *p, intpoint_t mouse_pos) {
 
 }
 
+//apply the velocity on the character if possible
 void character_apply_velocity (character_t *p, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
 
-  if (p->yGrid == NB_BLOCKS_HEIGHT - 4 || blocks[p->xGrid][p->yGrid + 4].type == 0 || blocks[p->xGrid + 1][p->yGrid + 4].type == 0) {
+  if (p->gridPos.y == NB_BLOCKS_HEIGHT - 4 || blocks[p->gridPos.x][p->gridPos.y + 4].type == 0 || blocks[p->gridPos.x + 1][p->gridPos.y + 4].type == 0) {
     p->onGround = true;
   } else {
     p->onGround = false;
@@ -172,57 +147,73 @@ void character_apply_velocity (character_t *p, block_t blocks[NB_BLOCKS_WIDTH][N
 
 
   if (p->vel.x < 0.0) {
-    if (p->xGrid != 0 && (blocks[p->xGrid - 1][p->yGrid].type != 0 && blocks[p->xGrid - 1][p->yGrid + 1].type != 0 && blocks[p->xGrid - 1][p->yGrid + 2].type != 0 && blocks[p->xGrid - 1][p->yGrid + 3].type != 0)) {
+    if (p->gridPos.x != 0 && (blocks[p->gridPos.x - 1][p->gridPos.y].type != 0 && blocks[p->gridPos.x - 1][p->gridPos.y + 1].type != 0 && blocks[p->gridPos.x - 1][p->gridPos.y + 2].type != 0 && blocks[p->gridPos.x - 1][p->gridPos.y + 3].type != 0)) {
       p->realPos.x += p->vel.x;
     }
   }
-  if (p->vel.x > 0.0 && (blocks[p->xGrid + 1][p->yGrid].type != 0 && blocks[p->xGrid + 1][p->yGrid + 1].type != 0 && blocks[p->xGrid + 1][p->yGrid + 2].type != 0 && blocks[p->xGrid + 1][p->yGrid + 3].type != 0)) {
-    if (p->xGrid != NB_BLOCKS_WIDTH - 1) {
+  if (p->vel.x > 0.0 && (blocks[p->gridPos.x + 1][p->gridPos.y].type != 0 && blocks[p->gridPos.x + 1][p->gridPos.y + 1].type != 0 && blocks[p->gridPos.x + 1][p->gridPos.y + 2].type != 0 && blocks[p->gridPos.x + 1][p->gridPos.y + 3].type != 0)) {
+    if (p->gridPos.x != NB_BLOCKS_WIDTH - 1) {
       p->realPos.x += p->vel.x;
     }
   }
 
-  if (blocks[p->xGrid][p->yGrid - 1].type == 0) {
+  if (blocks[p->gridPos.x][p->gridPos.y - 1].type == 0) {
     p->vel.y = 4.0;
   }
 
-  if (p->vel.y < 0.0 && blocks[p->xGrid][p->yGrid - 1].type != 0) {
-    if (p->yGrid != 0) {
+  if (p->vel.y < 0.0 && blocks[p->gridPos.x][p->gridPos.y - 1].type != 0) {
+    if (p->gridPos.y != 0) {
       p->realPos.y += p->vel.y;
     }
   }
-  if (p->vel.y > 0.0 && blocks[p->xGrid][p->yGrid + 4].type != 0) {
-    if (p->yGrid != NB_BLOCKS_HEIGHT - 4) {
+  if (p->vel.y > 0.0 && blocks[p->gridPos.x][p->gridPos.y + 4].type != 0) {
+    if (p->gridPos.y != NB_BLOCKS_HEIGHT - 4) {
       p->realPos.y += p->vel.y;
     }
+  }
+
+  if (!p->onGround) {
+    p->vel.x *= AIR_ACCELERATION;
   }
 
   return;
 }
 
+//apply the gravity if the character is in the air
 void character_gravity(character_t *p) {
 
   if (!p->onGround && p->vel.y < 12.0) {
-    set_character_vel_y(p, get_character_velocity(*p).y + GRAVITY);
+    set_character_velocity(p, get_character_velocity(*p).x, get_character_velocity(*p).y + GRAVITY);
   }
 
   return;
 }
 
-
+//make the character jump
 void character_jumping (character_t *p) {
 
   if (get_character_state(*p) == Jumping || get_character_state(*p) == nouse) {
-    set_character_vel_y(p, JUMP_HEIGHT);
+    /*if (get_vector_x(get_character_velocity(*p)) < 0.0) {
+      set_character_velocity (p, get_character_velocity(*p).x - 5, JUMP_HEIGHT);
+    } else if (get_vector_x(get_character_velocity(*p)) > 0.0) {
+      set_character_velocity (p, get_character_velocity(*p).x + 5, JUMP_HEIGHT);
+    } else {*/
+      set_character_velocity (p, get_character_velocity(*p).x, JUMP_HEIGHT);
+    //}
   }
 
   return;
 }
 
+//returns true if the character is alive, dead otherwise
 bool is_alive(character_t c) {
+
   return (get_character_hp(c) > 0);
 }
 
+/* LIST */
+
+//build a new character on the list
 character_list_t character_list_build (character_t c, character_list_t cl) {
   character_list_t tmp;
   tmp = malloc(sizeof(*tmp));
@@ -231,26 +222,33 @@ character_list_t character_list_build (character_t c, character_list_t cl) {
   return tmp;
 }
 
+//returns the head of the character list
 character_t character_list_head (character_list_t c) {
+
   if (character_list_is_empty(c)) {
     printf("Reading head of an empty character list!");
     exit(0);
   }
+
   return c->head;
 }
 
+//returns the rest of the character list
 character_list_t character_list_rest (character_list_t c) {
   return c->next;
 }
 
+//returns true if the character list is empty, false otherwise
 bool character_list_is_empty (character_list_t c) {
   return c == NULL;
 }
 
+//returns an empty character list
 character_list_t character_list_empty () {
   return NULL;
 }
 
+//free the list of character as well as their projectiles
 void character_list_free (character_list_t c) {
   if (character_list_is_empty(c)) {
     return;
@@ -270,21 +268,23 @@ character_t set_character (short int hp, floatpoint_t position, vector_t velocit
   set_character_hp(&p, hp);
   set_character_dir(&p, Left);
   set_character_step(&p, 0);
+  set_character_type(&p, type);
   set_character_on_ground(&p, false);
-  set_character_jumpPoint(&p, 0);
-  set_character_highPoint(&p, 0);
   set_character_state(&p, Walking);
+
+  set_character_step_delay(&p, 0);
+  set_character_shoot_delay(&p, 0);
+  set_character_jump_delay(&p, 0);
+
   set_character_real_position(&p, get_floatpoint_x(position), get_floatpoint_y(position));
-  set_character_screen_position(&p, (int)get_floatpoint_x(position), (int)get_floatpoint_y(position));
-  set_character_vel_x(&p, get_vector_x(velocity));
-  set_character_vel_y(&p, get_vector_y(velocity));
+  set_character_screen_position(&p, (int)floor(get_floatpoint_x(position)), (int)floor(get_floatpoint_y(position)));
+  set_character_grid_position(&p, (int)floor(get_intpoint_x(get_character_screen_position(p))), (int)floor(get_intpoint_y(get_character_screen_position(p)) / 16));
+
+  set_character_projectiles(&p, projectile_list_empty());
+
+  set_character_velocity(&p, velocity.x, velocity.y);
   set_character_sprite_pos(&p, posSprite);
   set_character_hitbox(&p, hitbox);
-  p.stepDelay = 0;
-  p.shootDelay = 0;
-  p.jumpDelay = 0;
-  p.projectiles = projectile_list_empty();
-  p.type = type;
 
   return p;
 }
@@ -307,27 +307,39 @@ void set_character_step (character_t *p, short int step) {
   return;
 }
 
-//set the character's ability to double jump
+//set the type
+void set_character_type (character_t *p, short int type) {
+  p->type = type;
+  return;
+}
+
+//set the character on ground or not
 void set_character_on_ground (character_t *p, bool onGround) {
   p->onGround = onGround;
-  return;
-}
-
-//set the character's jump point
-void set_character_jumpPoint (character_t *p, int jumpPoint) {
-  p->jumpPoint = jumpPoint;
-  return;
-}
-
-//set the character's high point
-void set_character_highPoint (character_t *p, int highPoint) {
-  p->highPoint = highPoint;
   return;
 }
 
 //set the character's state
 void set_character_state (character_t *p, short int state) {
   p->state = state;
+  return;
+}
+
+//set the delay of the step
+void set_character_step_delay (character_t *p, int stepDelay) {
+  p->stepDelay = stepDelay;
+  return;
+}
+
+//set the delay of shooting
+void set_character_shoot_delay (character_t *p, int shootDelay) {
+  p->shootDelay = shootDelay;
+  return;
+}
+
+//set the delay of the jump
+void set_character_jump_delay (character_t *p, int jumpDelay) {
+  p->jumpDelay = jumpDelay;
   return;
 }
 
@@ -338,21 +350,29 @@ void set_character_real_position (character_t *p, float x, float y) {
   return;
 }
 
-//set the character's position
+//set the character's screen position
 void set_character_screen_position (character_t *p, int x, int y) {
   p->screenPos.x = x;
   p->screenPos.y = y;
   return;
 }
 
-//set the character's x velocity
-void set_character_vel_x (character_t *p, float x) {
-  p->vel.x = x;
+//set the character's grid position
+void set_character_grid_position (character_t *p, int x, int y) {
+  p->gridPos.x = x;
+  p->gridPos.y = y;
   return;
 }
 
-//set the character's y velocity
-void set_character_vel_y (character_t *p, float y) {
+//set the list of projectiles
+void set_character_projectiles (character_t *p, projectile_list_t projectiles) {
+  p->projectiles = projectiles;
+  return;
+}
+
+//set the character's velocity
+void set_character_velocity (character_t *p, float x, float y) {
+  p->vel.x = x;
   p->vel.y = y;
   return;
 }
@@ -386,19 +406,14 @@ short int get_character_step (character_t p) {
   return p.step;
 }
 
-//get the character's ability to double jump
+//get the type
+short int get_character_type (character_t p) {
+  return p.type;
+}
+
+//get the on ground boolean
 bool get_character_on_ground (character_t p) {
   return p.onGround;
-}
-
-//get the character's jump point
-int get_character_jumpPoint (character_t p) {
-  return p.jumpPoint;
-}
-
-//get the character's high point
-int get_character_highPoint (character_t p) {
-  return p.highPoint;
 }
 
 //get the character's state
@@ -414,6 +429,16 @@ floatpoint_t get_character_real_position (character_t p) {
 //get the character's position
 intpoint_t get_character_screen_position (character_t p) {
   return p.screenPos;
+}
+
+//get the character's grid position
+intpoint_t get_character_grid_position (character_t p) {
+  return p.gridPos;
+}
+
+//get the list of projectiles
+projectile_list_t get_character_projectiles (character_t p) {
+  return p.projectiles;
 }
 
 //get the character's x velocity

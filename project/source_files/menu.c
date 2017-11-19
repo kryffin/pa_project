@@ -1,7 +1,10 @@
+/*
+
+menu.c : contain the menu loop and the displays
+
+*/
+
 #include "../header_files/menu.h"
-
-
-  /* FUNCTIONS */
 
 //function returning the state of the mouse :
 /* 0 : no motion
@@ -14,25 +17,30 @@ int menu_controls(game_t *game) {
   while (SDL_PollEvent(game->event)) {
     switch(game->event->type) {
       case SDL_MOUSEMOTION:
+        //movement of the mouse
         game->mouse_pos.x = game->event->motion.x;
         game->mouse_pos.y = game->event->motion.y;
         break;
 
       case SDL_MOUSEBUTTONDOWN:
+        //clicking
         return 1;
         break;
 
       case SDL_MOUSEBUTTONUP:
+        //releasing the click
         return 2;
         break;
 
       case SDL_KEYDOWN:
         if (game->event->key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+          //escape key
           return 10;
         }
         break;
 
       case SDL_QUIT:
+        //closing the window
         return 10;
         break;
 
@@ -57,7 +65,6 @@ bool mouse_hover_menu (intpoint_t mouse_pos, int targetx, int targety, int width
   2 : Options
   3 : Quit
 */
-
 int main_menu_display (game_t *game) {
 
   int *control = NULL;
@@ -241,9 +248,7 @@ int main_menu_display (game_t *game) {
   }
 }
 
-/* resolution options menu */
-
-/* 1 : FullScreen | 2 : 4:3 | 3 : 16:10 | 4 : 16:9 | 5 : Ad | 6 : Back */
+//display of the option menu
 int option_menu_display (game_t *game) {
 
   int *control = NULL;
@@ -554,6 +559,7 @@ int option_menu_display (game_t *game) {
   }
 }
 
+//loop managing the menus
 int render_menu (game_t *game) {
 
   //keeps the option in the main menu

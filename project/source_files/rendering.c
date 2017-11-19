@@ -1,5 +1,48 @@
+/*
+
+rendering.c : contain the functions to display everything
+
+*/
+
 #include "../header_files/rendering.h"
 
+//render the melee attacks
+void render_melee (character_t p, SDL_Renderer *renderer, SDL_Texture *img) {
+
+  SDL_Rect *target = NULL;
+  target = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  target->x = get_character_screen_position(p).x;
+  target->y = get_character_screen_position(p).y;
+  target->w = get_character_hitbox(p).w;
+  target->h = get_character_hitbox(p).h;
+
+  SDL_Rect *effect = NULL;
+  effect = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  effect->y = 128;
+  effect->w = 32;
+  effect->h = 64;
+
+  if (get_character_dir(p) == Left) {
+    //facing left
+    target->x -= IMG_WIDTH;
+    effect->x = 32;
+
+  } else {
+    //facing right
+    target->x += IMG_WIDTH;
+    effect->x = 0;
+
+  }
+
+  SDL_RenderCopy(renderer, img, effect, target);
+
+  free(target);
+  free(effect);
+
+  return;
+}
+
+//render the cursor
 void render_cursor (game_t game) {
 
   SDL_Rect temp;
@@ -13,6 +56,7 @@ void render_cursor (game_t game) {
   return;
 }
 
+//render the death screen
 void game_over (SDL_Renderer *renderer) {
   SDL_Surface *temp;
   SDL_Texture *panel;
@@ -29,64 +73,7 @@ void game_over (SDL_Renderer *renderer) {
   return;
 }
 
-void rendering (game_t *game) {
-
-  SDL_RenderCopy(game->renderer, get_level_background(game->currLevel), NULL, NULL);
-
-  //render the background elements
-  render_background_level(*game);
-
-  //render the enemy projectile
-  character_list_t c;
-  c = game->enemies;
-  while (!character_list_is_empty(c)) {
-    render_character(character_list_head(c), game->renderer, game->spriteSheet);
-    render_projectiles(character_list_head(c).projectiles, game->renderer, game->spriteSheet);
-    c = c->next;
-  }
-
-  //render the character_t
-  render_character(game->player, game->renderer, game->spriteSheet);
-  render_projectiles(game->player.projectiles, game->renderer, game->spriteSheet);
-
-  //render the attack and process it
-  if (get_character_state(game->player) == Attacking)  {
-    character_melee(game->player, game->renderer, game->spriteSheet);
-  }
-
-  //render the foreground
-  render_foreground_level(*game);
-
-  //render the cursor
-  render_cursor(*game);
-
-  //DEBUG
-  /*SDL_Rect tempRect = {game->player.xGrid * 16, game->player.yGrid * 16, 16, 16};
-
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x+=16;
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x-=16;
-  tempRect.y+=16;
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x+=16;
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x-=16;
-  tempRect.y+=16;
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x+=16;
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x-=16;
-  tempRect.y+=16;
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x+=16;
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);*/
-
-  SDL_RenderPresent(game->renderer);
-
-  return;
-}
-
+//render the foreground level
 void render_foreground_level (game_t game) {
 
   unsigned short int type;
@@ -122,6 +109,7 @@ void render_foreground_level (game_t game) {
   return;
 }
 
+//render the background level as well as the background image
 void render_background_level (game_t game) {
 
   SDL_Rect tempSpritePos = {16, 0, 16, 16};
@@ -142,6 +130,7 @@ void render_background_level (game_t game) {
   return;
 }
 
+//render the projectiles of a projectile list
 void render_projectiles (projectile_list_t p, SDL_Renderer *renderer, SDL_Texture *img) {
 
   if (projectile_list_is_empty(p)) {
@@ -159,6 +148,7 @@ void render_projectiles (projectile_list_t p, SDL_Renderer *renderer, SDL_Textur
 
 }
 
+//render a character
 void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) {
 
   SDL_Rect *temp = NULL;
@@ -348,6 +338,65 @@ void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) 
   SDL_RenderCopy(renderer, img, &tempSpritePos, &tempPos);
 
   free(temp);
+
+  return;
+}
+
+//calls every functions to render
+void rendering (game_t *game) {
+
+  SDL_RenderCopy(game->renderer, get_level_background(game->currLevel), NULL, NULL);
+
+  //render the background elements
+  render_background_level(*game);
+
+  //render the enemy projectile
+  character_list_t c;
+  c = game->enemies;
+  while (!character_list_is_empty(c)) {
+    render_character(character_list_head(c), game->renderer, game->spriteSheet);
+    render_projectiles(character_list_head(c).projectiles, game->renderer, game->spriteSheet);
+    c = c->next;
+  }
+
+  //render the character_t
+  render_character(game->player, game->renderer, game->spriteSheet);
+  render_projectiles(game->player.projectiles, game->renderer, game->spriteSheet);
+
+  //render the attack and process it
+  if (get_character_state(game->player) == Attacking)  {
+    render_melee(game->player, game->renderer, game->spriteSheet);
+  }
+
+  //render the foreground
+  render_foreground_level(*game);
+
+  //render the cursor
+  render_cursor(*game);
+
+  //DEBUG
+  /*SDL_Rect tempRect = {game->player.xGrid * 16, game->player.yGrid * 16, 16, 16};
+
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
+  tempRect.x+=16;
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
+  tempRect.x-=16;
+  tempRect.y+=16;
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
+  tempRect.x+=16;
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
+  tempRect.x-=16;
+  tempRect.y+=16;
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
+  tempRect.x+=16;
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
+  tempRect.x-=16;
+  tempRect.y+=16;
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
+  tempRect.x+=16;
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);*/
+
+  SDL_RenderPresent(game->renderer);
 
   return;
 }

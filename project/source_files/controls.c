@@ -1,5 +1,12 @@
+/*
+
+controls.c : contain every functions for the controls regarding the keyboard and mouse
+
+*/
+
 #include "../header_files/controls.h"
 
+//update the controls of the keyboard and mouse
 void update_controls (game_t *game) {
 
   while (SDL_PollEvent(game->event)) {
@@ -36,10 +43,9 @@ void update_controls (game_t *game) {
   }
 
   return;
-
 }
 
-//gestion des touches du clavier
+//manages the keyboard inputs
 void keyboard_control (game_t *game) {
 
   //keys :: left, right, jump, melee
@@ -50,14 +56,14 @@ void keyboard_control (game_t *game) {
   //'q' or 'a' key
   if (game->keys[keysTab[0]] == 1) {
     if(get_character_state(game->player) != Crouching) {
-      set_character_vel_x(&game->player, -3); //set a left velocity
+      set_character_velocity(&game->player, -1 * CHARACTER_SPEED, game->player.vel.y); //set a left velocity
     }
   }
 
   //'d' key
   if (game->keys[keysTab[1]] == 1) {
     if(get_character_state(game->player) != Crouching) {
-      set_character_vel_x(&game->player, 3); //set a left velocity
+      set_character_velocity(&game->player, 1 * CHARACTER_SPEED, game->player.vel.y); //set a left velocity
     }
   }
 
@@ -82,7 +88,7 @@ void keyboard_control (game_t *game) {
   //'s' key
   if (game->keys[keysTab[4]] == 1) {
     set_character_state(&game->player, Crouching);
-    set_character_vel_x(&game->player, 0); //set a left velocity
+    set_character_velocity(&game->player, 0, game->player.vel.y); //set a left velocity
   }
 
   /* KEYUP Controls */
@@ -90,14 +96,14 @@ void keyboard_control (game_t *game) {
   //'q' or 'a' key
   if (game->keys[keysTab[0]] == 0) {
     if (get_character_velocity(game->player).x < 0) {
-      set_character_vel_x(&game->player, 0);
+      set_character_velocity(&game->player, 0, game->player.vel.y);
     }
   }
 
   //'d' key
   if (game->keys[keysTab[1]] == 0) {
     if (get_character_velocity(game->player).x > 0) {
-      set_character_vel_x(&game->player, 0);
+      set_character_velocity(&game->player, 0, game->player.vel.y);
     }
   }
 
@@ -105,7 +111,7 @@ void keyboard_control (game_t *game) {
   if (game->keys[keysTab[2]] == 0) {
     if (get_character_state(game->player) == Jumping) {
       set_character_state(&game->player, Walking);
-      set_character_vel_y(&game->player, 0);
+      set_character_velocity(&game->player, game->player.vel.x, 0);
     }
     game->player.jumpDelay = SDL_GetTicks();
   }
@@ -124,8 +130,10 @@ void keyboard_control (game_t *game) {
     }
   }
 
+  return;
 }
 
+//call the update and control of the keyboard and mouse
 void controls (game_t *game) {
 
   //update the keyboard & mouse controls
@@ -135,5 +143,4 @@ void controls (game_t *game) {
   keyboard_control(game);
 
   return;
-
 }

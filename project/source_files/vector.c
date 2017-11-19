@@ -1,5 +1,12 @@
+/*
+
+vector.c : contain the functions for the vectors
+
+*/
+
 #include "../header_files/vector.h"
 
+//returns the normalized vector
 vector_t normalize (vector_t v) {
   float temp = vector_length(v);
   set_vector_x(&v, get_vector_x(v) / temp);
@@ -7,6 +14,7 @@ vector_t normalize (vector_t v) {
   return v;
 }
 
+//return a direction vector between a and b
 vector_t vector_direction (SDL_Rect a, SDL_Rect b) {
   vector_t v;
   set_vector_x(&v, b.x - a.x);
@@ -14,12 +22,14 @@ vector_t vector_direction (SDL_Rect a, SDL_Rect b) {
   return v;
 }
 
+//returns the length of a vector
 float vector_length (vector_t v) {
   return sqrt(pow(v.x, 2) + pow(v.y, 2));
 }
 
-/* * * * * * Set * * * * * */
+/* SET */
 
+//create a new vector
 vector_t set_vector (float x, float y) {
   vector_t v;
   set_vector_x(&v, x);
@@ -27,22 +37,26 @@ vector_t set_vector (float x, float y) {
   return v;
 }
 
+//set the x coordinate
 void set_vector_x (vector_t *v, float x) {
   v->x = x;
   return;
 }
 
+//set the y coordinate
 void set_vector_y (vector_t *v, float y) {
   v->y = y;
   return;
 }
 
-/* * * * * * Get * * * * * */
+/* GET */
 
+//get the x coordinate
 float get_vector_x (vector_t v) {
   return v.x;
 }
 
+//get the y coordinate
 float get_vector_y (vector_t v) {
   return v.y;
 }
