@@ -7,7 +7,7 @@ level.c : every functions regarding the levels
 #include "../header_files/level.h"
 
 //read the txt file to complete the block array, create the enemies and place the player
-level_t init_level (char *path_blocks, char *path_background, character_t *p, character_list_t *enemies, SDL_Renderer *renderer) {
+level_t init_level (char *path_blocks, char *path_background, char *path_file, character_t *p, character_list_t *enemies, SDL_Renderer *renderer) {
 
   level_t l;
   int i = 0;
@@ -34,7 +34,7 @@ level_t init_level (char *path_blocks, char *path_background, character_t *p, ch
   SDL_FreeSurface(temp);
 
   //loading the txt file
-  FILE *txtFile = fopen(PATH_TXT_FILE, "r");
+  FILE *txtFile = fopen(path_file, "r");
   if (txtFile == NULL) {
     printf("Error opening the txt file\n");
     exit(0);
@@ -144,6 +144,49 @@ level_t init_level (char *path_blocks, char *path_background, character_t *p, ch
   }
 
   return l;
+}
+
+/* LIST */
+
+//build a new level on the list
+level_list_t level_list_build (level_t l, level_list_t ll) {
+  level_list_t temp;
+  temp = malloc(sizeof(*temp));
+  temp->head = l;
+  temp->next = ll;
+  return temp;
+}
+
+//returns the head of the list
+level_t level_list_head (level_list_t l) {
+  return l->head;
+}
+
+//returns the rest of the list
+level_list_t level_list_rest (level_list_t l) {
+  return l->next;
+}
+
+//returns if the list is empty or not
+bool level_list_is_empty (level_list_t l) {
+  return l == NULL;
+}
+
+//returns an empty list
+level_list_t level_list_empty () {
+  return NULL;
+}
+
+//free the entire list
+void level_list_free (level_list_t l) {
+  if (level_list_is_empty(l)) {
+    return;
+  }
+  level_list_free(level_list_rest(l));
+  SDL_DestroyTexture(l->head.background);
+  SDL_DestroyTexture(l->head.blocks_spritesheet);
+  free(l);
+  return;
 }
 
 /* SET */

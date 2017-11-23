@@ -36,7 +36,7 @@
 
 #define ENEMY_SHOOT_DELAY 500
 
-#define AIR_ACCELERATION 2
+#define AIR_ACCELERATION 1.5
 
 /**************/
 /* STRUCTURES */
@@ -71,7 +71,6 @@ typedef struct Character {
 
   int stepDelay; //used to delay between each step of the walking animation
   int shootDelay; //used to delay between each shot
-  int jumpDelay; //used to delay the jump
 
   floatpoint_t realPos; //real position
   intpoint_t screenPos; //screen position
@@ -101,6 +100,12 @@ void shooting (bool mouse_btn, character_t *p, intpoint_t target);
 //update the grid position
 void character_update_grid_pos (character_t *character);
 
+//update a list of projectiles
+projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], character_t *player, character_list_t enemies, bool playerShooting);
+
+//check the collision between the projectile and the enemies
+character_list_t bullet_collision (character_list_t enemies, projectile_t p, bool *destroy);
+
 //make the character jump
 void character_jumping (character_t *p);
 
@@ -108,10 +113,10 @@ void character_jumping (character_t *p);
 void character_gravity(character_t *p);
 
 //update the positions and hitbox
-void update_character (character_t *p, bool *quit);
+void update_character (character_t *p, character_list_t *enemies, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], bool *quit);
 
 //update the enemies' shots and directions
-character_list_t update_enemies (character_list_t c, character_t p, block_t [NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]);
+character_list_t update_enemies (character_list_t c, character_t *p, block_t [NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]);
 
 //update the step used for the walking animation
 void character_update_step(character_t *p);
@@ -174,9 +179,6 @@ void set_character_step_delay (character_t *p, int stepDelay);
 //set the delay of shooting
 void set_character_shoot_delay (character_t *p, int shootDelay);
 
-//set the delay of the jump
-void set_character_jump_delay (character_t *p, int jumpDelay);
-
 //set the character's real position
 void set_character_real_position (character_t *p, float x, float y);
 
@@ -217,6 +219,12 @@ bool get_character_on_ground (character_t p);
 
 //get the character's state
 short int get_character_state (character_t p);
+
+//get the character's step delay
+int get_character_step_delay (character_t p);
+
+//get the character's shoot delay
+int get_character_shoot_delay (character_t p);
 
 //get the character's real position
 floatpoint_t get_character_real_position (character_t p);

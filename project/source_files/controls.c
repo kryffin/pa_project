@@ -73,10 +73,8 @@ void keyboard_control (game_t *game) {
       set_character_state(&game->player, Walking);
     } else {
       set_character_state(&game->player, Jumping);
+      character_jumping(&game->player);
       game->player.onGround = false;
-    }
-    if (SDL_GetTicks() > game->player.jumpDelay + JUMP_DURATION) {
-      set_character_state(&game->player, Walking);
     }
   }
 
@@ -89,6 +87,11 @@ void keyboard_control (game_t *game) {
   if (game->keys[keysTab[4]] == 1) {
     set_character_state(&game->player, Crouching);
     set_character_velocity(&game->player, 0, game->player.vel.y); //set a left velocity
+
+    //debug
+    if (!level_list_is_empty(level_list_rest(game->currLevel))) {
+      game->currLevel = level_list_rest(game->currLevel);
+    }
   }
 
   /* KEYUP Controls */
@@ -113,7 +116,6 @@ void keyboard_control (game_t *game) {
       set_character_state(&game->player, Walking);
       set_character_velocity(&game->player, game->player.vel.x, 0);
     }
-    game->player.jumpDelay = SDL_GetTicks();
   }
 
   //'f' key

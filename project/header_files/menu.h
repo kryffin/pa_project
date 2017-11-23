@@ -47,9 +47,6 @@ bool mouse_hover_menu (intpoint_t mouse_pos, int targetx, int targety, int width
 //display of the main menu
 int main_menu_display (game_t *game);
 
-//display of the option menu
-int option_menu_display (game_t *game);
-
 //loop managing the menus
 int render_menu (game_t *game);
 

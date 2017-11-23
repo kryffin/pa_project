@@ -6,35 +6,6 @@ projectile.c : contain the functions for the projectiles
 
 #include "../header_files/projectile.h"
 
-//update a list of projectiles
-projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
-
-  if (projectile_list_is_empty(projectiles)) {
-    return projectile_list_empty();
-  }
-
-  if ((get_projectile_real_position(projectile_list_head(projectiles)).x + BULLET_WIDTH < 0.0
-        || get_projectile_real_position(projectile_list_head(projectiles)).x > SCREEN_WIDTH)
-        || (get_projectile_real_position(projectile_list_head(projectiles)).y + BULLET_HEIGHT < 0.0
-        || get_projectile_real_position(projectile_list_head(projectiles)).y > SCREEN_HEIGHT)) {
-
-    //projectile isn't in the screen
-    return projectile_list_rest(projectiles);
-  }
-
-  if (get_block_type(blocks[(int)floor((get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) + (BULLET_WIDTH / 2)) / 16)][(int)floor((get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) + (BULLET_HEIGHT / 2)) / 16)]) == Solid) {
-    return projectile_list_rest(projectiles);
-  }
-
-  projectile_t p;
-  floatpoint_t newPos = set_floatpoint(get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) + get_vector_x(get_projectile_direction(projectile_list_head(projectiles))), get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) + get_vector_y(get_projectile_direction(projectile_list_head(projectiles))));
-  SDL_Rect hitbox = {floor(get_floatpoint_x(newPos)), floor(get_floatpoint_y(newPos)), BULLET_WIDTH, BULLET_HEIGHT};
-
-  p = set_projectile(newPos, get_projectile_direction(projectile_list_head(projectiles)), hitbox, get_projectile_sprite_pos(projectile_list_head(projectiles)));
-
-  return projectile_list_build(p, update_projectiles(projectile_list_rest(projectiles), blocks));
-}
-
 /* LIST */
 
 //build a new projectile on the list
@@ -77,6 +48,7 @@ void projectile_list_free (projectile_list_t p) {
   }
   projectile_list_free(projectile_list_rest(p));
   free(p);
+  return;
 }
 
 /* SET */

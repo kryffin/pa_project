@@ -60,7 +60,7 @@ typedef struct Game {
 
   bool quit; //variable running the main loop and quitting the game if desired
 
-  level_t currLevel; //current level in which we are playing, hopefully a list one day
+  level_list_t currLevel; //current level in which we are playing, hopefully a list one day
 
 } game_t;
 

@@ -83,7 +83,7 @@ void render_foreground_level (game_t game) {
   for (i = 0; i < NB_BLOCKS_WIDTH; i++) {
     for (j = 0; j < NB_BLOCKS_HEIGHT; j++) {
 
-      type = get_block_type(get_level_block(game.currLevel, i, j));
+      type = get_block_type(get_level_block(game.currLevel->head, i, j));
       tempPos.x = i * 16;
       tempPos.y = j * 16;
 
@@ -91,12 +91,12 @@ void render_foreground_level (game_t game) {
 
         case Solid:
           tempSpritePos.x = 0;
-          SDL_RenderCopy(game.renderer, get_level_blocks_spritesheet(game.currLevel), &tempSpritePos, &tempPos);
+          SDL_RenderCopy(game.renderer, get_level_blocks_spritesheet(game.currLevel->head), &tempSpritePos, &tempPos);
           break;
 
         case Foreground:
           tempSpritePos.x = 32;
-          SDL_RenderCopy(game.renderer, get_level_blocks_spritesheet(game.currLevel), &tempSpritePos, &tempPos);
+          SDL_RenderCopy(game.renderer, get_level_blocks_spritesheet(game.currLevel->head), &tempSpritePos, &tempPos);
           break;
 
         default:
@@ -121,8 +121,8 @@ void render_background_level (game_t game) {
       tempPos.x = i * 16;
       tempPos.y = j * 16;
 
-      if (get_block_type(get_level_block(game.currLevel, i, j)) == Background) {
-        SDL_RenderCopy(game.renderer, get_level_blocks_spritesheet(game.currLevel), &tempSpritePos, &tempPos);
+      if (get_block_type(get_level_block(game.currLevel->head, i, j)) == Background) {
+        SDL_RenderCopy(game.renderer, get_level_blocks_spritesheet(game.currLevel->head), &tempSpritePos, &tempPos);
       }
     }
   }
@@ -345,7 +345,7 @@ void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) 
 //calls every functions to render
 void rendering (game_t *game) {
 
-  SDL_RenderCopy(game->renderer, get_level_background(game->currLevel), NULL, NULL);
+  SDL_RenderCopy(game->renderer, get_level_background(game->currLevel->head), NULL, NULL);
 
   //render the background elements
   render_background_level(*game);

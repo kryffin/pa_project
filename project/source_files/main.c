@@ -18,10 +18,28 @@ int main () {
   //render the present renderer
   SDL_RenderPresent(g->renderer);
 
+  g->currLevel = level_list_empty();
+
   //main menu
-  if (render_menu(g) == 0) {
-    return EXIT_FAILURE;
+  int menuOption = render_menu(g);
+  switch (menuOption) {
+
+    case 1:
+      g->currLevel = level_list_build(init_level(PATH_BLOCKS_SHEET, "./res/background1.jpg", "./res/level1.txt", &g->player, &g->enemies, g->renderer), level_list_build( init_level(PATH_BLOCKS_SHEET, "./res/background2.png", "./res/level2.txt", &g->player, &g->enemies, g->renderer), level_list_build( init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND, "./res/level3.txt", &g->player, &g->enemies, g->renderer), level_list_empty())));
+      break;
+
+    case 2:
+      g->currLevel = level_list_build(init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND, "./res/arena.txt", &g->player, &g->enemies, g->renderer), level_list_empty());
+      break;
+
+    case 3:
+      g->quit = true;
+      break;
+
+    default:
+      break;
   }
+
 
   while (!(g->quit)) {
 
@@ -41,15 +59,14 @@ int main () {
 
     /* movement */
 
-    character_jumping(&g->player);
     character_gravity(&g->player);
-    character_apply_velocity(&g->player, g->currLevel.blocks);
+    character_apply_velocity(&g->player, g->currLevel->head.blocks);
 
     /* updates */
 
     //player
-    update_character(&g->player, &g->quit);
-    g->player.projectiles = update_projectiles(g->player.projectiles, g->currLevel.blocks);
+    update_character(&g->player, &g->enemies, g->currLevel->head.blocks, &g->quit);
+    g->player.projectiles = update_projectiles(g->player.projectiles, g->currLevel->head.blocks, &g->player, g->enemies, true);
     character_update_grid_pos(&g->player);
     character_update_dir(&g->player, g->mouse_pos);
 
@@ -57,9 +74,6 @@ int main () {
       character_update_step(&g->player);
       g->player.stepDelay = SDL_GetTicks();
     }
-
-    //enemies
-    g->enemies = update_enemies(g->enemies, g->player, g->currLevel.blocks);
 
     //debug
     if (get_floatpoint_y(get_character_real_position(g->player)) + IMG_HEIGHT > SCREEN_HEIGHT) {
@@ -84,11 +98,13 @@ int main () {
 
   /* free */
 
+  printf("%lu \n",sizeof(*g));
+
   projectile_list_free(g->player.projectiles);
   character_list_free(g->enemies);
+  level_list_free(g->currLevel);
   SDL_DestroyTexture(g->spriteSheet);
-  SDL_DestroyTexture(g->currLevel.blocks_spritesheet);
-  SDL_DestroyTexture(g->currLevel.background);
+  SDL_DestroyTexture(g->cursor);
   SDL_DestroyRenderer(g->renderer);
   SDL_DestroyWindow(g->window);
   TTF_CloseFont(g->font);

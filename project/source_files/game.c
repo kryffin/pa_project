@@ -15,6 +15,7 @@ game_t *create_game () {
   //SDL initialization
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     printf("Error while SDL initialization : %s\n", SDL_GetError());
+    exit(0);
   }
 
   g->manager = malloc(sizeof(FPSmanager));
@@ -27,12 +28,14 @@ game_t *create_game () {
   g->window = SDL_CreateWindow("MVt", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
   if (g->window == NULL) {
     printf("Error during window creation : %s\n", SDL_GetError());
+    exit(0);
   }
 
   //renderer initialization
   g->renderer = SDL_CreateRenderer(g->window, -1, SDL_RENDERER_ACCELERATED);
   if (g->renderer == NULL) {
     printf("Error during renderer creation : %s\n", SDL_GetError());
+    exit(0);
   }
   //set the draw color of the renderer to white
   SDL_SetRenderDrawColor(g->renderer, 255, 255, 255, 255);
@@ -46,12 +49,14 @@ game_t *create_game () {
   g->cursor = SDL_CreateTextureFromSurface(g->renderer, temp);
   if (g->cursor == NULL) {
     printf("Error during cursor image loading : %s\n", SDL_GetError());
+    exit(0);
   }
   SDL_FreeSurface(temp);
   temp = IMG_Load(PATH_SPRITES);
   g->spriteSheet = SDL_CreateTextureFromSurface(g->renderer, temp);
   if (g->spriteSheet == NULL) {
     printf("Error during sprite sheet image loading : %s\n", SDL_GetError());
+    exit(0);
   }
   SDL_FreeSurface(temp);
   IMG_Quit();
@@ -62,10 +67,12 @@ game_t *create_game () {
 
   if (TTF_Init() != 0) {
     printf("Error while TTF initialization : %s\n", SDL_GetError());
+    exit(0);
   }
   g->font = TTF_OpenFont(PATH_FONT, FONT_SIZE);
   if (g->font == NULL) {
     printf("Error opening the font : %s\n", SDL_GetError());
+    exit(0);
   }
 
   init_palette2(g);
@@ -73,7 +80,7 @@ game_t *create_game () {
   floatpoint_t basePosition = set_floatpoint(0.0, 0.0);
   vector_t baseVelocity = set_vector(0.0, 0.0);
   SDL_Rect desRec = {0, 0, IMG_WIDTH, IMG_HEIGHT};
-  g->player = set_character(10, basePosition, baseVelocity, desRec, desRec, Player);
+  g->player = set_character(50, basePosition, baseVelocity, desRec, desRec, Player);
 
   g->enemies = character_list_empty();
 
@@ -83,12 +90,11 @@ game_t *create_game () {
   texture = SDL_CreateTextureFromSurface(g->renderer, temp);
   if (texture == NULL) {
     printf("Error during bullet image loading : %s\n", SDL_GetError());
+    exit(0);
   }
   SDL_FreeSurface(temp);
 
   g->quit = false;
-
-  g->currLevel = init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND, &g->player, &g->enemies, g->renderer);
 
   g->keys[SDL_SCANCODE_A] = 0;
   g->keys[SDL_SCANCODE_D] = 0;
@@ -105,7 +111,7 @@ void init_palette2 (game_t *game) {
   game->colorPalette = (SDL_Color*)malloc(15 * sizeof(SDL_Color));
   if (game->colorPalette == NULL) {
     printf("Error allocating memory for the palette\n");
-    return;
+    exit(0);
   }
 
   //black

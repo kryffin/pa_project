@@ -53,9 +53,6 @@ struct Projectile_List {
 /* FUNCTIONS */
 /*************/
 
-//update a list of projectiles
-projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]);
-
 /* LIST */
 
 //build a new projectile on the list
