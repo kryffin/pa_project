@@ -31,6 +31,7 @@
 #define IMG_HEIGHT 64
 #define BULLET_WIDTH 16
 #define BULLET_HEIGHT 16
+#define NB_MAX_KEYS 8
 
 /**************/
 /* STRUCTURES */
@@ -44,7 +45,7 @@ typedef struct Game {
 
   bool mouse_btn; //actual state of the mouse button
   intpoint_t mouse_pos; //mouse position
-  SDL_Keycode keys[SDL_NUM_SCANCODES]; //array for the keys pressed
+  bool keys[NB_MAX_KEYS]; //array for the keys pressed
   SDL_Texture *cursor; //cursor's image
 
   SDL_Event *event; //event running the controls

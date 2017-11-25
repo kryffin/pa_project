@@ -6,6 +6,14 @@ vector.c : contain the functions for the vectors
 
 #include "../header_files/vector.h"
 
+//rotate a vector with teta as an angle
+vector_t vector_rotate (vector_t v, int teta) {
+  vector_t temp;
+  set_vector_x(&temp, get_vector_x(v) * cos(teta) - get_vector_y(v) * sin(teta));
+  set_vector_y(&temp, get_vector_x(v) * sin(teta) + get_vector_y(v) * cos(teta));
+  return temp;
+}
+
 //returns the normalized vector
 vector_t normalize (vector_t v) {
   float temp = vector_length(v);

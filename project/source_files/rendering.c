@@ -46,8 +46,8 @@ void render_melee (character_t p, SDL_Renderer *renderer, SDL_Texture *img) {
 void render_cursor (game_t game) {
 
   SDL_Rect temp;
-  temp.x = get_intpoint_x(game.mouse_pos) - (CURSOR_WIDTH/2);
-  temp.y = get_intpoint_y(game.mouse_pos) - (CURSOR_HEIGHT/2);
+  temp.x = get_intpoint_x(game.mouse_pos) - (CURSOR_WIDTH / 2);
+  temp.y = get_intpoint_y(game.mouse_pos) - (CURSOR_HEIGHT / 2);
   temp.w = CURSOR_WIDTH;
   temp.h = CURSOR_HEIGHT;
 
@@ -137,7 +137,7 @@ void render_projectiles (projectile_list_t p, SDL_Renderer *renderer, SDL_Textur
     return;
   }
 
-  SDL_Rect tempPos = {get_intpoint_x(get_projectile_screen_position(projectile_list_head(p))), get_intpoint_y(get_projectile_screen_position(projectile_list_head(p))), BULLET_WIDTH, BULLET_HEIGHT};
+  SDL_Rect tempPos = {get_intpoint_x(get_projectile_screen_position(projectile_list_head(p))) - (BULLET_WIDTH / 2), get_intpoint_y(get_projectile_screen_position(projectile_list_head(p))) - (BULLET_HEIGHT / 2), BULLET_WIDTH, BULLET_HEIGHT};
   SDL_Rect tempSpritePos = get_projectile_sprite_pos(projectile_list_head(p));
 
   SDL_RenderCopy(renderer, img, &tempSpritePos, &tempPos);

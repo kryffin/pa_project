@@ -96,12 +96,6 @@ game_t *create_game () {
 
   g->quit = false;
 
-  g->keys[SDL_SCANCODE_A] = 0;
-  g->keys[SDL_SCANCODE_D] = 0;
-  g->keys[SDL_SCANCODE_SPACE] = 0;
-  g->keys[SDL_SCANCODE_F] = 0;
-  g->keys[SDL_SCANCODE_S] = 0;
-
   return g;
 }
 

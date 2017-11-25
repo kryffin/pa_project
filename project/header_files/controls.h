@@ -26,6 +26,25 @@
 
 #define CHARACTER_SPEED 5
 
+#define RIFLE_SHOOT_DELAY 200
+#define SHOTGUN_SHOOT_DELAY 1000
+#define BAZOOKA_SHOOT_DELAY 3000
+
+/**************/
+/* STRUCTURES */
+/**************/
+
+enum Keys {
+  KeyQ,
+  KeyS,
+  KeyD,
+  KeyF,
+  KeySpace,
+  Key1,
+  Key2,
+  Key3
+};
+
 /*************/
 /* FUNCTIONS */
 /*************/

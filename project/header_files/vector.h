@@ -21,6 +21,9 @@ typedef struct Vector {
 /* FUNCTIONS */
 /*************/
 
+//rotate a vector with teta as an angle
+vector_t vector_rotate (vector_t v, int teta);
+
 //returns the normalized vector
 vector_t normalize (vector_t v);
 

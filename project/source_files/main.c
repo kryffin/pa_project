@@ -51,12 +51,6 @@ int main () {
     //control the keyboard and mouse inputs
     controls(g);
 
-    //add a new projectile to the list if right mouse button is clicked
-    if (SDL_GetTicks() > g->player.shootDelay + PLAYER_SHOOT_DELAY) {
-      shooting(g->mouse_btn, &g->player, g->mouse_pos);
-      g->player.shootDelay = SDL_GetTicks();
-    }
-
     /* movement */
 
     character_gravity(&g->player);
@@ -97,8 +91,6 @@ int main () {
   }
 
   /* free */
-
-  printf("%lu \n",sizeof(*g));
 
   projectile_list_free(g->player.projectiles);
   character_list_free(g->enemies);

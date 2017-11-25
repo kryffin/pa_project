@@ -16,7 +16,32 @@ void update_controls (game_t *game) {
     }
 
     if (game->event->type == SDL_KEYUP) {
-      game->keys[game->event->key.keysym.scancode] = 0;
+
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_A) {
+        game->keys[KeyQ] = false;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_S) {
+        game->keys[KeyS] = false;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_D) {
+        game->keys[KeyD] = false;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_F) {
+        game->keys[KeyF] = false;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_SPACE) {
+        game->keys[KeySpace] = false;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_1) {
+        game->keys[Key1] = false;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_2) {
+        game->keys[Key2] = false;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_3) {
+        game->keys[Key3] = false;
+      }
+
     }
 
     if (game->event->type == SDL_KEYDOWN) {
@@ -25,7 +50,30 @@ void update_controls (game_t *game) {
         game->quit = true;
       }
 
-      game->keys[game->event->key.keysym.scancode] = 1;
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_A) {
+        game->keys[KeyQ] = true;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_S) {
+        game->keys[KeyS] = true;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_D) {
+        game->keys[KeyD] = true;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_F) {
+        game->keys[KeyF] = true;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_SPACE) {
+        game->keys[KeySpace] = true;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_1) {
+        game->keys[Key1] = true;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_2) {
+        game->keys[Key2] = true;
+      }
+      if (game->event->key.keysym.scancode == SDL_SCANCODE_3) {
+        game->keys[Key3] = true;
+      }
 
     }
 
@@ -48,27 +96,24 @@ void update_controls (game_t *game) {
 //manages the keyboard inputs
 void keyboard_control (game_t *game) {
 
-  //keys :: left, right, jump, melee
-  SDL_Keycode keysTab[5] = {SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_SPACE, SDL_SCANCODE_F, SDL_SCANCODE_S};
-
   /* KEYDOWN Controls */
 
-  //'q' or 'a' key
-  if (game->keys[keysTab[0]] == 1) {
+  //'q' key
+  if (game->keys[KeyQ] == true) {
     if(get_character_state(game->player) != Crouching) {
       set_character_velocity(&game->player, -1 * CHARACTER_SPEED, game->player.vel.y); //set a left velocity
     }
   }
 
   //'d' key
-  if (game->keys[keysTab[1]] == 1) {
+  if (game->keys[KeyD] == true) {
     if(get_character_state(game->player) != Crouching) {
       set_character_velocity(&game->player, 1 * CHARACTER_SPEED, game->player.vel.y); //set a left velocity
     }
   }
 
   //'space' key
-  if (game->keys[keysTab[2]] == 1) {
+  if (game->keys[KeySpace] == true) {
     if (!(game->player.onGround)) {
       set_character_state(&game->player, Walking);
     } else {
@@ -79,12 +124,12 @@ void keyboard_control (game_t *game) {
   }
 
   //'f' key
-  if (game->keys[keysTab[3]] == 1) {
+  if (game->keys[KeyF] == true) {
     set_character_state(&game->player, Attacking);
   }
 
   //'s' key
-  if (game->keys[keysTab[4]] == 1) {
+  if (game->keys[KeyS] == true) {
     set_character_state(&game->player, Crouching);
     set_character_velocity(&game->player, 0, game->player.vel.y); //set a left velocity
 
@@ -95,24 +140,39 @@ void keyboard_control (game_t *game) {
     set_character_weapon(&game->player, Bazooka);
   }
 
+  //'space' key
+  if (game->keys[Key1] == true) {
+    set_character_weapon(&game->player, Rifle);
+  }
+
+  //'f' key
+  if (game->keys[Key2] == true) {
+    set_character_weapon(&game->player, Shotgun);
+  }
+
+  //'s' key
+  if (game->keys[Key3] == true) {
+    set_character_weapon(&game->player, Bazooka);
+  }
+
   /* KEYUP Controls */
 
-  //'q' or 'a' key
-  if (game->keys[keysTab[0]] == 0) {
+  //'q' key
+  if (game->keys[KeyQ] == false) {
     if (get_character_velocity(game->player).x < 0) {
       set_character_velocity(&game->player, 0, game->player.vel.y);
     }
   }
 
   //'d' key
-  if (game->keys[keysTab[1]] == 0) {
+  if (game->keys[KeyD] == false) {
     if (get_character_velocity(game->player).x > 0) {
       set_character_velocity(&game->player, 0, game->player.vel.y);
     }
   }
 
   //'space' key
-  if (game->keys[keysTab[2]] == 0) {
+  if (game->keys[KeySpace] == false) {
     if (get_character_state(game->player) == Jumping) {
       set_character_state(&game->player, Walking);
       set_character_velocity(&game->player, game->player.vel.x, 0);
@@ -120,14 +180,14 @@ void keyboard_control (game_t *game) {
   }
 
   //'f' key
-  if (game->keys[keysTab[3]] == 0) {
+  if (game->keys[KeyF] == false) {
     if (get_character_state(game->player) == Attacking) {
       set_character_state(&game->player, Walking);
     }
   }
 
   //'s' key
-  if (game->keys[keysTab[4]] == 0) {
+  if (game->keys[KeyS] == false) {
     if (get_character_state(game->player) == Crouching) {
       set_character_state(&game->player, Walking);
     }
@@ -144,6 +204,33 @@ void controls (game_t *game) {
 
   //act depending on the keyboard state
   keyboard_control(game);
+
+  //add a new projectile to the list if right mouse button is clicked
+  short int weapon = get_character_weapon(game->player);
+  int shoot_delay = 0;
+
+  switch (weapon) {
+
+    case Rifle:
+      shoot_delay = RIFLE_SHOOT_DELAY;
+      break;
+
+    case Shotgun:
+      shoot_delay = SHOTGUN_SHOOT_DELAY;
+      break;
+
+    case Bazooka:
+      shoot_delay = BAZOOKA_SHOOT_DELAY;
+      break;
+
+    default:
+      break;
+
+  }
+  if (SDL_GetTicks() > game->player.shootDelay + shoot_delay) {
+    shooting(game->mouse_btn, &game->player, game->mouse_pos);
+    game->player.shootDelay = SDL_GetTicks();
+  }
 
   return;
 }

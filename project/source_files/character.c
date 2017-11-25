@@ -13,7 +13,7 @@ void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos) {
     return;
   }
 
-  vector_t dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_character_real_position(*p).x + (IMG_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_character_real_position(*p).y + (IMG_HEIGHT / 2)));
+  vector_t dir = set_vector((get_intpoint_x(mouse_pos)) - (get_character_real_position(*p).x + (IMG_WIDTH / 2)), (get_intpoint_y(mouse_pos)) - (get_character_real_position(*p).y + (IMG_HEIGHT / 4) ));
   dir = normalize(dir);
   dir = set_vector(get_vector_x(dir) * BULLET_SPEED, get_vector_y(dir) * BULLET_SPEED);
   SDL_Rect temp = {get_intpoint_x(get_character_screen_position(*p)), get_intpoint_x(get_character_screen_position(*p)), BULLET_WIDTH, BULLET_HEIGHT};
@@ -42,14 +42,28 @@ void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos) {
 
     case Shotgun:
 
+      //sprite position
+      if (p->type == Player) {
+        tempSprite.x = 144;
+        tempSprite.y = 64;
+      }
+      tempSprite.w = BULLET_WIDTH;
+      tempSprite.h = BULLET_HEIGHT;
+
+      p->projectiles = projectile_list_build(set_projectile(set_floatpoint(get_intpoint_x(get_character_screen_position(*p)) + (IMG_WIDTH / 2), get_intpoint_y(get_character_screen_position(*p)) + (IMG_HEIGHT / 4)), dir, Bullet, temp, tempSprite), p->projectiles);
+
+      p->projectiles = projectile_list_build(set_projectile(set_floatpoint(get_intpoint_x(get_character_screen_position(*p)) + (IMG_WIDTH / 2), get_intpoint_y(get_character_screen_position(*p)) + (IMG_HEIGHT / 4)), vector_rotate(dir, 25), Bullet, temp, tempSprite), p->projectiles);
+
+      p->projectiles = projectile_list_build(set_projectile(set_floatpoint(get_intpoint_x(get_character_screen_position(*p)) + (IMG_WIDTH / 2), get_intpoint_y(get_character_screen_position(*p)) + (IMG_HEIGHT / 4)), vector_rotate(dir, -25), Bullet, temp, tempSprite), p->projectiles);
+
       break;
 
     case Bazooka:
 
       //sprite position
       if (p->type == Player) {
-        tempSprite.x = 144;
-        tempSprite.y = 64;
+        tempSprite.x = 128;
+        tempSprite.y = 80;
       }
       tempSprite.w = BULLET_WIDTH;
       tempSprite.h = BULLET_HEIGHT;
@@ -121,6 +135,7 @@ projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blo
   short int bulletType = get_projectile_bullet_type(projectile_list_head(projectiles));
   switch (bulletType) {
 
+    case Buckshot:
     case Bullet:
       newPos = set_floatpoint(get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) + get_vector_x(get_projectile_direction(projectile_list_head(projectiles))), get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) + get_vector_y(get_projectile_direction(projectile_list_head(projectiles))));
       hitbox.x = (int)floor(get_floatpoint_x(newPos));
@@ -128,9 +143,6 @@ projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blo
       hitbox.w = BULLET_WIDTH;
       hitbox.h = BULLET_HEIGHT;
       p = set_projectile(newPos, get_projectile_direction(projectile_list_head(projectiles)), bulletType, hitbox, get_projectile_sprite_pos(projectile_list_head(projectiles)));
-      break;
-
-    case Buckshot:
       break;
 
     case Missile:
@@ -185,10 +197,6 @@ void update_character (character_t *p, character_list_t *enemies, block_t blocks
 
   set_character_screen_position(p, (int)floor(get_character_real_position(*p).x), (int)floor(get_character_real_position(*p).y));
 
-  if (p->onGround && p->gridPos.y * 16 != p->screenPos.y) {
-    p->screenPos.y = p->gridPos.y * 16;
-  }
-
   SDL_Rect temp;
   temp.x = get_character_screen_position(*p).x;
   temp.y = get_character_screen_position(*p).y;
@@ -226,10 +234,6 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
 
   character_t e = character_list_head(c);
   e.projectiles = character_list_head(c).projectiles;
-
-  if (e.onGround && e.gridPos.y * 16 != e.screenPos.y) {
-    e.screenPos.y = e.gridPos.y * 16;
-  }
 
   if (SDL_GetTicks() > e.shootDelay + ENEMY_SHOOT_DELAY) {
     //shooting(true, &e, set_intpoint(get_character_screen_position(*p).x + (IMG_WIDTH / 2), get_character_screen_position(*p).y + (IMG_HEIGHT / 2)));

@@ -32,7 +32,6 @@
 #define SCREEN_BPP 32
 #define SCREEN_FPS 30
 
-#define PLAYER_SHOOT_DELAY 100
 #define DELAY_STEP 150
 
 #define CURSOR_WIDTH 15
