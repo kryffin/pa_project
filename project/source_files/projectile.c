@@ -54,13 +54,14 @@ void projectile_list_free (projectile_list_t p) {
 /* SET */
 
 //create a new projectile
-projectile_t set_projectile (floatpoint_t pos, vector_t dir, SDL_Rect hitbox, SDL_Rect spritePos) {
+projectile_t set_projectile (floatpoint_t pos, vector_t dir, short int bulletType, SDL_Rect hitbox, SDL_Rect spritePos) {
 
   projectile_t p;
 
   set_projectile_real_position(&p, pos);
   set_projectile_screen_position(&p, floor(get_floatpoint_x(pos)), floor(get_floatpoint_y(pos)));
   set_projectile_direction(&p, dir);
+  set_projectile_bullet_type(&p, bulletType);
   set_projectile_hitbox(&p, hitbox);
   set_projectile_sprite_pos(&p, spritePos);
 
@@ -86,6 +87,12 @@ void set_projectile_real_position (projectile_t *p, floatpoint_t pos) {
 void set_projectile_direction (projectile_t *p, vector_t dir) {
   p->dir.x = dir.x;
   p->dir.y = dir.y;
+  return;
+}
+
+//set the type
+void set_projectile_bullet_type(projectile_t *p, short int bulletType) {
+  p->bulletType = bulletType;
   return;
 }
 
@@ -122,6 +129,11 @@ intpoint_t get_projectile_screen_position (projectile_t p) {
 //get the direction
 vector_t get_projectile_direction (projectile_t p) {
   return p.dir;
+}
+
+//get the type
+short int get_projectile_bullet_type (projectile_t p) {
+  return p.bulletType;
 }
 
 //get the hitbox

@@ -16,20 +16,52 @@ void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos) {
   vector_t dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_character_real_position(*p).x + (IMG_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_character_real_position(*p).y + (IMG_HEIGHT / 2)));
   dir = normalize(dir);
   dir = set_vector(get_vector_x(dir) * BULLET_SPEED, get_vector_y(dir) * BULLET_SPEED);
-
   SDL_Rect temp = {get_intpoint_x(get_character_screen_position(*p)), get_intpoint_x(get_character_screen_position(*p)), BULLET_WIDTH, BULLET_HEIGHT};
   SDL_Rect tempSprite;
-  if (p->type == Player) {
-    tempSprite.x = 128;
-    tempSprite.y = 64;
-  } else {
-    tempSprite.x = 144;
-    tempSprite.y = 64;
-  }
-  tempSprite.w = BULLET_WIDTH;
-  tempSprite.h = BULLET_HEIGHT;
 
-  p->projectiles = projectile_list_build(set_projectile(set_floatpoint(get_intpoint_x(get_character_screen_position(*p)) + (IMG_WIDTH / 2), get_intpoint_y(get_character_screen_position(*p)) + (IMG_HEIGHT / 4)), dir, temp, tempSprite), p->projectiles);
+  short int weapon = get_character_weapon(*p);
+
+  switch (weapon) {
+
+    case Rifle:
+
+      //sprite position
+      if (p->type == Player) {
+        tempSprite.x = 128;
+        tempSprite.y = 64;
+      } else {
+        tempSprite.x = 144;
+        tempSprite.y = 64;
+      }
+      tempSprite.w = BULLET_WIDTH;
+      tempSprite.h = BULLET_HEIGHT;
+
+      p->projectiles = projectile_list_build(set_projectile(set_floatpoint(get_intpoint_x(get_character_screen_position(*p)) + (IMG_WIDTH / 2), get_intpoint_y(get_character_screen_position(*p)) + (IMG_HEIGHT / 4)), dir, Bullet, temp, tempSprite), p->projectiles);
+
+      break;
+
+    case Shotgun:
+
+      break;
+
+    case Bazooka:
+
+      //sprite position
+      if (p->type == Player) {
+        tempSprite.x = 144;
+        tempSprite.y = 64;
+      }
+      tempSprite.w = BULLET_WIDTH;
+      tempSprite.h = BULLET_HEIGHT;
+
+      p->projectiles = projectile_list_build(set_projectile(set_floatpoint(get_intpoint_x(get_character_screen_position(*p)) + (IMG_WIDTH / 2), get_intpoint_y(get_character_screen_position(*p)) + (IMG_HEIGHT / 4)), dir, Missile, temp, tempSprite), p->projectiles);
+
+      break;
+
+    default:
+      break;
+
+  }
 
   return;
 
@@ -44,7 +76,7 @@ void character_update_grid_pos (character_t *character) {
 }
 
 //update a list of projectiles
-projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], character_t *player, character_list_t enemies, bool playerShooting) {
+projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], character_t *player, character_list_t enemies, intpoint_t mouse_pos, bool playerShooting) {
 
   if (projectile_list_is_empty(projectiles)) {
     return projectile_list_empty();
@@ -56,37 +88,75 @@ projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blo
         || get_projectile_real_position(projectile_list_head(projectiles)).y > SCREEN_HEIGHT)) {
 
     //projectile isn't in the screen
-    return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, playerShooting);
+    return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, mouse_pos, playerShooting);
   }
 
   block_t temp = blocks[(int)floor((get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) + (BULLET_WIDTH / 2)) / 16)][(int)floor((get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) + (BULLET_HEIGHT / 2)) / 16)];
 
   if (get_block_type(temp) == Solid) {
-    return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, playerShooting);
+    return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, mouse_pos, playerShooting);
   }
 
   if (!playerShooting) {
     //ennemy shooting
     if (get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) >= player->hitbox.x && get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles) ))<= player->hitbox.x + player->hitbox.w && get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) >= player->hitbox.y && get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) <= player->hitbox.y + player->hitbox.h) {
-      player->hp -= 1;
-      return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, playerShooting);
+      //player->hp -= 1;
+      return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, mouse_pos, playerShooting);
     }
   } else {
     //player shooting
     bool destroy = false;
     enemies = bullet_collision(enemies, projectile_list_head(projectiles), &destroy);
     if (destroy) {
-      return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, playerShooting);
+      return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, mouse_pos, playerShooting);
     }
   }
 
   projectile_t p;
-  floatpoint_t newPos = set_floatpoint(get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) + get_vector_x(get_projectile_direction(projectile_list_head(projectiles))), get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) + get_vector_y(get_projectile_direction(projectile_list_head(projectiles))));
-  SDL_Rect hitbox = {floor(get_floatpoint_x(newPos)), floor(get_floatpoint_y(newPos)), BULLET_WIDTH, BULLET_HEIGHT};
+  floatpoint_t newPos;
+  vector_t dir;
+  float dist;
+  SDL_Rect hitbox;
 
-  p = set_projectile(newPos, get_projectile_direction(projectile_list_head(projectiles)), hitbox, get_projectile_sprite_pos(projectile_list_head(projectiles)));
+  short int bulletType = get_projectile_bullet_type(projectile_list_head(projectiles));
+  switch (bulletType) {
 
-  return projectile_list_build(p, update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, playerShooting));
+    case Bullet:
+      newPos = set_floatpoint(get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) + get_vector_x(get_projectile_direction(projectile_list_head(projectiles))), get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) + get_vector_y(get_projectile_direction(projectile_list_head(projectiles))));
+      hitbox.x = (int)floor(get_floatpoint_x(newPos));
+      hitbox.y = (int)floor(get_floatpoint_y(newPos));
+      hitbox.w = BULLET_WIDTH;
+      hitbox.h = BULLET_HEIGHT;
+      p = set_projectile(newPos, get_projectile_direction(projectile_list_head(projectiles)), bulletType, hitbox, get_projectile_sprite_pos(projectile_list_head(projectiles)));
+      break;
+
+    case Buckshot:
+      break;
+
+    case Missile:
+      dist = sqrt(pow(mouse_pos.x - projectiles->head.realPos.x, 2) + pow(mouse_pos.y - projectiles->head.realPos.y, 2));
+      if (dist < 10.0) {
+        return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, mouse_pos, playerShooting);
+      }
+      dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_projectile_real_position(projectiles->head).x + (BULLET_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_projectile_real_position(projectiles->head).y + (BULLET_HEIGHT / 2)));
+      set_vector_x(&dir, (projectiles->head.dir.x + dir.x) / 100);
+      set_vector_y(&dir, (projectiles->head.dir.y + dir.y) / 100);
+      dir = normalize(dir);
+      dir = set_vector(get_vector_x(dir) * BULLET_SPEED, get_vector_y(dir) * BULLET_SPEED);
+      newPos = set_floatpoint(get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) + get_vector_x(dir), get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) + get_vector_y(dir));
+      hitbox.x = (int)floor(get_floatpoint_x(newPos));
+      hitbox.y = (int)floor(get_floatpoint_y(newPos));
+      hitbox.w = BULLET_WIDTH;
+      hitbox.h = BULLET_HEIGHT;
+      p = set_projectile(newPos, get_projectile_direction(projectile_list_head(projectiles)), bulletType, hitbox, get_projectile_sprite_pos(projectile_list_head(projectiles)));
+      break;
+
+    default:
+      break;
+
+  }
+
+  return projectile_list_build(p, update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, mouse_pos, playerShooting));
 }
 
 //check the collision between the projectile and the enemies
@@ -106,7 +176,7 @@ character_list_t bullet_collision (character_list_t enemies, projectile_t p, boo
 }
 
 //update the positions and hitbox
-void update_character (character_t *p, character_list_t *enemies, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], bool *quit) {
+void update_character (character_t *p, character_list_t *enemies, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], intpoint_t mouse_pos, bool *quit) {
 
   if (!is_alive(*p)) {
     *quit = true;
@@ -135,7 +205,7 @@ void update_character (character_t *p, character_list_t *enemies, block_t blocks
 
   set_character_hitbox(p, temp);
 
-  p->projectiles = update_projectiles(p->projectiles, blocks, p, *enemies, true);
+  p->projectiles = update_projectiles(p->projectiles, blocks, p, *enemies, mouse_pos, true);
 
   *enemies = update_enemies(*enemies, p, blocks);
 
@@ -162,10 +232,10 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
   }
 
   if (SDL_GetTicks() > e.shootDelay + ENEMY_SHOOT_DELAY) {
-    shooting(true, &e, set_intpoint(get_character_screen_position(*p).x + (IMG_WIDTH / 2), get_character_screen_position(*p).y + (IMG_HEIGHT / 2)));
+    //shooting(true, &e, set_intpoint(get_character_screen_position(*p).x + (IMG_WIDTH / 2), get_character_screen_position(*p).y + (IMG_HEIGHT / 2)));
     e.shootDelay = SDL_GetTicks();
   }
-  e.projectiles = update_projectiles(e.projectiles, blocks, p, c, false);
+  e.projectiles = update_projectiles(e.projectiles, blocks, p, c, p->screenPos, false);
 
   character_update_dir(&e, set_intpoint(get_character_screen_position(*p).x + (IMG_WIDTH / 2), get_character_screen_position(*p).y + (IMG_HEIGHT / 2)));
 
@@ -329,6 +399,7 @@ character_t set_character (short int hp, floatpoint_t position, vector_t velocit
   set_character_type(&p, type);
   set_character_on_ground(&p, false);
   set_character_state(&p, Walking);
+  set_character_weapon(&p, Rifle);
 
   set_character_step_delay(&p, 0);
   set_character_shoot_delay(&p, 0);
@@ -379,6 +450,12 @@ void set_character_on_ground (character_t *p, bool onGround) {
 //set the character's state
 void set_character_state (character_t *p, short int state) {
   p->state = state;
+  return;
+}
+
+//set the weapon
+void set_character_weapon (character_t *p, short int weapon) {
+  p->weapon = weapon;
   return;
 }
 
@@ -470,6 +547,11 @@ bool get_character_on_ground (character_t p) {
 //get the character's state
 short int get_character_state (character_t p) {
   return p.state;
+}
+
+//get the weapon
+short int get_character_weapon (character_t p) {
+  return p.weapon;
 }
 
 //get the character's step delay

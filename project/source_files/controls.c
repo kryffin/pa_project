@@ -92,6 +92,7 @@ void keyboard_control (game_t *game) {
     if (!level_list_is_empty(level_list_rest(game->currLevel))) {
       game->currLevel = level_list_rest(game->currLevel);
     }
+    set_character_weapon(&game->player, Bazooka);
   }
 
   /* KEYUP Controls */

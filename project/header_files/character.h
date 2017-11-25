@@ -61,6 +61,12 @@ enum CharacterType {
   Boss
 };
 
+enum Weapon {
+  Rifle,
+  Shotgun,
+  Bazooka
+};
+
 typedef struct Character {
   short int hp; //health points
   short int dir; //direction
@@ -68,6 +74,7 @@ typedef struct Character {
   short int type; //type
   bool onGround; //is the character on a ground?
   short int state; //curent state
+  short int weapon; //weapon currently in use
 
   int stepDelay; //used to delay between each step of the walking animation
   int shootDelay; //used to delay between each shot
@@ -101,7 +108,7 @@ void shooting (bool mouse_btn, character_t *p, intpoint_t target);
 void character_update_grid_pos (character_t *character);
 
 //update a list of projectiles
-projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], character_t *player, character_list_t enemies, bool playerShooting);
+projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], character_t *player, character_list_t enemies, intpoint_t mouse_pos, bool playerShooting);
 
 //check the collision between the projectile and the enemies
 character_list_t bullet_collision (character_list_t enemies, projectile_t p, bool *destroy);
@@ -113,7 +120,7 @@ void character_jumping (character_t *p);
 void character_gravity(character_t *p);
 
 //update the positions and hitbox
-void update_character (character_t *p, character_list_t *enemies, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], bool *quit);
+void update_character (character_t *p, character_list_t *enemies, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], intpoint_t mouse_pos, bool *quit);
 
 //update the enemies' shots and directions
 character_list_t update_enemies (character_list_t c, character_t *p, block_t [NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]);
@@ -173,6 +180,9 @@ void set_character_on_ground (character_t *p, bool onGround);
 //set the character's state
 void set_character_state (character_t *p, short int state);
 
+//set the weapon
+void set_character_weapon (character_t *p, short int weapon);
+
 //set the delay of the step
 void set_character_step_delay (character_t *p, int stepDelay);
 
@@ -219,6 +229,9 @@ bool get_character_on_ground (character_t p);
 
 //get the character's state
 short int get_character_state (character_t p);
+
+//get the weapon
+short int get_character_weapon (character_t p);
 
 //get the character's step delay
 int get_character_step_delay (character_t p);

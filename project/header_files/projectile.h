@@ -31,9 +31,17 @@
 /* STRUCTURES */
 /**************/
 
+enum BulletType {
+  Bullet,
+  Buckshot,
+  Missile
+};
+
 typedef struct Projectile {
   floatpoint_t realPos; //real position
   intpoint_t screenPos; //screen position
+
+  short int bulletType; //used to update the projectile
 
   vector_t dir; //direction
   SDL_Rect hitbox; //hitbox
@@ -76,7 +84,7 @@ void projectile_list_free (projectile_list_t p);
 /* SET */
 
 //create a new projectile
-projectile_t set_projectile (floatpoint_t pos, vector_t dir, SDL_Rect hitbox, SDL_Rect spritePos);
+projectile_t set_projectile (floatpoint_t pos, vector_t dir, short int bulletType, SDL_Rect hitbox, SDL_Rect spritePos);
 
 //set the screen position
 void set_projectile_screen_position (projectile_t *p, int x, int y);
@@ -86,6 +94,9 @@ void set_projectile_real_position (projectile_t *p, floatpoint_t pos);
 
 //set the direction
 void set_projectile_direction (projectile_t *p, vector_t dir);
+
+//set the type
+void set_projectile_bullet_type(projectile_t *p, short int bulletType);
 
 //set the hitbox
 void set_projectile_hitbox (projectile_t *p, SDL_Rect hitbox);
@@ -103,6 +114,9 @@ intpoint_t get_projectile_screen_position (projectile_t p);
 
 //get the direction
 vector_t get_projectile_direction (projectile_t p);
+
+//get the type
+short int get_projectile_bullet_type (projectile_t p);
 
 //get the hitbox
 SDL_Rect get_projectile_hitbox (projectile_t p);

@@ -65,8 +65,8 @@ int main () {
     /* updates */
 
     //player
-    update_character(&g->player, &g->enemies, g->currLevel->head.blocks, &g->quit);
-    g->player.projectiles = update_projectiles(g->player.projectiles, g->currLevel->head.blocks, &g->player, g->enemies, true);
+    update_character(&g->player, &g->enemies, g->currLevel->head.blocks, g->mouse_pos, &g->quit);
+    //g->player.projectiles = update_projectiles(g->player.projectiles, g->currLevel->head.blocks, &g->player, g->enemies, true);
     character_update_grid_pos(&g->player);
     character_update_dir(&g->player, g->mouse_pos);
 
