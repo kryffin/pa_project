@@ -27,8 +27,18 @@
 #define PATH_FONT "./res/font.ttf"
 #define PATH_CURSOR "./res/cursor.png"
 #define PATH_BLOCKS_SHEET "./res/blocks_spritesheet.png"
-#define PATH_BACKGROUND "./res/background.bmp"
-#define PATH_TXT_FILE "./res/arena.txt"
+
+#define PATH_BACKGROUND "./res/menubackground.jpg"
+#define PATH_BACKGROUND_LEVEL_1 "./res/background1.jpg"
+#define PATH_BACKGROUND_LEVEL_2 "./res/background2.png"
+#define PATH_BACKGROUND_LEVEL_3 "./res/background3.jpg"
+#define PATH_BACKGROUND_ARENA "./res/arenabackground.jpg"
+
+#define PATH_TXT_LEVEL_1 "./res/level1.txt"
+#define PATH_TXT_LEVEL_2 "./res/level2.txt"
+#define PATH_TXT_LEVEL_3 "./res/level3.txt"
+#define PATH_TXT_ARENA "./res/arena.txt"
+
 #define PATH_YOU_DIED "./res/you_died.png"
 
 #define IMG_WIDTH 32
@@ -37,6 +47,9 @@
 /*************/
 /* FUNCTIONS */
 /*************/
+
+//manages the menu
+void menu (game_t *g);
 
 //function returning the state of the mouse
 int menu_controls(game_t *game);

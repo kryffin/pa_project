@@ -6,6 +6,30 @@ menu.c : contain the menu loop and the displays
 
 #include "../header_files/menu.h"
 
+//manages the menu
+void menu (game_t *g) {
+  int menuOption = render_menu(g);
+  switch (menuOption) {
+
+    case 1:
+      g->currLevel = level_list_build(init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND_LEVEL_1, "./res/level1.txt", &g->player, &g->enemies, g->renderer), level_list_build( init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND_LEVEL_2, "./res/level2.txt", &g->player, &g->enemies, g->renderer), level_list_build( init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND_LEVEL_3, "./res/level3.txt", &g->player, &g->enemies, g->renderer), level_list_empty())));
+      break;
+
+    case 2:
+      g->currLevel = level_list_build(init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND_ARENA, "./res/arena.txt", &g->player, &g->enemies, g->renderer), level_list_empty());
+      break;
+
+    case 3:
+      g->quit = true;
+      break;
+
+    default:
+      break;
+  }
+
+  return;
+}
+
 //function returning the state of the mouse :
 /* 0 : no motion
    1 : button down
@@ -81,6 +105,10 @@ int main_menu_display (game_t *game) {
   SDL_Texture *background;
 
   temp = IMG_Load(PATH_BACKGROUND);
+  if (temp == NULL) {
+    printf("Error loading the menu backgroun : %s\n", IMG_GetError());
+    exit(1);
+  }
   background = SDL_CreateTextureFromSurface(game->renderer, temp);
   SDL_FreeSurface(temp);
 

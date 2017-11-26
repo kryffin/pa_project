@@ -22,8 +22,6 @@
 #define PATH_FONT "./res/font.ttf"
 #define PATH_CURSOR "./res/cursor.png"
 #define PATH_SPRITES "./res/spritesheet.png"
-#define PATH_BLOCKS_SHEET "./res/blocks_spritesheet.png"
-#define PATH_BACKGROUND "./res/background.bmp"
 #define SCREEN_FPS 30
 #define FONT_SIZE 15
 
@@ -32,6 +30,8 @@
 #define BULLET_WIDTH 16
 #define BULLET_HEIGHT 16
 #define NB_MAX_KEYS 8
+
+#define PLAYER_BASE_HP 10
 
 /**************/
 /* STRUCTURES */
@@ -71,6 +71,12 @@ typedef struct Game {
 
 //create a new game
 game_t *create_game ();
+
+//reset the player and enemies of the game
+void reset_game(game_t *game);
+
+//reset the keys
+void reset_keys (game_t *game);
 
 //initialize the palatte of colors
 void init_palette2 (game_t *game);

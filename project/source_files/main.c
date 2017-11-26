@@ -21,25 +21,7 @@ int main () {
   g->currLevel = level_list_empty();
 
   //main menu
-  int menuOption = render_menu(g);
-  switch (menuOption) {
-
-    case 1:
-      g->currLevel = level_list_build(init_level(PATH_BLOCKS_SHEET, "./res/background1.jpg", "./res/level1.txt", &g->player, &g->enemies, g->renderer), level_list_build( init_level(PATH_BLOCKS_SHEET, "./res/background2.png", "./res/level2.txt", &g->player, &g->enemies, g->renderer), level_list_build( init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND, "./res/level3.txt", &g->player, &g->enemies, g->renderer), level_list_empty())));
-      break;
-
-    case 2:
-      g->currLevel = level_list_build(init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND, "./res/arena.txt", &g->player, &g->enemies, g->renderer), level_list_empty());
-      break;
-
-    case 3:
-      g->quit = true;
-      break;
-
-    default:
-      break;
-  }
-
+  menu(g);
 
   while (!(g->quit)) {
 
@@ -81,7 +63,9 @@ int main () {
 
     //game over screen
     if (!is_alive(g->player)) {
-      game_over(g->renderer);
+      game_over(*g);
+      reset_game(g);
+      menu(g);
     }
 
     /* fps */

@@ -8,6 +8,12 @@
 #include "game.h"
 
 /*************/
+/* CONSTANTS */
+/*************/
+
+#define PATH_YOU_DIED "./res/you_died.png"
+
+/*************/
 /* FUNCTIONS */
 /*************/
 
@@ -18,7 +24,7 @@ void character_melee (character_t p, SDL_Renderer *renderer, SDL_Texture *img);
 void render_cursor (game_t game);
 
 //render the death screen
-void game_over (SDL_Renderer *renderer);
+void game_over (game_t g);
 
 //render the foreground level
 void render_foreground_level (game_t game);

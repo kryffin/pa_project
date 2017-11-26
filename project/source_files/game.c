@@ -80,7 +80,7 @@ game_t *create_game () {
   floatpoint_t basePosition = set_floatpoint(0.0, 0.0);
   vector_t baseVelocity = set_vector(0.0, 0.0);
   SDL_Rect desRec = {0, 0, IMG_WIDTH, IMG_HEIGHT};
-  g->player = set_character(50, basePosition, baseVelocity, desRec, desRec, Player);
+  g->player = set_character(PLAYER_BASE_HP, basePosition, baseVelocity, desRec, desRec, Player);
 
   g->enemies = character_list_empty();
 
@@ -96,7 +96,30 @@ game_t *create_game () {
 
   g->quit = false;
 
+  reset_keys(g);
+
   return g;
+}
+
+//reset the player and enemies of the game
+void reset_game(game_t *game) {
+  floatpoint_t basePosition = set_floatpoint(0.0, 0.0);
+  vector_t baseVelocity = set_vector(0.0, 0.0);
+  SDL_Rect desRec = {0, 0, IMG_WIDTH, IMG_HEIGHT};
+  game->player = set_character(50, basePosition, baseVelocity, desRec, desRec, Player);
+  game->enemies = character_list_empty();
+
+  reset_keys(game);
+
+  return;
+}
+
+//reset the keys
+void reset_keys (game_t *game) {
+  int i = 0;
+  for (i = 0; i < NB_MAX_KEYS; i++) {
+    game->keys[i] = false;
+  }
 }
 
 //initialize the palatte of colors

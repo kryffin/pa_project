@@ -16,14 +16,6 @@
 /* CONSTANTS */
 /*************/
 
-#define PATH_SPRITES "./res/spritesheet.png"
-#define PATH_FONT "./res/font.ttf"
-#define PATH_CURSOR "./res/cursor.png"
-#define PATH_BLOCKS_SHEET "./res/blocks_spritesheet.png"
-#define PATH_BACKGROUND "./res/background.bmp"
-#define PATH_TXT_FILE "./res/arena.txt"
-#define PATH_YOU_DIED "./res/you_died.png"
-
 #define NB_BLOCKS_WIDTH 40
 #define NB_BLOCKS_HEIGHT 30
 

@@ -84,7 +84,7 @@ void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos) {
 //update the grid position
 void character_update_grid_pos (character_t *character) {
   character->gridPos.x = (int)floor((get_floatpoint_x(get_character_real_position(*character)) + (IMG_WIDTH / 2)) / 16);
-  character->gridPos.y = (int)floor((get_floatpoint_y(get_character_real_position(*character)) + (IMG_HEIGHT / 2)) / 16);
+  character->gridPos.y = (int)floor((get_floatpoint_y(get_character_real_position(*character))) / 16);
 
   return;
 }
@@ -114,7 +114,7 @@ projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blo
   if (!playerShooting) {
     //ennemy shooting
     if (get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) >= player->hitbox.x && get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles) ))<= player->hitbox.x + player->hitbox.w && get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) >= player->hitbox.y && get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) <= player->hitbox.y + player->hitbox.h) {
-      //player->hp -= 1;
+      player->hp -= 1;
       return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, mouse_pos, playerShooting);
     }
   } else {
@@ -190,11 +190,6 @@ character_list_t bullet_collision (character_list_t enemies, projectile_t p, boo
 //update the positions and hitbox
 void update_character (character_t *p, character_list_t *enemies, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], intpoint_t mouse_pos, bool *quit) {
 
-  if (!is_alive(*p)) {
-    *quit = true;
-    return;
-  }
-
   set_character_screen_position(p, (int)floor(get_character_real_position(*p).x), (int)floor(get_character_real_position(*p).y));
 
   SDL_Rect temp;
@@ -236,7 +231,7 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
   e.projectiles = character_list_head(c).projectiles;
 
   if (SDL_GetTicks() > e.shootDelay + ENEMY_SHOOT_DELAY) {
-    //shooting(true, &e, set_intpoint(get_character_screen_position(*p).x + (IMG_WIDTH / 2), get_character_screen_position(*p).y + (IMG_HEIGHT / 2)));
+    shooting(true, &e, set_intpoint(get_character_screen_position(*p).x + (IMG_WIDTH / 2), get_character_screen_position(*p).y + (IMG_HEIGHT / 2)));
     e.shootDelay = SDL_GetTicks();
   }
   e.projectiles = update_projectiles(e.projectiles, blocks, p, c, p->screenPos, false);
@@ -279,24 +274,22 @@ void character_update_dir (character_t *p, intpoint_t target) {
 //apply the velocity on the character if possible
 void character_apply_velocity (character_t *p, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
 
-  if (p->gridPos.y == NB_BLOCKS_HEIGHT - 4 || blocks[p->gridPos.x][p->gridPos.y + 4].type == 0 || blocks[p->gridPos.x + 1][p->gridPos.y + 4].type == 0) {
+  if (p->gridPos.y + 4 >= NB_BLOCKS_HEIGHT || get_block_type(blocks[p->gridPos.x][p->gridPos.y + 4]) == Solid) {
     p->onGround = true;
-  } else {
-    p->onGround = false;
+    p->realPos.y = p->gridPos.y * 16;
   }
 
   if (!p->onGround) {
     p->vel.x *= AIR_ACCELERATION;
   }
 
-
   if (p->vel.x < 0.0) {
     if (p->gridPos.x != 0 && (blocks[p->gridPos.x - 1][p->gridPos.y].type != 0 && blocks[p->gridPos.x - 1][p->gridPos.y + 1].type != 0 && blocks[p->gridPos.x - 1][p->gridPos.y + 2].type != 0 && blocks[p->gridPos.x - 1][p->gridPos.y + 3].type != 0)) {
       p->realPos.x += p->vel.x;
     }
   }
-  if (p->vel.x > 0.0 && (blocks[p->gridPos.x + 1][p->gridPos.y].type != 0 && blocks[p->gridPos.x + 1][p->gridPos.y + 1].type != 0 && blocks[p->gridPos.x + 1][p->gridPos.y + 2].type != 0 && blocks[p->gridPos.x + 1][p->gridPos.y + 3].type != 0)) {
-    if (p->gridPos.x != NB_BLOCKS_WIDTH - 1) {
+  if (p->vel.x > 0.0) {
+    if (p->gridPos.x != NB_BLOCKS_WIDTH - 1 && (blocks[p->gridPos.x + 1][p->gridPos.y].type != 0 && blocks[p->gridPos.x + 1][p->gridPos.y + 1].type != 0 && blocks[p->gridPos.x + 1][p->gridPos.y + 2].type != 0 && blocks[p->gridPos.x + 1][p->gridPos.y + 3].type != 0)) {
       p->realPos.x += p->vel.x;
     }
   }
@@ -305,13 +298,14 @@ void character_apply_velocity (character_t *p, block_t blocks[NB_BLOCKS_WIDTH][N
     p->vel.y = 4.0;
   }
 
-  if (p->vel.y < 0.0 && blocks[p->gridPos.x][p->gridPos.y - 1].type != 0) {
-    if (p->gridPos.y != 0) {
+  if (p->vel.y < 0.0) {
+    if (p->gridPos.y != 0 && blocks[p->gridPos.x][p->gridPos.y - 1].type != 0) {
       p->realPos.y += p->vel.y;
     }
   }
-  if (p->vel.y > 0.0 && blocks[p->gridPos.x][p->gridPos.y + 4].type != 0) {
-    if (p->gridPos.y != NB_BLOCKS_HEIGHT - 4) {
+
+  if (p->vel.y > 0.0) {
+    if (p->gridPos.y != NB_BLOCKS_HEIGHT - 4 && blocks[p->gridPos.x][p->gridPos.y + 4].type != 0) {
       p->realPos.y += p->vel.y;
     }
   }

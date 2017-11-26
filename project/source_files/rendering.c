@@ -57,19 +57,55 @@ void render_cursor (game_t game) {
 }
 
 //render the death screen
-void game_over (SDL_Renderer *renderer) {
+void game_over (game_t g) {
   SDL_Surface *temp;
-  SDL_Texture *panel;
+  SDL_Texture *panel, *background, *img;
+  SDL_Rect tempSpritePos = {128, 128, IMG_WIDTH, IMG_HEIGHT}, spritePos = get_character_hitbox(g.player);
 
   temp = IMG_Load(PATH_YOU_DIED);
-  panel = SDL_CreateTextureFromSurface(renderer, temp);
+  panel = SDL_CreateTextureFromSurface(g.renderer, temp);
   SDL_FreeSurface(temp);
 
-  SDL_RenderCopy(renderer, panel, NULL, NULL);
+  background = g.currLevel->head.background;
+  img = g.spriteSheet;
 
-  SDL_RenderPresent(renderer);
+  int currTime = SDL_GetTicks();
 
-  SDL_Delay(1000);
+  /* fade in */
+  
+  int opacity = 0;
+  for (opacity = 0; opacity <= 240; opacity += 20) {
+    printf("opacity : %d\n", opacity);
+    SDL_RenderCopy(g.renderer, background, NULL, NULL);
+    SDL_RenderCopy(g.renderer, img, &tempSpritePos, &spritePos);
+    SDL_SetTextureAlphaMod(panel, (Uint8)opacity);
+    SDL_RenderCopy(g.renderer, panel, NULL, NULL);
+    SDL_RenderPresent(g.renderer);
+    currTime = SDL_GetTicks();
+    while (SDL_GetTicks() < currTime + 50);
+  }
+
+  /* stand by */
+
+  currTime = SDL_GetTicks();
+  while (SDL_GetTicks() < currTime + 1500);
+
+  /* fade out */
+
+  for (opacity = 240; opacity >= 0; opacity -= 20) {
+    SDL_RenderCopy(g.renderer, background, NULL, NULL);
+    SDL_RenderCopy(g.renderer, img, &tempSpritePos, &spritePos);
+    SDL_SetTextureAlphaMod(panel, (Uint8)opacity);
+    SDL_RenderCopy(g.renderer, panel, NULL, NULL);
+    SDL_RenderPresent(g.renderer);
+    currTime = SDL_GetTicks();
+    while (SDL_GetTicks() < currTime + 50);
+  }
+
+  printf("fin\n");
+
+  SDL_DestroyTexture(panel);
+
   return;
 }
 
@@ -360,7 +396,9 @@ void rendering (game_t *game) {
   }
 
   //render the character_t
-  render_character(game->player, game->renderer, game->spriteSheet);
+  if (is_alive(game->player)) {
+    render_character(game->player, game->renderer, game->spriteSheet);
+  }
   render_projectiles(game->player.projectiles, game->renderer, game->spriteSheet);
 
   //render the attack and process it
@@ -375,26 +413,15 @@ void rendering (game_t *game) {
   render_cursor(*game);
 
   //DEBUG
-  /*SDL_Rect tempRect = {game->player.xGrid * 16, game->player.yGrid * 16, 16, 16};
+  SDL_Rect tempRect = {game->player.gridPos.x * 16, game->player.gridPos.y * 16, 16, 16};
 
   SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x+=16;
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x-=16;
   tempRect.y+=16;
   SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x+=16;
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x-=16;
   tempRect.y+=16;
   SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x+=16;
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x-=16;
   tempRect.y+=16;
   SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
-  tempRect.x+=16;
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);*/
 
   SDL_RenderPresent(game->renderer);
 
