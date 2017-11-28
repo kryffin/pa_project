@@ -179,32 +179,67 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
 
   set_character_hitbox(&e, temp);
 
-  if (SDL_GetTicks() > e.shootDelay + ENEMY_SHOOT_DELAY) {
-    shooting(false, &e, set_intpoint(get_character_screen_position(*p).x + (IMG_WIDTH / 2), get_character_screen_position(*p).y + (IMG_HEIGHT / 2)));
-    e.shootDelay = SDL_GetTicks();
-
-  }
-
-  if (SDL_GetTicks() > e.changeVelDelay + 5000) {
-    int velX = SDL_GetTicks()%character_list_size(c);
-    velX %= 5;
-    velX = (SDL_GetTicks()%2 == 0)? -velX : velX;
-    if (e.gridPos.x == 0 && velX <0){
-      velX = -velX;
-    }
-    set_character_velocity(&e, velX, get_character_velocity(*p).y);
-    e.changeVelDelay = SDL_GetTicks();
-  }
+  character_behaviour (&e, character_list_size(c), get_character_screen_position(*p).x, get_character_screen_position(*p).y);
+  //printf("velX:%2.f\n", e.vel.x);
   e.projectiles = update_projectiles(e.projectiles, blocks, p, c, false);
 
   character_update_dir(&e, set_intpoint(get_character_screen_position(*p).x + (IMG_WIDTH / 2), get_character_screen_position(*p).y + (IMG_HEIGHT / 2)));
 
-  //set_character_on_ground(&e, true);
+
   character_update_grid_pos (&e);
   character_apply_velocity (&e, blocks);
   character_gravity(&e);
 
   return character_list_build(e, update_enemies(character_list_rest(c), p, blocks));
+}
+
+//embryon of IA
+void character_behaviour(character_t *e, int taille, int x, int y){
+  int rdm;
+  rdm = SDL_GetTicks() + taille;
+  rdm %= 3;
+  switch (rdm){
+    //moving on x axis
+  case 0:
+    if (SDL_GetTicks() > e->changeVelDelay + 1500) {
+      int velX;
+      velX = (SDL_GetTicks()%x); //cause 27 is a prime number and i like it
+      velX %= 5;
+      velX = (SDL_GetTicks()%2 == 0)? -velX : velX;
+      if (velX > 5){
+        velX = 5;
+      }
+      if (velX < -5){
+        velX = -5;
+      }
+      //velX = 5;
+      set_character_velocity(e, velX, 0);
+      e->changeVelDelay = SDL_GetTicks();
+    }
+    break;
+    //jumping
+  case 1:
+    if (SDL_GetTicks() > e->changeVelDelay + 1500){
+      character_jumping(e);
+    }
+    break;
+    //shooting
+  case 2:
+    if (SDL_GetTicks() > e->shootDelay + ENEMY_SHOOT_DELAY) {
+      if (taille%2 == 0){
+        shooting(true, e, set_intpoint(x + (IMG_WIDTH / 2), y + (IMG_HEIGHT / 2)));
+        e->shootDelay = SDL_GetTicks();
+      } else {
+        shooting(false, e, set_intpoint(x + (IMG_WIDTH / 2), y + (IMG_HEIGHT / 2)));
+        e->shootDelay = SDL_GetTicks();
+      }
+    }
+    break;
+
+  case 3:
+    shooting(false, e, set_intpoint(x + (IMG_WIDTH / 2), y + (IMG_HEIGHT / 2)));
+    break;
+  }
 }
 
 //update the step used for the walking animation
@@ -225,6 +260,7 @@ void character_update_step (character_t *p) {
   return;
 
 }
+
 
 //update the character direction to look towards the target
 void character_update_dir (character_t *p, intpoint_t target) {
@@ -249,7 +285,7 @@ void character_apply_velocity (character_t *p, block_t blocks[NB_BLOCKS_WIDTH][N
   }
 
   if (!p->onGround) {
-    p->vel.x *= AIR_ACCELERATION;
+    //p->vel.x *= AIR_ACCELERATION;
   }
 
 
@@ -285,10 +321,8 @@ void character_apply_velocity (character_t *p, block_t blocks[NB_BLOCKS_WIDTH][N
 void character_apply_velocity_ennemies (character_list_t *enemies, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], Uint32 time) {
     if(!character_list_is_empty(*enemies)){
       if(is_alive(character_list_head(*enemies))){
-        character_t tmp = character_list_head(*enemies);
+        //character_t tmp = character_list_head(*enemies);
         character_list_t tmpRest = character_list_rest(*enemies);
-
-        //set_character_velocity(&tmp, velX, 0);
         character_apply_velocity_ennemies(&tmpRest, blocks, SDL_GetTicks());
 
       } else {

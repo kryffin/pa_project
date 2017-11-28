@@ -64,10 +64,10 @@ int main () {
     character_apply_velocity(&g->player, g->currLevel->head.blocks);
 
     //enemies
-    character_apply_velocity_ennemies(&g->enemies, g->currLevel->head.blocks, SDL_GetTicks());
+    //character_apply_velocity_ennemies(&g->enemies, g->currLevel->head.blocks, SDL_GetTicks());
 
     /* updates */
-    //printf("size ennemies : %d\n", character_list_size(g->enemies));
+    printf("size ennemies : %d\n", character_list_size(g->enemies));
 
     //player
     update_character(&g->player, &g->enemies, g->currLevel->head.blocks, &g->quit);

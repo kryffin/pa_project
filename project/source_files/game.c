@@ -6,6 +6,7 @@ game.c : contain every functions for the game creation
 
 #include "../header_files/game.h"
 
+#define BASE_HP 10000
 //create a new game
 game_t *create_game () {
   SDL_Surface *temp;
@@ -80,7 +81,7 @@ game_t *create_game () {
   floatpoint_t basePosition = set_floatpoint(0.0, 0.0);
   vector_t baseVelocity = set_vector(0.0, 0.0);
   SDL_Rect desRec = {0, 0, IMG_WIDTH, IMG_HEIGHT};
-  g->player = set_character(50, basePosition, baseVelocity, desRec, desRec, Player);
+  g->player = set_character(BASE_HP, basePosition, baseVelocity, desRec, desRec, Player);
 
   g->enemies = character_list_empty();
 
