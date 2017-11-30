@@ -9,6 +9,7 @@
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include <math.h>
+
 #include "2dpoint.h"
 #include "vector.h"
 #include "blocks.h"

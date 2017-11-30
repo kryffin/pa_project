@@ -195,24 +195,28 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
 
 //embryon of IA
 void character_behaviour(character_t *e, int taille, int x, int y){
-  int rdm;
-  rdm = SDL_GetTicks() + taille;
+
+  //initialisation of a random number:
+  srand(SDL_GetTicks());
+  int rdm = rand();
+  printf("%d\n", rdm);
+  rdm *= taille;
   rdm %= 3;
+  //printf("___%d\n*****", rdm);
   switch (rdm){
+  case -2:
+      //set_character_velocity(e, 5, 0);
+      break;
+  case -1:
+      //set_character_velocity(e, -5, 0);
+      break;
     //moving on x axis
   case 0:
     if (SDL_GetTicks() > e->changeVelDelay + 1500) {
       int velX;
-      velX = (SDL_GetTicks()%x); //cause 27 is a prime number and i like it
+      velX = (SDL_GetTicks()%taille); //cause 27 is a prime number and i like it
       velX %= 5;
       velX = (SDL_GetTicks()%2 == 0)? -velX : velX;
-      if (velX > 5){
-        velX = 5;
-      }
-      if (velX < -5){
-        velX = -5;
-      }
-      //velX = 5;
       set_character_velocity(e, velX, 0);
       e->changeVelDelay = SDL_GetTicks();
     }
@@ -226,13 +230,8 @@ void character_behaviour(character_t *e, int taille, int x, int y){
     //shooting
   case 2:
     if (SDL_GetTicks() > e->shootDelay + ENEMY_SHOOT_DELAY) {
-      if (taille%2 == 0){
         shooting(true, e, set_intpoint(x + (IMG_WIDTH / 2), y + (IMG_HEIGHT / 2)));
         e->shootDelay = SDL_GetTicks();
-      } else {
-        shooting(false, e, set_intpoint(x + (IMG_WIDTH / 2), y + (IMG_HEIGHT / 2)));
-        e->shootDelay = SDL_GetTicks();
-      }
     }
     break;
 
