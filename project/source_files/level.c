@@ -59,6 +59,8 @@ level_t init_level (char *path_blocks, char *path_background, char *path_file, c
   SDL_Rect cHitbox = {0, 0, IMG_WIDTH, IMG_HEIGHT};
   SDL_Rect cSpritePos = {0, 0, IMG_WIDTH, IMG_HEIGHT};
 
+  //reseting the ennemies
+  *enemies = character_list_empty();
   /* reading */
 
   //x is the column and y the line
