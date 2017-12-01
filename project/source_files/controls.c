@@ -102,6 +102,7 @@ void keyboard_control (game_t *game) {
   if (game->keys[KeyQ] == true) {
     if(get_character_state(game->player) != Crouching) {
       set_character_velocity(&game->player, -1 * CHARACTER_SPEED, game->player.vel.y); //set a left velocity
+      //set_character_velocity(&game->enemies->head, -1 * CHARACTER_SPEED, game->enemies->head.vel.y); //set a left velocity
     }
   }
 
@@ -109,6 +110,7 @@ void keyboard_control (game_t *game) {
   if (game->keys[KeyD] == true) {
     if(get_character_state(game->player) != Crouching) {
       set_character_velocity(&game->player, 1 * CHARACTER_SPEED, game->player.vel.y); //set a left velocity
+      //set_character_velocity(&game->enemies->head, 1 * CHARACTER_SPEED, game->enemies->head.vel.y); //set a left velocity
     }
   }
 
@@ -161,6 +163,7 @@ void keyboard_control (game_t *game) {
   if (game->keys[KeyQ] == false) {
     if (get_character_velocity(game->player).x < 0) {
       set_character_velocity(&game->player, 0, game->player.vel.y);
+      //set_character_velocity(&game->enemies->head, -1 * CHARACTER_SPEED, game->enemies->head.vel.y); //set a left velocity
     }
   }
 
@@ -168,6 +171,7 @@ void keyboard_control (game_t *game) {
   if (game->keys[KeyD] == false) {
     if (get_character_velocity(game->player).x > 0) {
       set_character_velocity(&game->player, 0, game->player.vel.y);
+      //set_character_velocity(&game->enemies->head, 1 * CHARACTER_SPEED, game->enemies->head.vel.y); //set a left velocity
     }
   }
 

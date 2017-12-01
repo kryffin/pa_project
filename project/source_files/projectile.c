@@ -21,7 +21,7 @@ projectile_list_t projectile_list_build (projectile_t p, projectile_list_t pl) {
 projectile_t projectile_list_head (projectile_list_t p) {
   if (projectile_list_is_empty(p)) {
     printf("Reading head of an empty projectile list!");
-    exit(0);
+    exit(1);
   }
   return p->head;
 }
@@ -54,26 +54,19 @@ void projectile_list_free (projectile_list_t p) {
 /* SET */
 
 //create a new projectile
-projectile_t set_projectile (floatpoint_t pos, vector_t dir, short int bulletType, SDL_Rect hitbox, SDL_Rect spritePos) {
+projectile_t set_projectile (floatpoint_t pos, vector_t dir, short int bulletType, SDL_Rect spritePos) {
 
   projectile_t p;
 
   set_projectile_real_position(&p, pos);
-  set_projectile_screen_position(&p, floor(get_floatpoint_x(pos)), floor(get_floatpoint_y(pos)));
   set_projectile_direction(&p, dir);
   set_projectile_bullet_type(&p, bulletType);
+  SDL_Rect hitbox = {(int)floor(get_floatpoint_x(pos)), (int)floor(get_floatpoint_y(pos)), BULLET_WIDTH, BULLET_HEIGHT};
   set_projectile_hitbox(&p, hitbox);
   set_projectile_sprite_pos(&p, spritePos);
 
   return p;
 
-}
-
-//set the screen position
-void set_projectile_screen_position (projectile_t *p, int x, int y) {
-  p->screenPos.x = x;
-  p->screenPos.y = y;
-  return;
 }
 
 //set the real position
@@ -119,11 +112,6 @@ void set_projectile_sprite_pos (projectile_t *p, SDL_Rect spritePos) {
 //get the real position
 floatpoint_t get_projectile_real_position (projectile_t p) {
   return p.realPos;
-}
-
-//get the screen position
-intpoint_t get_projectile_screen_position (projectile_t p) {
-  return p.screenPos;
 }
 
 //get the direction

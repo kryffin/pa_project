@@ -80,14 +80,13 @@ typedef struct Character {
   int shootDelay; //used to delay between each shot
 
   floatpoint_t realPos; //real position
-  intpoint_t screenPos; //screen position
+  SDL_Rect hitbox; //hitbox
   intpoint_t gridPos; //position on the level grid
 
   projectile_list_t projectiles; //list of projectiles
 
   vector_t vel; //velocity
   SDL_Rect spritePos; //position of the sprite in the sprite sheet
-  SDL_Rect hitbox; //hitbox
 
 } character_t;
 
@@ -160,7 +159,7 @@ void character_list_free (character_list_t p);
 /* SET */
 
 //create a new character
-character_t set_character (short int hp, floatpoint_t position, vector_t velocity, SDL_Rect posSprite, SDL_Rect hitbox, short int type);
+character_t set_character (short int hp, floatpoint_t position, vector_t velocity, SDL_Rect posSprite, short int type);
 
 //set the character's health points
 void set_character_hp (character_t *p, short int hp);
@@ -191,9 +190,6 @@ void set_character_shoot_delay (character_t *p, int shootDelay);
 
 //set the character's real position
 void set_character_real_position (character_t *p, float x, float y);
-
-//set the character's screen position
-void set_character_screen_position (character_t *p, int x, int y);
 
 //set the character's grid position
 void set_character_grid_position (character_t *p, int x, int y);
@@ -241,9 +237,6 @@ int get_character_shoot_delay (character_t p);
 
 //get the character's real position
 floatpoint_t get_character_real_position (character_t p);
-
-//get the character's position
-intpoint_t get_character_screen_position (character_t p);
 
 //get the character's grid position
 intpoint_t get_character_grid_position (character_t p);

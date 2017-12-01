@@ -11,8 +11,8 @@ void render_melee (character_t p, SDL_Renderer *renderer, SDL_Texture *img) {
 
   SDL_Rect *target = NULL;
   target = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  target->x = get_character_screen_position(p).x;
-  target->y = get_character_screen_position(p).y;
+  target->x = get_character_hitbox(p).x;
+  target->y = get_character_hitbox(p).y;
   target->w = get_character_hitbox(p).w;
   target->h = get_character_hitbox(p).h;
 
@@ -72,10 +72,9 @@ void game_over (game_t g) {
   int currTime = SDL_GetTicks();
 
   /* fade in */
-  
+
   int opacity = 0;
   for (opacity = 0; opacity <= 240; opacity += 20) {
-    printf("opacity : %d\n", opacity);
     SDL_RenderCopy(g.renderer, background, NULL, NULL);
     SDL_RenderCopy(g.renderer, img, &tempSpritePos, &spritePos);
     SDL_SetTextureAlphaMod(panel, (Uint8)opacity);
@@ -101,8 +100,6 @@ void game_over (game_t g) {
     currTime = SDL_GetTicks();
     while (SDL_GetTicks() < currTime + 50);
   }
-
-  printf("fin\n");
 
   SDL_DestroyTexture(panel);
 
@@ -173,7 +170,9 @@ void render_projectiles (projectile_list_t p, SDL_Renderer *renderer, SDL_Textur
     return;
   }
 
-  SDL_Rect tempPos = {get_intpoint_x(get_projectile_screen_position(projectile_list_head(p))) - (BULLET_WIDTH / 2), get_intpoint_y(get_projectile_screen_position(projectile_list_head(p))) - (BULLET_HEIGHT / 2), BULLET_WIDTH, BULLET_HEIGHT};
+  SDL_Rect tempPos = p->head.hitbox;
+  tempPos.x -= BULLET_WIDTH / 2;
+  tempPos.y -= BULLET_HEIGHT / 2;
   SDL_Rect tempSpritePos = get_projectile_sprite_pos(projectile_list_head(p));
 
   SDL_RenderCopy(renderer, img, &tempSpritePos, &tempPos);
@@ -401,19 +400,19 @@ void rendering (game_t *game) {
   }
   render_projectiles(game->player.projectiles, game->renderer, game->spriteSheet);
 
+  //render the foreground
+  render_foreground_level(*game);
+
   //render the attack and process it
   if (get_character_state(game->player) == Attacking)  {
     render_melee(game->player, game->renderer, game->spriteSheet);
   }
 
-  //render the foreground
-  render_foreground_level(*game);
-
   //render the cursor
   render_cursor(*game);
 
   //DEBUG
-  SDL_Rect tempRect = {game->player.gridPos.x * 16, game->player.gridPos.y * 16, 16, 16};
+  /*SDL_Rect tempRect = {game->player.gridPos.x * 16, game->player.gridPos.y * 16, 16, 16};
 
   SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
   tempRect.y+=16;
@@ -421,7 +420,7 @@ void rendering (game_t *game) {
   tempRect.y+=16;
   SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
   tempRect.y+=16;
-  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);
+  SDL_RenderCopy(game->renderer, game->spriteSheet, NULL, &tempRect);*/
 
   SDL_RenderPresent(game->renderer);
 

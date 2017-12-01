@@ -20,7 +20,7 @@ level_t init_level (char *path_blocks, char *path_background, char *path_file, c
   l.blocks_spritesheet = SDL_CreateTextureFromSurface(renderer, temp);
   if (l.blocks_spritesheet == NULL) {
     printf("Error during blocks_spritesheet image loading : %s\n", SDL_GetError());
-    exit(0);
+    exit(1);
   }
   SDL_FreeSurface(temp);
 
@@ -29,7 +29,7 @@ level_t init_level (char *path_blocks, char *path_background, char *path_file, c
   l.background = SDL_CreateTextureFromSurface(renderer, temp);
   if (l.background == NULL) {
     printf("Error during background image loading : %s\n", SDL_GetError());
-    exit(0);
+    exit(1);
   }
   SDL_FreeSurface(temp);
 
@@ -37,7 +37,7 @@ level_t init_level (char *path_blocks, char *path_background, char *path_file, c
   FILE *txtFile = fopen(path_file, "r");
   if (txtFile == NULL) {
     printf("Error opening the txt file\n");
-    exit(0);
+    exit(1);
   }
 
   //the array of block that we will fill
@@ -56,7 +56,6 @@ level_t init_level (char *path_blocks, char *path_background, char *path_file, c
   SDL_Rect spritesheet_pos = {0, 0, 16, 16};
 
   //hitbox and position used for the enemies
-  SDL_Rect cHitbox = {0, 0, IMG_WIDTH, IMG_HEIGHT};
   SDL_Rect cSpritePos = {0, 0, IMG_WIDTH, IMG_HEIGHT};
 
   /* reading */
@@ -111,9 +110,7 @@ level_t init_level (char *path_blocks, char *path_background, char *path_file, c
 
         case 'e':
           //enemy
-          cHitbox.x = x * 16;
-          cHitbox.y = (y * 16) - IMG_HEIGHT;
-          *enemies = character_list_build(set_character(10, set_floatpoint(x * 16, (y * 16) - IMG_HEIGHT), set_vector(0.0, 0.0), cSpritePos, cHitbox, Enemy), *enemies);
+          *enemies = character_list_build(set_character(10, set_floatpoint(x * 16, (y * 16) - IMG_HEIGHT), set_vector(0.0, 0.0), cSpritePos, Enemy), *enemies);
           i++;
           break;
 

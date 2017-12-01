@@ -106,7 +106,7 @@ int main_menu_display (game_t *game) {
 
   temp = IMG_Load(PATH_BACKGROUND);
   if (temp == NULL) {
-    printf("Error loading the menu backgroun : %s\n", IMG_GetError());
+    printf("Error loading the menu backgroung : %s\n", IMG_GetError());
     exit(1);
   }
   background = SDL_CreateTextureFromSurface(game->renderer, temp);
