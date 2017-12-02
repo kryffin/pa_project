@@ -254,5 +254,5 @@ SDL_Rect get_character_hitbox (character_t p);
 int character_list_size (character_list_t c);
 
 //embryon of IA
-void character_behaviour (character_t *e, int taille, int x, int y);
+void character_behaviour (character_t *e, character_t p, int taille, int x, int y);
 #endif

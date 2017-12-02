@@ -179,7 +179,7 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
 
   set_character_hitbox(&e, temp);
 
-  character_behaviour (&e, character_list_size(c), get_character_screen_position(*p).x, get_character_screen_position(*p).y);
+  character_behaviour (&e, *p, character_list_size(c), get_character_screen_position(*p).x, get_character_screen_position(*p).y);
   //printf("velX:%2.f\n", e.vel.x);
   e.projectiles = update_projectiles(e.projectiles, blocks, p, c, false);
 
@@ -194,7 +194,7 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
 }
 
 //embryon of IA
-void character_behaviour(character_t *e, int taille, int x, int y){
+void character_behaviour(character_t *e, character_t p, int taille, int x, int y){
 
   //initialisation of a random number:
   srand(SDL_GetTicks());
@@ -212,13 +212,25 @@ void character_behaviour(character_t *e, int taille, int x, int y){
       break;
     //moving on x axis
   case 0:
-    if (SDL_GetTicks() > e->changeVelDelay + 1500) {
-      int velX;
-      velX = (SDL_GetTicks()%taille); //cause 27 is a prime number and i like it
-      velX %= 5;
-      velX = (SDL_GetTicks()%2 == 0)? -velX : velX;
-      set_character_velocity(e, velX, 0);
-      e->changeVelDelay = SDL_GetTicks();
+    //if the ennemy is away from the "safe zone" of the player then the velocity is applied
+    if (get_character_screen_position(p).x + 100 < get_character_screen_position(*e).x){
+      if (SDL_GetTicks() > e->changeVelDelay + 1500) {
+        int velX;
+        velX = SDL_GetTicks()%5;
+        set_character_velocity(e, velX, 0);
+        e->changeVelDelay = SDL_GetTicks();
+      }
+    } else {//the ennemy is in the safe area
+      int tmp = get_character_screen_position(*e).x - get_character_screen_position(p).x;
+      //on the right part
+      if (tmp >= 0){
+        set_character_velocity(e, 5, 0);
+        e->changeVelDelay = SDL_GetTicks();
+      } else { // on the left part
+        set_character_velocity(e, -5, 0);
+        e->changeVelDelay = SDL_GetTicks();
+      }
+
     }
     break;
     //jumping
