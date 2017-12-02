@@ -7,7 +7,7 @@ character.c : contain every functions for the characters
 #include "../header_files/character.h"
 
 //create a new projectile and add it in the list
-void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos) {
+void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos, musicbox_t musicBox) {
 
   if (!mouse_btn) {
     return;
@@ -37,6 +37,8 @@ void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos) {
 
       p->projectiles = projectile_list_build(set_projectile(set_floatpoint(get_character_hitbox(*p).x + (IMG_WIDTH / 2), get_character_hitbox(*p).y + (IMG_HEIGHT / 4)), dir, Bullet, tempSprite), p->projectiles);
 
+      Mix_PlayChannel(-1, musicBox.rifleSoundEffect, 0);
+
       break;
 
     case Shotgun:
@@ -55,6 +57,8 @@ void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos) {
 
       p->projectiles = projectile_list_build(set_projectile(set_floatpoint(get_character_hitbox(*p).x + (IMG_WIDTH / 2), get_character_hitbox(*p).y + (IMG_HEIGHT / 4)), vector_rotate(dir, -25), Bullet, tempSprite), p->projectiles);
 
+      Mix_PlayChannel(-1, musicBox.shotgunSoundEffect, 0);
+
       break;
 
     case Bazooka:
@@ -68,6 +72,8 @@ void shooting (bool mouse_btn, character_t *p, intpoint_t mouse_pos) {
       tempSprite.h = BULLET_HEIGHT;
 
       p->projectiles = projectile_list_build(set_projectile(set_floatpoint(get_character_hitbox(*p).x + (IMG_WIDTH / 2), get_character_hitbox(*p).y + (IMG_HEIGHT / 4)), dir, Missile, tempSprite), p->projectiles);
+
+      Mix_PlayChannel(-1, musicBox.missileSoundEffect, 0);
 
       break;
 
@@ -178,7 +184,7 @@ character_list_t bullet_collision (character_list_t enemies, projectile_t p, boo
 }
 
 //update the positions and hitbox
-void update_character (character_t *p, character_list_t *enemies, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], intpoint_t mouse_pos, bool *quit) {
+void update_character (character_t *p, character_list_t *enemies, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], intpoint_t mouse_pos, bool *quit, musicbox_t musicBox) {
 
   SDL_Rect temp;
   temp.x = (int)floor(get_floatpoint_x(get_character_real_position(*p)));
@@ -198,13 +204,13 @@ void update_character (character_t *p, character_list_t *enemies, block_t blocks
 
   p->projectiles = update_projectiles(p->projectiles, blocks, p, *enemies, mouse_pos, true);
 
-  *enemies = update_enemies(*enemies, p, blocks);
+  *enemies = update_enemies(*enemies, p, blocks, musicBox);
 
   return;
 }
 
 //update the enemies' shots and directions
-character_list_t update_enemies (character_list_t c, character_t *p, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
+character_list_t update_enemies (character_list_t c, character_t *p, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], musicbox_t musicBox) {
 
   if (character_list_is_empty(c)) {
     return character_list_empty();
@@ -212,14 +218,14 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
 
   if (!is_alive(character_list_head(c))) {
     //if this enemy is dead
-    return update_enemies(character_list_rest(c), p, blocks);
+    return update_enemies(character_list_rest(c), p, blocks, musicBox);
   }
 
   character_t e = character_list_head(c);
   e.projectiles = character_list_head(c).projectiles;
 
   if (SDL_GetTicks() > e.shootDelay + ENEMY_SHOOT_DELAY) {
-    shooting(true, &e, set_intpoint(get_character_hitbox(*p).x + (IMG_WIDTH / 2), get_character_hitbox(*p).y + (IMG_HEIGHT / 2)));
+    shooting(true, &e, set_intpoint(get_character_hitbox(*p).x + (IMG_WIDTH / 2), get_character_hitbox(*p).y + (IMG_HEIGHT / 2)), musicBox);
     e.shootDelay = SDL_GetTicks();
   }
   e.projectiles = update_projectiles(e.projectiles, blocks, p, c, set_intpoint((int)floor(get_floatpoint_x(get_character_real_position(*p))), (int)floor(get_floatpoint_y(get_character_real_position(*p)))), false);
@@ -244,7 +250,7 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
 
   character_update_dir(&e, set_intpoint(get_character_hitbox(*p).x + (IMG_WIDTH / 2), get_character_hitbox(*p).y + (IMG_HEIGHT / 2)));
 
-  return character_list_build(e, update_enemies(character_list_rest(c), p, blocks));
+  return character_list_build(e, update_enemies(character_list_rest(c), p, blocks, musicBox));
 }
 
 //update the step used for the walking animation

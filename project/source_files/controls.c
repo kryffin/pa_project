@@ -138,6 +138,7 @@ void keyboard_control (game_t *game) {
     //debug
     if (!level_list_is_empty(level_list_rest(game->currLevel))) {
       game->currLevel = level_list_rest(game->currLevel);
+      Mix_PlayMusic(game->currLevel->head.levelMusic, -1);
     }
     set_character_weapon(&game->player, Bazooka);
   }
@@ -232,7 +233,7 @@ void controls (game_t *game) {
 
   }
   if (SDL_GetTicks() > game->player.shootDelay + shoot_delay) {
-    shooting(game->mouse_btn, &game->player, game->mouse_pos);
+    shooting(game->mouse_btn, &game->player, game->mouse_pos, game->musicBox);
     game->player.shootDelay = SDL_GetTicks();
   }
 

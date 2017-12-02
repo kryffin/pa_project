@@ -13,6 +13,7 @@
 #include "vector.h"
 #include "blocks.h"
 #include "projectile.h"
+#include "music.h"
 
 /*************/
 /* CONSTANTS */
@@ -101,7 +102,7 @@ struct Character_List {
 /*************/
 
 //create a new projectile and add it in the list
-void shooting (bool mouse_btn, character_t *p, intpoint_t target);
+void shooting (bool mouse_btn, character_t *p, intpoint_t target, musicbox_t musicBox);
 
 //update the grid position
 void character_update_grid_pos (character_t *character);
@@ -119,10 +120,10 @@ void character_jumping (character_t *p);
 void character_gravity(character_t *p);
 
 //update the positions and hitbox
-void update_character (character_t *p, character_list_t *enemies, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], intpoint_t mouse_pos, bool *quit);
+void update_character (character_t *p, character_list_t *enemies, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], intpoint_t mouse_pos, bool *quit, musicbox_t musicBox);
 
 //update the enemies' shots and directions
-character_list_t update_enemies (character_list_t c, character_t *p, block_t [NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]);
+character_list_t update_enemies (character_list_t c, character_t *p, block_t [NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], musicbox_t musicBox);
 
 //update the step used for the walking animation
 void character_update_step(character_t *p);

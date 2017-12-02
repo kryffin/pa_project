@@ -11,6 +11,7 @@
 #include "2dpoint.h"
 #include "character.h"
 #include "blocks.h"
+#include "music.h"
 
 /*************/
 /* CONSTANTS */
@@ -30,6 +31,8 @@ typedef struct Level {
   SDL_Texture *blocks_spritesheet; //spritesheet of the blocks
   SDL_Texture *background; //background of the level
 
+  Mix_Music *levelMusic; //music to play in the background
+
 } level_t;
 
 typedef struct Level_List *level_list_t;
@@ -42,8 +45,11 @@ struct Level_List {
 /* FUNCTIONS */
 /*************/
 
+//set the level music
+void set_level_music (level_t *l, char *path);
+
 //read the txt file to complete the block array, create the enemies and place the player
-level_t init_level (char *blocks, char *path_background, char *path_file, character_t *p, character_list_t *enemies, SDL_Renderer *renderer);
+level_t init_level (char *blocks, char *path_background, char *path_file, char *path_music, character_t *p, character_list_t *enemies, SDL_Renderer *renderer);
 
 /* LIST */
 

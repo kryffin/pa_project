@@ -6,8 +6,19 @@ level.c : every functions regarding the levels
 
 #include "../header_files/level.h"
 
+//set the level music
+void set_level_music (level_t *l, char *path) {
+  l->levelMusic = Mix_LoadMUS(path);
+  if (l->levelMusic == NULL) {
+    printf("Error while setting level music : %s\n", Mix_GetError());
+    exit(0);
+  }
+
+  return;
+}
+
 //read the txt file to complete the block array, create the enemies and place the player
-level_t init_level (char *path_blocks, char *path_background, char *path_file, character_t *p, character_list_t *enemies, SDL_Renderer *renderer) {
+level_t init_level (char *path_blocks, char *path_background, char *path_file, char *path_music, character_t *p, character_list_t *enemies, SDL_Renderer *renderer) {
 
   level_t l;
   int i = 0;
@@ -139,6 +150,8 @@ level_t init_level (char *path_blocks, char *path_background, char *path_file, c
 
     }
   }
+
+  set_level_music(&l, path_music);
 
   return l;
 }

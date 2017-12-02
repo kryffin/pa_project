@@ -14,6 +14,7 @@
 #include "character.h"
 #include "projectile.h"
 #include "level.h"
+#include "music.h"
 
 /*************/
 /* CONSTANTS */
@@ -22,6 +23,10 @@
 #define PATH_FONT "./res/font.ttf"
 #define PATH_CURSOR "./res/cursor.png"
 #define PATH_SPRITES "./res/spritesheet.png"
+#define PATH_MENU_MUSIC "./res/menu.mp3"
+#define PATH_RIFLE_SOUND_EFFECT "./res/rifle.wav"
+#define PATH_SHOTGUN_SOUND_EFFECT "./res/shotgun.wav"
+#define PATH_MISSILE_SOUND_EFFECT "./res/missile.wav"
 #define SCREEN_FPS 30
 #define FONT_SIZE 15
 
@@ -62,6 +67,10 @@ typedef struct Game {
   bool quit; //variable running the main loop and quitting the game if desired
 
   level_list_t currLevel; //current level in which we are playing, hopefully a list one day
+
+  Mix_Music *menuMusic; //music used in the menu
+
+  musicbox_t musicBox; //box containing music and sound effects
 
 } game_t;
 

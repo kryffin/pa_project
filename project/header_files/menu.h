@@ -28,11 +28,16 @@
 #define PATH_CURSOR "./res/cursor.png"
 #define PATH_BLOCKS_SHEET "./res/blocks_spritesheet.png"
 
+#define PATH_ARENA_MUSIC "./res/arena.mp3"
+#define PATH_LEVEL1_MUSIC "./res/level1.mp3"
+#define PATH_LEVEL2_MUSIC "./res/level2.mp3"
+#define PATH_LEVEL3_MUSIC "./res/level3.mp3"
+
 #define PATH_BACKGROUND "./res/menubackground.jpg"
 #define PATH_BACKGROUND_LEVEL_1 "./res/background1.jpg"
 #define PATH_BACKGROUND_LEVEL_2 "./res/background2.png"
 #define PATH_BACKGROUND_LEVEL_3 "./res/background3.jpg"
-#define PATH_BACKGROUND_ARENA "./res/arenabackground.jpg"
+#define PATH_BACKGROUND_ARENA "./res/arena.jpg"
 
 #define PATH_TXT_LEVEL_1 "./res/level1.txt"
 #define PATH_TXT_LEVEL_2 "./res/level2.txt"

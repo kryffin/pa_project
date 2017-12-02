@@ -61,6 +61,10 @@ game_t *create_game () {
   SDL_FreeSurface(temp);
   IMG_Quit();
 
+  Mix_Init(MIX_INIT_MP3);
+  Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024);
+  Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
+
   g->mouse_pos = set_intpoint(0, 0);
 
   g->mouse_btn = false;
@@ -97,6 +101,14 @@ game_t *create_game () {
   g->quit = false;
 
   reset_keys(g);
+
+  g->menuMusic = Mix_LoadMUS(PATH_MENU_MUSIC);
+  if (g->menuMusic == NULL) {
+    printf("Error loading the menu music : %s\n", Mix_GetError());
+    exit(1);
+  }
+
+  g->musicBox = set_music_box(PATH_RIFLE_SOUND_EFFECT, PATH_SHOTGUN_SOUND_EFFECT, PATH_MISSILE_SOUND_EFFECT);
 
   return g;
 }
