@@ -79,7 +79,7 @@ typedef struct Game {
 /*************/
 
 //create a new game
-game_t *create_game ();
+void create_game (game_t *g);
 
 //reset the player and enemies of the game
 void reset_game(game_t *game);
@@ -89,5 +89,11 @@ void reset_keys (game_t *game);
 
 //initialize the palatte of colors
 void init_palette2 (game_t *game);
+
+//free a game
+void free_game (game_t *g);
+
+//exit the game
+void exit_game (game_t *g);
 
 #endif

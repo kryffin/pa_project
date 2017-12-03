@@ -10,7 +10,7 @@ int main () {
 
   //entire structure of the game
   game_t *g = malloc(sizeof(game_t));
-  g = create_game();
+  create_game(g);
 
   //clear the renderer's render
   SDL_RenderClear(g->renderer);
@@ -35,6 +35,8 @@ int main () {
 
     /* movement */
 
+    character_update_grid_pos(&g->player);
+    character_update_dir(&g->player, g->mouse_pos);
     character_gravity(&g->player);
     character_apply_velocity(&g->player, g->currLevel->head.blocks);
 
@@ -43,8 +45,7 @@ int main () {
     //player
     update_character(&g->player, &g->enemies, g->currLevel->head.blocks, g->mouse_pos, &g->quit, g->musicBox);
     //g->player.projectiles = update_projectiles(g->player.projectiles, g->currLevel->head.blocks, &g->player, g->enemies, true);
-    character_update_grid_pos(&g->player);
-    character_update_dir(&g->player, g->mouse_pos);
+
 
     if (SDL_GetTicks() >= g->player.stepDelay + DELAY_STEP) {
       character_update_step(&g->player);
@@ -76,23 +77,7 @@ int main () {
 
   /* free */
 
-  projectile_list_free(g->player.projectiles);
-  character_list_free(g->enemies);
-  level_list_free(g->currLevel);
-  SDL_DestroyTexture(g->spriteSheet);
-  SDL_DestroyTexture(g->cursor);
-  SDL_DestroyRenderer(g->renderer);
-  SDL_DestroyWindow(g->window);
-  TTF_CloseFont(g->font);
-
-  Mix_Quit();
-  TTF_Quit();
-  SDL_Quit();
-
-  free(g->manager);
-  free(g->colorPalette);
-  free(g->event);
-  free(g);
+  exit_game(g);
 
   return EXIT_SUCCESS;
 }

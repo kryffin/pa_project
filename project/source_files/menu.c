@@ -93,8 +93,7 @@ bool mouse_hover_menu (intpoint_t mouse_pos, int targetx, int targety, int width
 */
 int main_menu_display (game_t *game) {
 
-  int *control = NULL;
-  control = (int*)malloc(sizeof(int));
+  int control = 0;
   int option = 0;
 
   //message surfaces
@@ -160,21 +159,21 @@ int main_menu_display (game_t *game) {
     SDL_RenderClear(game->renderer);
 
     //controls
-    *control = menu_controls(game);
+    control = menu_controls(game);
 
     if (mouse_hover_menu(game->mouse_pos, posPlay->x, posPlay->y, surPlay->clip_rect.w, surPlay->clip_rect.h)) {
 
-      if (*control == 0) {
+      if (control == 0) {
 
         SDL_FreeSurface(surPlay);
         surPlay = TTF_RenderText_Solid(game->font, strPlay, game->colorPalette[3]);
 
-      } else if (*control == 1){
+      } else if (control == 1){
 
         SDL_FreeSurface(surPlay);
         surPlay = TTF_RenderText_Solid(game->font, strPlay, game->colorPalette[2]);
 
-      } else if (*control == 2) {
+      } else if (control == 2) {
 
         SDL_FreeSurface(surPlay);
         surPlay = TTF_RenderText_Solid(game->font, strPlay, game->colorPalette[3]);
@@ -184,17 +183,17 @@ int main_menu_display (game_t *game) {
 
     } else if (mouse_hover_menu(game->mouse_pos, posOptions->x, posOptions->y, surOptions->clip_rect.w, surOptions->clip_rect.h)) {
 
-      if (*control == 0) {
+      if (control == 0) {
 
         SDL_FreeSurface(surOptions);
         surOptions = TTF_RenderText_Solid(game->font, strOptions, game->colorPalette[3]);
 
-      } else if (*control == 1){
+      } else if (control == 1){
 
         SDL_FreeSurface(surOptions);
         surOptions = TTF_RenderText_Solid(game->font, strOptions, game->colorPalette[2]);
 
-      } else if (*control == 2) {
+      } else if (control == 2) {
 
         SDL_FreeSurface(surOptions);
         surOptions = TTF_RenderText_Solid(game->font, strOptions, game->colorPalette[3]);
@@ -204,17 +203,17 @@ int main_menu_display (game_t *game) {
 
     } else if (mouse_hover_menu(game->mouse_pos, posQuit->x, posQuit->y, surQuit->clip_rect.w, surQuit->clip_rect.h)) {
 
-      if (*control == 0) {
+      if (control == 0) {
 
         SDL_FreeSurface(surQuit);
         surQuit = TTF_RenderText_Solid(game->font, strQuit, game->colorPalette[3]);
 
-      } else if (*control == 1) {
+      } else if (control == 1) {
 
         SDL_FreeSurface(surQuit);
         surQuit = TTF_RenderText_Solid(game->font, strQuit, game->colorPalette[2]);
 
-      } else if (*control == 2) {
+      } else if (control == 2) {
 
         SDL_FreeSurface(surPlay);
         surPlay = TTF_RenderText_Solid(game->font, strPlay, game->colorPalette[3]);
@@ -255,12 +254,11 @@ int main_menu_display (game_t *game) {
     SDL_Delay(1000 / SCREEN_FPS);
 
     //if we escape
-    if (*control == 10) {
+    if (control == 10) {
       option = 3;
     }
 
     if (option != 0) {
-      free(control);
       SDL_FreeSurface(surPlay);
       SDL_FreeSurface(surOptions);
       SDL_FreeSurface(surQuit);

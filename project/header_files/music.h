@@ -23,6 +23,9 @@ typedef struct MusicBox {
 /* FUNCTIONS */
 /*************/
 
+//free a music box
+void free_music_box (musicbox_t *mb);
+
 /* set */
 
 //create a music box

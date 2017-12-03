@@ -7,10 +7,8 @@ game.c : contain every functions for the game creation
 #include "../header_files/game.h"
 
 //create a new game
-game_t *create_game () {
+void create_game (game_t *g) {
   SDL_Surface *temp;
-  SDL_Texture *texture;
-  game_t *g = malloc(sizeof(game_t));
 
   //SDL initialization
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -59,7 +57,6 @@ game_t *create_game () {
     exit(1);
   }
   SDL_FreeSurface(temp);
-  IMG_Quit();
 
   Mix_Init(MIX_INIT_MP3);
   Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024);
@@ -88,16 +85,6 @@ game_t *create_game () {
 
   g->enemies = character_list_empty();
 
-  desRec.w = BULLET_WIDTH;
-  desRec.h = BULLET_HEIGHT;
-  temp = IMG_Load(PATH_SPRITES);
-  texture = SDL_CreateTextureFromSurface(g->renderer, temp);
-  if (texture == NULL) {
-    printf("Error during bullet image loading : %s\n", SDL_GetError());
-    exit(1);
-  }
-  SDL_FreeSurface(temp);
-
   g->quit = false;
 
   reset_keys(g);
@@ -110,7 +97,7 @@ game_t *create_game () {
 
   g->musicBox = set_music_box(PATH_RIFLE_SOUND_EFFECT, PATH_SHOTGUN_SOUND_EFFECT, PATH_MISSILE_SOUND_EFFECT);
 
-  return g;
+  return;
 }
 
 //reset the player and enemies of the game
@@ -118,7 +105,9 @@ void reset_game(game_t *game) {
   floatpoint_t basePosition = set_floatpoint(0.0, 0.0);
   vector_t baseVelocity = set_vector(0.0, 0.0);
   SDL_Rect desRec = {0, 0, IMG_WIDTH, IMG_HEIGHT};
+  projectile_list_free(game->player.projectiles);
   game->player = set_character(50, basePosition, baseVelocity, desRec, Player);
+  character_list_free(game->enemies);
   game->enemies = character_list_empty();
 
   reset_keys(game);
@@ -217,6 +206,38 @@ void init_palette2 (game_t *game) {
   game->colorPalette[14].r = 128;
   game->colorPalette[14].g = 128;
   game->colorPalette[14].b = 255;
+
+  return;
+}
+
+//free a game
+void free_game (game_t *g) {
+  free(g->manager);
+  SDL_DestroyRenderer(g->renderer);
+  SDL_DestroyWindow(g->window);
+  SDL_DestroyTexture(g->cursor);
+  free(g->event);
+  TTF_CloseFont(g->font);
+  free(g->colorPalette);
+  projectile_list_free(g->player.projectiles);
+  character_list_free(g->enemies);
+  SDL_DestroyTexture(g->spriteSheet);
+  level_list_free(g->currLevel);
+  Mix_FreeMusic(g->menuMusic);
+  free_music_box(&g->musicBox);
+  free(g);
+
+  return;
+}
+
+//exit the game
+void exit_game (game_t *g) {
+  free_game(g);
+  Mix_CloseAudio();
+  Mix_Quit();
+  TTF_Quit();
+  IMG_Quit();
+  SDL_Quit();
 
   return;
 }

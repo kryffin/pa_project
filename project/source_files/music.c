@@ -1,5 +1,15 @@
 #include "../header_files/music.h"
 
+//free a music box
+void free_music_box (musicbox_t *mb) {
+  Mix_FreeChunk(mb->rifleSoundEffect);
+  Mix_FreeChunk(mb->shotgunSoundEffect);
+  Mix_FreeChunk(mb->missileSoundEffect);
+  mb = NULL;
+
+  return;
+}
+
 /* set */
 
 //create a music box

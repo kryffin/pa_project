@@ -107,7 +107,9 @@ projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blo
         || get_projectile_real_position(projectile_list_head(projectiles)).y > SCREEN_HEIGHT)) {
 
     //projectile isn't in the screen
-    return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, mouse_pos, playerShooting);
+    projectile_list_t next = projectile_list_rest(projectiles);
+    projectile_list_free(projectiles);
+    return update_projectiles(next, blocks, player, enemies, mouse_pos, playerShooting);
   }
 
   block_t temp = blocks[(int)floor((get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) + (BULLET_WIDTH / 2)) / 16)][(int)floor((get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) + (BULLET_HEIGHT / 2)) / 16)];
@@ -120,14 +122,18 @@ projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blo
     //ennemy shooting
     if (get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) >= player->hitbox.x && get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles) ))<= player->hitbox.x + player->hitbox.w && get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) >= player->hitbox.y && get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) <= player->hitbox.y + player->hitbox.h) {
       player->hp -= 1;
-      return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, mouse_pos, playerShooting);
+      projectile_list_t next = projectile_list_rest(projectiles);
+      projectile_list_free(projectiles);
+      return update_projectiles(next, blocks, player, enemies, mouse_pos, playerShooting);
     }
   } else {
     //player shooting
     bool destroy = false;
     enemies = bullet_collision(enemies, projectile_list_head(projectiles), &destroy);
     if (destroy) {
-      return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, mouse_pos, playerShooting);
+      projectile_list_t next = projectile_list_rest(projectiles);
+      projectile_list_free(projectiles);
+      return update_projectiles(next, blocks, player, enemies, mouse_pos, playerShooting);
     }
   }
 
@@ -148,7 +154,9 @@ projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blo
     case Missile:
       dist = sqrt(pow(mouse_pos.x - projectiles->head.realPos.x, 2) + pow(mouse_pos.y - projectiles->head.realPos.y, 2));
       if (dist < 10.0) {
-        return update_projectiles(projectile_list_rest(projectiles), blocks, player, enemies, mouse_pos, playerShooting);
+        projectile_list_t next = projectile_list_rest(projectiles);
+        projectile_list_free(projectiles);
+        return update_projectiles(next, blocks, player, enemies, mouse_pos, playerShooting);
       }
       dir = set_vector((get_intpoint_x(mouse_pos) + (CURSOR_WIDTH / 2)) - (get_projectile_real_position(projectiles->head).x + (BULLET_WIDTH / 2)), (get_intpoint_y(mouse_pos) + (CURSOR_HEIGHT / 2)) - (get_projectile_real_position(projectiles->head).y + (BULLET_HEIGHT / 2)));
       set_vector_x(&dir, (projectiles->head.dir.x + dir.x) / 100);
@@ -202,7 +210,7 @@ void update_character (character_t *p, character_list_t *enemies, block_t blocks
 
   set_character_hitbox(p, temp);
 
-  p->projectiles = update_projectiles(p->projectiles, blocks, p, *enemies, mouse_pos, true);
+  //p->projectiles = update_projectiles(p->projectiles, blocks, p, *enemies, mouse_pos, true);
 
   *enemies = update_enemies(*enemies, p, blocks, musicBox);
 
@@ -228,7 +236,7 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
     shooting(true, &e, set_intpoint(get_character_hitbox(*p).x + (IMG_WIDTH / 2), get_character_hitbox(*p).y + (IMG_HEIGHT / 2)), musicBox);
     e.shootDelay = SDL_GetTicks();
   }
-  e.projectiles = update_projectiles(e.projectiles, blocks, p, c, set_intpoint((int)floor(get_floatpoint_x(get_character_real_position(*p))), (int)floor(get_floatpoint_y(get_character_real_position(*p)))), false);
+  //e.projectiles = update_projectiles(e.projectiles, blocks, p, c, set_intpoint((int)floor(get_floatpoint_x(get_character_real_position(*p))), (int)floor(get_floatpoint_y(get_character_real_position(*p)))), false);
   //character_gravity(&e);
   character_apply_velocity(&e, blocks);
 
