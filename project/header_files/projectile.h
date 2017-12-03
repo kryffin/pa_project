@@ -77,6 +77,9 @@ bool projectile_list_is_empty (projectile_list_t p);
 //returns an empty list
 projectile_list_t projectile_list_empty ();
 
+//copy a list of projectiles
+projectile_list_t projectile_list_copy (projectile_list_t p);
+
 //free a list
 void projectile_list_free (projectile_list_t p);
 

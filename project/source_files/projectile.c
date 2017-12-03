@@ -41,6 +41,15 @@ projectile_list_t projectile_list_empty () {
   return NULL;
 }
 
+//copy a list of projectiles
+projectile_list_t projectile_list_copy (projectile_list_t p) {
+  if (projectile_list_is_empty(p)) {
+    return projectile_list_empty();
+  }
+
+  return projectile_list_build(projectile_list_head(p), projectile_list_copy(projectile_list_rest(p)));
+}
+
 //free a list
 void projectile_list_free (projectile_list_t p) {
   if (projectile_list_is_empty(p)) {

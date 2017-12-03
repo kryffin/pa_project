@@ -154,6 +154,9 @@ bool character_list_is_empty (character_list_t p);
 //returns an empty character list
 character_list_t character_list_empty ();
 
+//copy the list of character
+character_list_t character_list_copy (character_list_t c);
+
 //free the list of character as well as their projectiles
 void character_list_free (character_list_t p);
 
