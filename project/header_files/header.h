@@ -28,14 +28,6 @@
 /* CONSTANTS */
 /*************/
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
-#define SCREEN_BPP 32
-#define SCREEN_FPS 30
-
 #define DELAY_STEP 150
-
-#define CURSOR_WIDTH 15
-#define CURSOR_HEIGHT 15
 
 #endif

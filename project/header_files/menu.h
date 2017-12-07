@@ -18,14 +18,6 @@
 /* CONSTANTS */
 /*************/
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
-#define SCREEN_BPP 32
-#define SCREEN_FPS 30
-
-#define PATH_SPRITES "./res/spritesheet.png"
-#define PATH_FONT "./res/font.ttf"
-#define PATH_CURSOR "./res/cursor.png"
 #define PATH_BLOCKS_SHEET "./res/blocks_spritesheet.png"
 
 #define PATH_ARENA_MUSIC "./res/arena.mp3"
@@ -43,11 +35,6 @@
 #define PATH_TXT_LEVEL_2 "./res/level2.txt"
 #define PATH_TXT_LEVEL_3 "./res/level3.txt"
 #define PATH_TXT_ARENA "./res/arena.txt"
-
-#define PATH_YOU_DIED "./res/you_died.png"
-
-#define IMG_WIDTH 32
-#define IMG_HEIGHT 64
 
 /*************/
 /* FUNCTIONS */

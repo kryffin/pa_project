@@ -16,14 +16,6 @@
 /* CONSTANTS */
 /*************/
 
-#define IMG_WIDTH 32
-#define IMG_HEIGHT 64
-
-#define JUMP_DURATION 50
-
-#define CURSOR_WIDTH 15
-#define CURSOR_HEIGHT 15
-
 #define CHARACTER_SPEED 5
 
 #define RIFLE_SHOOT_DELAY 200

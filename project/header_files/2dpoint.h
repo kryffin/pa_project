@@ -7,13 +7,6 @@
 
 #include <stdbool.h>
 
-/*************/
-/* CONSTANTS */
-/*************/
-
-#define IMG_WIDTH 32
-#define IMG_HEIGHT 64
-
 /**************/
 /* STRUCTURES */
 /**************/

@@ -27,6 +27,8 @@
 #define NB_BLOCKS_WIDTH 40
 #define NB_BLOCKS_HEIGHT 30
 
+#define BLOCK_SIZE 16
+
 /**************/
 /* STRUCTURES */
 /**************/

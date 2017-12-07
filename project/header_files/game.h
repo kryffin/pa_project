@@ -27,13 +27,9 @@
 #define PATH_RIFLE_SOUND_EFFECT "./res/rifle.wav"
 #define PATH_SHOTGUN_SOUND_EFFECT "./res/shotgun.wav"
 #define PATH_MISSILE_SOUND_EFFECT "./res/missile.wav"
-#define SCREEN_FPS 30
+
 #define FONT_SIZE 15
 
-#define IMG_WIDTH 32
-#define IMG_HEIGHT 64
-#define BULLET_WIDTH 16
-#define BULLET_HEIGHT 16
 #define NB_MAX_KEYS 8
 
 #define PLAYER_BASE_HP 10

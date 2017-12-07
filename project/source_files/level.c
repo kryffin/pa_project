@@ -61,7 +61,7 @@ level_t init_level (char *path_blocks, char *path_background, char *path_file, c
   block_t b;
 
   //hitbox of the block
-  SDL_Rect hitbox = {0, 0, 16, 16};
+  SDL_Rect hitbox = {0, 0, BLOCK_SIZE, BLOCK_SIZE};
 
   //the position on the sprite sheet
   SDL_Rect spritesheet_pos = {0, 0, 16, 16};
@@ -86,9 +86,9 @@ level_t init_level (char *path_blocks, char *path_background, char *path_file, c
 
     } else {
 
-      //setting the block to the x and y coordinates * 16
-      hitbox.x = x * 16;
-      hitbox.y = y * 16;
+      //setting the block to the x and y coordinates * BLOCK_SIZE
+      hitbox.x = x * BLOCK_SIZE;
+      hitbox.y = y * BLOCK_SIZE;
       b = set_block(hitbox, spritesheet_pos, Blank);
 
       switch (curr) {
@@ -116,12 +116,12 @@ level_t init_level (char *path_blocks, char *path_background, char *path_file, c
 
         case 'p':
           //player
-          set_character_real_position(p, x * 16, (y * 16) - IMG_HEIGHT);
+          set_character_real_position(p, x * BLOCK_SIZE, (y * BLOCK_SIZE) - IMG_HEIGHT);
           break;
 
         case 'e':
           //enemy
-          *enemies = character_list_build(set_character(10, set_floatpoint(x * 16, (y * 16) - IMG_HEIGHT), set_vector(0.0, 0.0), cSpritePos, Enemy), *enemies);
+          *enemies = character_list_build(set_character(10, set_floatpoint(x * BLOCK_SIZE, (y * BLOCK_SIZE) - IMG_HEIGHT), set_vector(0.0, 0.0), cSpritePos, Enemy), *enemies);
           i++;
           break;
 

@@ -13,13 +13,6 @@
 #include "blocks.h"
 #include "music.h"
 
-/*************/
-/* CONSTANTS */
-/*************/
-
-#define NB_BLOCKS_WIDTH 40
-#define NB_BLOCKS_HEIGHT 30
-
 /**************/
 /* STRUCTURES */
 /**************/

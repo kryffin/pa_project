@@ -19,18 +19,11 @@
 /* CONSTANTS */
 /*************/
 
-#define BULLET_WIDTH 16
-#define BULLET_HEIGHT 16
-#define BULLET_SPEED 10
-
 #define JUMP_HEIGHT -16
 #define GRAVITY 2
 
 #define IMG_WIDTH 32
 #define IMG_HEIGHT 64
-
-#define NB_BLOCKS_WIDTH 40
-#define NB_BLOCKS_HEIGHT 30
 
 #define CURSOR_WIDTH 15
 #define CURSOR_HEIGHT 15
@@ -77,6 +70,8 @@ typedef struct Character {
   short int state; //curent state
   short int weapon; //weapon currently in use
 
+  short int tts; //time to stay after death on screen
+
   int stepDelay; //used to delay between each step of the walking animation
   int shootDelay; //used to delay between each shot
 
@@ -102,7 +97,7 @@ struct Character_List {
 /*************/
 
 //create a new projectile and add it in the list
-void shooting (bool mouse_btn, character_t *p, intpoint_t target, musicbox_t musicBox);
+projectile_list_t shooting (bool mouse_btn, character_t p, intpoint_t target, musicbox_t musicBox);
 
 //update the grid position
 void character_update_grid_pos (character_t *character);
@@ -111,7 +106,7 @@ void character_update_grid_pos (character_t *character);
 projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT], character_t *player, character_list_t enemies, intpoint_t mouse_pos, bool playerShooting);
 
 //check the collision between the projectile and the enemies
-character_list_t bullet_collision (character_list_t enemies, projectile_t p, bool *destroy);
+void bullet_collision (character_list_t enemies, projectile_t p, bool *destroy);
 
 //make the character jump
 void character_jumping (character_t *p);

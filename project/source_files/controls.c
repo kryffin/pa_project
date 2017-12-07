@@ -233,7 +233,7 @@ void controls (game_t *game) {
 
   }
   if (SDL_GetTicks() > game->player.shootDelay + shoot_delay) {
-    shooting(game->mouse_btn, &game->player, game->mouse_pos, game->musicBox);
+    game->player.projectiles = shooting(game->mouse_btn, game->player, game->mouse_pos, game->musicBox);
     game->player.shootDelay = SDL_GetTicks();
   }
 

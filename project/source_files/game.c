@@ -60,7 +60,7 @@ void create_game (game_t *g) {
 
   Mix_Init(MIX_INIT_MP3);
   Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024);
-  Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
+  Mix_VolumeMusic(0);
 
   g->mouse_pos = set_intpoint(0, 0);
 
@@ -97,6 +97,10 @@ void create_game (game_t *g) {
 
   g->musicBox = set_music_box(PATH_RIFLE_SOUND_EFFECT, PATH_SHOTGUN_SOUND_EFFECT, PATH_MISSILE_SOUND_EFFECT);
 
+  Mix_VolumeChunk(g->musicBox.rifleSoundEffect, 0);
+  Mix_VolumeChunk(g->musicBox.shotgunSoundEffect, 0);
+  Mix_VolumeChunk(g->musicBox.missileSoundEffect, 0);
+
   return;
 }
 
@@ -106,7 +110,7 @@ void reset_game(game_t *game) {
   vector_t baseVelocity = set_vector(0.0, 0.0);
   SDL_Rect desRec = {0, 0, IMG_WIDTH, IMG_HEIGHT};
   projectile_list_free(game->player.projectiles);
-  game->player = set_character(50, basePosition, baseVelocity, desRec, Player);
+  game->player = set_character(PLAYER_BASE_HP, basePosition, baseVelocity, desRec, Player);
   character_list_free(game->enemies);
   game->enemies = character_list_empty();
 

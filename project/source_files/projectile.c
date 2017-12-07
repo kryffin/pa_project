@@ -56,7 +56,15 @@ void projectile_list_free (projectile_list_t p) {
     return;
   }
   projectile_list_free(projectile_list_rest(p));
-  free(p);
+
+  if (p == NULL) {
+    printf("projectile_list_t already freed!\n");
+    exit(1);
+  } else {
+    free(p);
+    p = NULL;
+  }
+
   return;
 }
 

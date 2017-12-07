@@ -58,7 +58,7 @@ void render_cursor (game_t game) {
 
 //render the death screen
 void game_over (game_t g) {
-  SDL_Surface *temp;
+  SDL_Surface *temp = NULL;
   SDL_Texture *panel, *background, *img;
   SDL_Rect tempSpritePos = {128, 128, IMG_WIDTH, IMG_HEIGHT}, spritePos = get_character_hitbox(g.player);
 
@@ -111,14 +111,14 @@ void render_foreground_level (game_t game) {
 
   unsigned short int type;
   SDL_Rect tempSpritePos = {0, 0, 16, 16};
-  SDL_Rect tempPos = {0, 0, 16, 16};
+  SDL_Rect tempPos = {0, 0, BLOCK_SIZE, BLOCK_SIZE};
   int i, j;
   for (i = 0; i < NB_BLOCKS_WIDTH; i++) {
     for (j = 0; j < NB_BLOCKS_HEIGHT; j++) {
 
       type = get_block_type(get_level_block(game.currLevel->head, i, j));
-      tempPos.x = i * 16;
-      tempPos.y = j * 16;
+      tempPos.x = i * BLOCK_SIZE;
+      tempPos.y = j * BLOCK_SIZE;
 
       switch (type) {
 
@@ -146,13 +146,13 @@ void render_foreground_level (game_t game) {
 void render_background_level (game_t game) {
 
   SDL_Rect tempSpritePos = {16, 0, 16, 16};
-  SDL_Rect tempPos = {0, 0, 16, 16};
+  SDL_Rect tempPos = {0, 0, BLOCK_SIZE, BLOCK_SIZE};
   int i, j;
   for (i = 0; i < NB_BLOCKS_WIDTH; i++) {
     for (j = 0; j < NB_BLOCKS_HEIGHT; j++) {
 
-      tempPos.x = i * 16;
-      tempPos.y = j * 16;
+      tempPos.x = i * BLOCK_SIZE;
+      tempPos.y = j * BLOCK_SIZE;
 
       if (get_block_type(get_level_block(game.currLevel->head, i, j)) == Background) {
         SDL_RenderCopy(game.renderer, get_level_blocks_spritesheet(game.currLevel->head), &tempSpritePos, &tempPos);
@@ -186,12 +186,38 @@ void render_projectiles (projectile_list_t p, SDL_Renderer *renderer, SDL_Textur
 //render a character
 void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) {
 
-  SDL_Rect *temp = NULL;
-  temp = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  temp->w = 32;
-  temp->h = 64;
+  SDL_Rect temp;
+  temp.w = 32;
+  temp.h = 64;
   short int step = get_character_step(p);
   short int state = get_character_state(p);
+
+  SDL_Rect tempSpritePos;
+  SDL_Rect tempPos = get_character_hitbox(p);
+
+  if (p.hp < 1) {
+    tempSpritePos.x = 128;
+    tempSpritePos.y = 128;
+    tempSpritePos.w = IMG_WIDTH;
+    tempSpritePos.h = IMG_HEIGHT;
+    SDL_SetTextureAlphaMod(img, (Uint8)p.tts);
+    SDL_RenderCopy(renderer, img, &tempSpritePos, &tempPos);
+    SDL_SetTextureAlphaMod(img, 255);
+
+    tempSpritePos.x = 128;
+    tempSpritePos.y = 116;
+    tempSpritePos.w = 30;
+    tempSpritePos.h = 2;
+
+    tempPos.x += 1;
+    tempPos.y -= 10;
+    tempPos.w = 30;
+    tempPos.h = 2;
+
+    SDL_RenderCopy(renderer, img, &tempSpritePos, &tempPos);
+
+    return;
+  }
 
   if (get_character_dir(p) == Right) {
     //character facing right
@@ -204,9 +230,9 @@ void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) 
         if (get_character_velocity(p).x == 0) {
 
           //stand by sprite
-          temp->x = 0;
-          temp->y = 0;
-          set_character_sprite_pos(&p, *temp);
+          temp.x = 0;
+          temp.y = 0;
+          set_character_sprite_pos(&p, temp);
 
         } else {
 
@@ -214,27 +240,27 @@ void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) 
           switch (step) {
 
             case 0:
-              temp->x = 32;
-              temp->y = 0;
-              set_character_sprite_pos(&p, *temp);
+              temp.x = 32;
+              temp.y = 0;
+              set_character_sprite_pos(&p, temp);
               break;
 
             case 1:
-              temp->x = 0;
-              temp->y = 0;
-              set_character_sprite_pos(&p, *temp);
+              temp.x = 0;
+              temp.y = 0;
+              set_character_sprite_pos(&p, temp);
               break;
 
             case 2:
-              temp->x = 64;
-              temp->y = 0;
-              set_character_sprite_pos(&p, *temp);
+              temp.x = 64;
+              temp.y = 0;
+              set_character_sprite_pos(&p, temp);
               break;
 
             case 3:
-              temp->x = 0;
-              temp->y = 0;
-              set_character_sprite_pos(&p, *temp);
+              temp.x = 0;
+              temp.y = 0;
+              set_character_sprite_pos(&p, temp);
               break;
 
             default:
@@ -250,28 +276,28 @@ void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) 
       case Jumping:
       case nouse:
 
-      temp->x = 96;
-      temp->y = 0;
-      set_character_sprite_pos(&p, *temp);
+      temp.x = 96;
+      temp.y = 0;
+      set_character_sprite_pos(&p, temp);
 
         break;
 
       //attacking
       case Attacking:
 
-      temp->x = 64;
-      temp->y = 128;
-      set_character_sprite_pos(&p, *temp);
+      temp.x = 64;
+      temp.y = 128;
+      set_character_sprite_pos(&p, temp);
 
         break;
 
       //crouching
       case Crouching:
 
-        temp->x = 128;
-        temp->y = 0;
-        temp->h = 32;
-        set_character_sprite_pos(&p, *temp);
+        temp.x = 128;
+        temp.y = 0;
+        temp.h = 32;
+        set_character_sprite_pos(&p, temp);
 
         break;
 
@@ -290,9 +316,9 @@ void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) 
         if (get_character_velocity(p).x == 0) {
 
           //stand by sprite
-          temp->x = 0;
-          temp->y = 64;
-          set_character_sprite_pos(&p, *temp);
+          temp.x = 0;
+          temp.y = 64;
+          set_character_sprite_pos(&p, temp);
 
         } else {
 
@@ -300,27 +326,27 @@ void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) 
           switch (step) {
 
             case 0:
-              temp->x = 32;
-              temp->y = 64;
-              set_character_sprite_pos(&p, *temp);
+              temp.x = 32;
+              temp.y = 64;
+              set_character_sprite_pos(&p, temp);
               break;
 
             case 1:
-              temp->x = 0;
-              temp->y = 64;
-              set_character_sprite_pos(&p, *temp);
+              temp.x = 0;
+              temp.y = 64;
+              set_character_sprite_pos(&p, temp);
               break;
 
             case 2:
-              temp->x = 64;
-              temp->y = 64;
-              set_character_sprite_pos(&p, *temp);
+              temp.x = 64;
+              temp.y = 64;
+              set_character_sprite_pos(&p, temp);
               break;
 
             case 3:
-              temp->x = 0;
-              temp->y = 64;
-              set_character_sprite_pos(&p, *temp);
+              temp.x = 0;
+              temp.y = 64;
+              set_character_sprite_pos(&p, temp);
               break;
 
             default:
@@ -336,28 +362,28 @@ void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) 
       case Jumping:
       case nouse:
 
-      temp->x = 96;
-      temp->y = 64;
-      set_character_sprite_pos(&p, *temp);
+      temp.x = 96;
+      temp.y = 64;
+      set_character_sprite_pos(&p, temp);
 
         break;
 
       //attacking
       case Attacking:
 
-      temp->x = 96;
-      temp->y = 128;
-      set_character_sprite_pos(&p, *temp);
+      temp.x = 96;
+      temp.y = 128;
+      set_character_sprite_pos(&p, temp);
 
         break;
 
       //crouching
       case Crouching:
 
-        temp->x = 128;
-        temp->y = 32;
-        temp->h = 32;
-        set_character_sprite_pos(&p, *temp);
+        temp.x = 128;
+        temp.y = 32;
+        temp.h = 32;
+        set_character_sprite_pos(&p, temp);
 
         break;
 
@@ -367,12 +393,21 @@ void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) 
 
   }
 
-  SDL_Rect tempSpritePos = get_character_sprite_pos(p);
-  SDL_Rect tempPos = get_character_hitbox(p);
+  tempSpritePos = get_character_sprite_pos(p);
 
   SDL_RenderCopy(renderer, img, &tempSpritePos, &tempPos);
 
-  free(temp);
+  tempSpritePos.x = 128;
+  tempSpritePos.y = 116 - (2 * p.hp);
+  tempSpritePos.w = 30;
+  tempSpritePos.h = 2;
+
+  tempPos.x += 1;
+  tempPos.y -= 10;
+  tempPos.w = 30;
+  tempPos.h = 2;
+
+  SDL_RenderCopy(renderer, img, &tempSpritePos, &tempPos);
 
   return;
 }
@@ -393,6 +428,7 @@ void rendering (game_t *game) {
     render_projectiles(character_list_head(c).projectiles, game->renderer, game->spriteSheet);
     c = c->next;
   }
+  character_list_free(c);
 
   //render the character_t
   if (is_alive(game->player)) {
