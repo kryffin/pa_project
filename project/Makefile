@@ -1,6 +1,6 @@
-SRC = source_files/music.c source_files/2dpoint.c source_files/vector.c source_files/menu.c source_files/character.c source_files/projectile.c source_files/controls.c source_files/blocks.c source_files/level.c source_files/rendering.c source_files/game.c source_files/main.c #source file
+SRC = source_files/iframes.c source_files/music.c source_files/2dpoint.c source_files/vector.c source_files/menu.c source_files/character.c source_files/projectile.c source_files/controls.c source_files/blocks.c source_files/level.c source_files/rendering.c source_files/game.c source_files/main.c #source file
 BIN = mvt #exe file
-INC = header_files/music.h header_files/header.h header_files/2dpoint.h header_files/vector.h header_files/menu.h header_files/character.h header_files/projectile.h header_files/controls.h header_files/blocks.h header_files/level.h header_files/rendering.h header_files/game.h #header file
+INC = header_files/iframes.h header_files/music.h header_files/header.h header_files/2dpoint.h header_files/vector.h header_files/menu.h header_files/character.h header_files/projectile.h header_files/controls.h header_files/blocks.h header_files/level.h header_files/rendering.h header_files/game.h #header file
 
 CC = gcc
 FLAGS = -Wall -g -std=c99

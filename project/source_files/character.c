@@ -6,6 +6,24 @@ character.c : contain every functions for the characters
 
 #include "../header_files/character.h"
 
+//apply damage on a character and begin the invincibility frames
+void apply_damage (character_t *p, int dmg) {
+  if (get_i_frames_invincible(p->iFrames)) {
+    return;
+  }
+
+  //apply the damage
+  set_character_hp(p, get_character_hp(*p) - dmg);
+
+  //set the Invincibility state to true
+  set_i_frames_invincible(&p->iFrames, true);
+
+  //set the time of the damage for a delay
+  set_i_frames_delay(&p->iFrames, SDL_GetTicks());
+
+  return;
+}
+
 //create a new projectile and add it in the list
 projectile_list_t shooting (bool mouse_btn, character_t p, intpoint_t mouse_pos, musicbox_t musicBox) {
 
@@ -120,7 +138,7 @@ projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blo
   if (!playerShooting) {
     //ennemy shooting
     if (get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) >= player->hitbox.x && get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles) ))<= player->hitbox.x + player->hitbox.w && get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) >= player->hitbox.y && get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) <= player->hitbox.y + player->hitbox.h) {
-      player->hp -= 1;
+      apply_damage(player, 1);
       projectile_list_t next = projectile_list_copy(projectile_list_rest(projectiles));
       projectile_list_free(projectiles);
       return update_projectiles(next, blocks, player, enemies, mouse_pos, playerShooting);
@@ -186,7 +204,7 @@ void bullet_collision (character_list_t enemies, projectile_t p, bool *destroy) 
   if (get_floatpoint_x(get_projectile_real_position(p)) >= enemies->head.hitbox.x && get_floatpoint_x(get_projectile_real_position(p)) <= enemies->head.hitbox.x + enemies->head.hitbox.w && get_floatpoint_y(get_projectile_real_position(p)) >= enemies->head.hitbox.y && get_floatpoint_y(get_projectile_real_position(p)) <= enemies->head.hitbox.y + enemies->head.hitbox.h && enemies->head.hp > 0) {
     //if there is a collision, we stop searching, we decrease enemy life and returns the updated list
     *destroy = true;
-    enemies->head.hp -= 1;
+    apply_damage(&enemies->head, 1);
     return;
   }
 
@@ -211,6 +229,17 @@ void update_character (character_t *p, character_list_t *enemies, block_t blocks
   }
 
   set_character_hitbox(p, temp);
+
+  if (get_i_frames_invincible(p->iFrames)) {
+    if (SDL_GetTicks() >= get_i_frames_delay(p->iFrames) + DELAY_INVINCIBILITY) {
+      set_i_frames_invincible(&p->iFrames, false);
+    } else {
+      if (SDL_GetTicks() >= get_i_frames_display_delay(p->iFrames) + DELAY_BLINK) {
+        set_i_frames_display(&p->iFrames, !get_i_frames_display(p->iFrames));
+        set_i_frames_display_delay(&p->iFrames, SDL_GetTicks());
+      }
+    }
+  }
 
   p->projectiles = update_projectiles(p->projectiles, blocks, p, *enemies, mouse_pos, true);
 
@@ -267,6 +296,17 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
   }
 
   set_character_hitbox(&e, temp);
+
+  if (get_i_frames_invincible(e.iFrames)) {
+    if (SDL_GetTicks() >= get_i_frames_delay(e.iFrames) + DELAY_INVINCIBILITY) {
+      set_i_frames_invincible(&e.iFrames, false);
+    } else {
+      if (SDL_GetTicks() >= get_i_frames_display_delay(e.iFrames) + DELAY_BLINK) {
+        set_i_frames_display(&e.iFrames, !get_i_frames_display(e.iFrames));
+        set_i_frames_display_delay(&e.iFrames, SDL_GetTicks());
+      }
+    }
+  }
 
   character_update_dir(&e, set_intpoint(get_character_hitbox(*p).x + (IMG_WIDTH / 2), get_character_hitbox(*p).y + (IMG_HEIGHT / 2)));
 
@@ -466,6 +506,8 @@ character_t set_character (short int hp, floatpoint_t position, vector_t velocit
   set_character_velocity(&p, velocity.x, velocity.y);
   set_character_sprite_pos(&p, posSprite);
 
+  set_character_i_frames(&p, init_i_frames());
+
   return p;
 }
 
@@ -562,6 +604,12 @@ void set_character_hitbox (character_t *p, SDL_Rect hitbox) {
   return;
 }
 
+//set the iFrames
+void set_character_i_frames(character_t *p, i_frames_t f) {
+  p->iFrames = f;
+  return;
+}
+
 /* GET */
 
 //get the character's health points
@@ -637,4 +685,9 @@ SDL_Rect get_character_sprite_pos (character_t p) {
 //get the character's hitbox
 SDL_Rect get_character_hitbox (character_t p) {
   return p.hitbox;
+}
+
+//get the iFrames
+i_frames_t get_character_i_frames (character_t p) {
+  return p.iFrames;
 }

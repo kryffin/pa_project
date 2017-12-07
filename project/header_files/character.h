@@ -14,6 +14,7 @@
 #include "blocks.h"
 #include "projectile.h"
 #include "music.h"
+#include "iframes.h"
 
 /*************/
 /* CONSTANTS */
@@ -31,6 +32,10 @@
 #define ENEMY_SHOOT_DELAY 500
 
 #define AIR_ACCELERATION 1.5
+
+#define DELAY_INVINCIBILITY 2000
+
+#define DELAY_BLINK 100
 
 /**************/
 /* STRUCTURES */
@@ -83,6 +88,8 @@ typedef struct Character {
 
   vector_t vel; //velocity
   SDL_Rect spritePos; //position of the sprite in the sprite sheet
+
+  i_frames_t iFrames; //manages the invincibility frames of the character
 
 } character_t;
 
@@ -205,6 +212,9 @@ void set_character_sprite_pos (character_t *p, SDL_Rect posSprite);
 //set the character hitbox
 void set_character_hitbox (character_t *p, SDL_Rect hitbox);
 
+//set the iFrames
+void set_character_i_frames(character_t *p, i_frames_t f);
+
 /* GET */
 
 //get the character's health points
@@ -251,5 +261,8 @@ SDL_Rect get_character_sprite_pos (character_t p);
 
 //get the character's hitbox
 SDL_Rect get_character_hitbox (character_t p);
+
+//get the iFrames
+i_frames_t get_character_i_frames (character_t p);
 
 #endif

@@ -395,7 +395,11 @@ void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) 
 
   tempSpritePos = get_character_sprite_pos(p);
 
-  SDL_RenderCopy(renderer, img, &tempSpritePos, &tempPos);
+  if (!(get_i_frames_invincible(get_character_i_frames(p)) && !get_i_frames_display(get_character_i_frames(p)))) {
+
+    SDL_RenderCopy(renderer, img, &tempSpritePos, &tempPos);
+
+  }
 
   tempSpritePos.x = 128;
   tempSpritePos.y = 116 - (2 * p.hp);
