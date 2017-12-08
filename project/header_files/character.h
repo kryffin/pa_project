@@ -68,11 +68,13 @@ typedef struct Character {
   short int step; //step used for walking animation
   short int type; //type
   bool onGround; //is the character on a ground?
+  bool isCollision; //is the character under collision ?
+  bool isHit;
   short int state; //curent state
 
   int stepDelay; //used to delay between each step of the walking animation
   int shootDelay; //used to delay between each shot
-  int changeVelDelay; //used to delay the automatic change of velocity
+  int salveDelay; //used to delay the automatic change of velocity
   floatpoint_t realPos; //real position
   intpoint_t screenPos; //screen position
   intpoint_t gridPos; //position on the level grid

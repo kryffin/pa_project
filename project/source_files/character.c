@@ -99,7 +99,10 @@ character_list_t bullet_collision (character_list_t enemies, projectile_t p, boo
     //if there is a collision, we stop searching, we decrease enemy's life and returns the updated list
     *destroy = true;
     enemies->head.hp -= 1;
+    enemies->head.isHit = true;
     return character_list_build(enemies->head, character_list_rest(enemies));
+  } else {
+    enemies->head.isHit = false;
   }
 
   return character_list_build(enemies->head, bullet_collision(character_list_rest(enemies), p, destroy));
@@ -135,9 +138,9 @@ void update_character (character_t *p, character_list_t *enemies, block_t blocks
 
   set_character_hitbox(p, temp);
 
+  *enemies = update_enemies(*enemies, p, blocks);
   p->projectiles = update_projectiles(p->projectiles, blocks, p, *enemies, true);
 
-  *enemies = update_enemies(*enemies, p, blocks);
 
   return;
 }
@@ -156,7 +159,6 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
 
   character_t e = character_list_head(c);
   e.projectiles = character_list_head(c).projectiles;
-
   set_character_screen_position(&e, (int)floor(get_character_real_position(e).x), (int)floor(get_character_real_position(e).y));
 
   if (e.onGround && e.gridPos.y * 16 != e.screenPos.y) {
@@ -195,62 +197,42 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
 
 //embryon of IA
 void character_behaviour(character_t *e, character_t p, int taille, int x, int y){
-
   //initialisation of a random number:
-  srand(SDL_GetTicks());
-  int rdm = rand();
-  printf("%d\n", rdm);
-  rdm *= taille;
-  rdm %= 3;
-  //printf("___%d\n*****", rdm);
-  switch (rdm){
-  case -2:
-      //set_character_velocity(e, 5, 0);
-      break;
-  case -1:
+  //srand(SDL_GetTicks());
+  //int rdm = rand();
+
+  //IDLE STATE
+
+  //initialisation variables needed to detect the player in the range box
+  int p_scr_x = get_character_screen_position(p).x;
+  int p_scr_y = get_character_screen_position(p).y;
+  int e_scr_x = get_character_screen_position(*e).x;
+  int e_scr_y = get_character_screen_position(*e).y;
+  int player_far = abs(p_scr_x - e_scr_x);
+
+  bool inRangeLeft = (p_scr_x < e_scr_x) && (p_scr_x + 200 - e_scr_x) > 0 && ((p_scr_y -100 - e_scr_y) < 0 && (e_scr_y - p_scr_y - 100) < 0);
+  bool inRangeRight = (p_scr_x > e_scr_x) && (p_scr_x - 200 - e_scr_x) < 0 && ((p_scr_y - 100 - e_scr_y) < 0 && (e_scr_y - p_scr_y - 100) < 0);;
+  bool inRange = inRangeLeft || inRangeRight;
+
+
+  if (inRange){ //if the player is in range or hitten, its the alert state
+    if (player_far > IMG_WIDTH){
+      set_character_state(e, Walking);
+      shooting(true, e, set_intpoint(p_scr_x + (IMG_WIDTH/2), p_scr_y+10 - (IMG_HEIGHT/2)));
+    } else {
+      shooting(false, e, set_intpoint(p_scr_x + (IMG_WIDTH/2), p_scr_y+10 - (IMG_HEIGHT/2)));
+      set_character_state(e, Attacking);
+    }
+  } else { //not inRange check if its hit
+    set_character_state(e, Walking);
+    shooting(false, e, set_intpoint(p_scr_x + (IMG_WIDTH/2), p_scr_y+10 - (IMG_HEIGHT/2)));
+    if (!e->isHit){ //if hitten
       //set_character_velocity(e, -5, 0);
-      break;
-    //moving on x axis
-  case 0:
-    //if the ennemy is away from the "safe zone" of the player then the velocity is applied
-    if (get_character_screen_position(p).x + 100 < get_character_screen_position(*e).x){
-      if (SDL_GetTicks() > e->changeVelDelay + 1500) {
-        int velX;
-        velX = SDL_GetTicks()%5;
-        set_character_velocity(e, velX, 0);
-        e->changeVelDelay = SDL_GetTicks();
-      }
-    } else {//the ennemy is in the safe area
-      int tmp = get_character_screen_position(*e).x - get_character_screen_position(p).x;
-      //on the right part
-      if (tmp >= 0){
-        set_character_velocity(e, 5, 0);
-        e->changeVelDelay = SDL_GetTicks();
-      } else { // on the left part
-        set_character_velocity(e, -5, 0);
-        e->changeVelDelay = SDL_GetTicks();
-      }
-
+    } else { //not hitten
+      //set_character_velocity(e, 5, 0);
     }
-    break;
-    //jumping
-  case 1:
-    if (SDL_GetTicks() > e->changeVelDelay + 1500){
-      character_jumping(e);
-    }
-    break;
-    //shooting
-  case 2:
-    if (SDL_GetTicks() > e->shootDelay + ENEMY_SHOOT_DELAY) {
-        shooting(true, e, set_intpoint(x + (IMG_WIDTH / 2), y + (IMG_HEIGHT / 2)));
-        e->shootDelay = SDL_GetTicks();
-    }
-    break;
-
-  case 3:
-    shooting(false, e, set_intpoint(x + (IMG_WIDTH / 2), y + (IMG_HEIGHT / 2)));
-    break;
   }
+
 }
 
 //update the step used for the walking animation
@@ -289,10 +271,14 @@ void character_update_dir (character_t *p, intpoint_t target) {
 //apply the velocity on the character if possible
 void character_apply_velocity (character_t *p, block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]) {
 
+  p->isCollision = true;
+
   if (p->gridPos.y == NB_BLOCKS_HEIGHT - 4 || blocks[p->gridPos.x][p->gridPos.y + 4].type == 0 || blocks[p->gridPos.x + 1][p->gridPos.y + 4].type == 0) {
     p->onGround = true;
+    //p->isCollision = false;
   } else {
     p->onGround = false;
+    //p->isCollision = false;
   }
 
   if (!p->onGround) {
@@ -303,26 +289,31 @@ void character_apply_velocity (character_t *p, block_t blocks[NB_BLOCKS_WIDTH][N
   if (p->vel.x < 0.0) {
     if (p->gridPos.x != 0 && (blocks[p->gridPos.x - 1][p->gridPos.y].type != 0 && blocks[p->gridPos.x - 1][p->gridPos.y + 1].type != 0 && blocks[p->gridPos.x - 1][p->gridPos.y + 2].type != 0 && blocks[p->gridPos.x - 1][p->gridPos.y + 3].type != 0)) {
       p->realPos.x += p->vel.x;
+      //p->isCollision = false;
     }
   }
   if (p->vel.x > 0.0 && (blocks[p->gridPos.x + 1][p->gridPos.y].type != 0 && blocks[p->gridPos.x + 1][p->gridPos.y + 1].type != 0 && blocks[p->gridPos.x + 1][p->gridPos.y + 2].type != 0 && blocks[p->gridPos.x + 1][p->gridPos.y + 3].type != 0)) {
     if (p->gridPos.x != NB_BLOCKS_WIDTH - 1) {
       p->realPos.x += p->vel.x;
+      //p->isCollision = false;
     }
   }
 
   if (blocks[p->gridPos.x][p->gridPos.y - 1].type == 0) {
     p->vel.y = 4.0;
+    //p->isCollision = false;
   }
 
   if (p->vel.y < 0.0 && blocks[p->gridPos.x][p->gridPos.y - 1].type != 0) {
     if (p->gridPos.y != 0) {
       p->realPos.y += p->vel.y;
+      //p->isCollision = false;
     }
   }
   if (p->vel.y > 0.0 && blocks[p->gridPos.x][p->gridPos.y + 4].type != 0) {
     if (p->gridPos.y != NB_BLOCKS_HEIGHT - 4) {
       p->realPos.y += p->vel.y;
+      //p->isCollision = false;
     }
   }
 
