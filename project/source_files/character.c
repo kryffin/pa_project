@@ -6,6 +6,38 @@ character.c : contain every functions for the characters
 
 #include "../header_files/character.h"
 
+//apply the melee damage
+void apply_melee_damage (character_t p, character_list_t enemies, int dmg) {
+
+  if (character_list_is_empty(enemies)) {
+    return;
+  }
+
+  //target of the melee attack
+  SDL_Rect target = get_character_hitbox(p);
+  target.w = 32;
+  target.h = 32;
+
+  if (get_character_dir(p) == Left) {
+    //facing left
+    target.x -= IMG_WIDTH;
+  } else {
+    //facing right
+    target.x += IMG_WIDTH;
+  }
+
+  SDL_Rect enemyPos = get_character_hitbox(enemies->head);
+
+  if ((target.x <= enemyPos.x + enemyPos.w && target.x >= enemyPos.x)
+      || (target.x + target.w <= enemyPos.x + enemyPos.w && target.x + target.w >= enemyPos.x)
+      || (target.y <= enemyPos.y + enemyPos.h && target.y >= enemyPos.y)
+      || (target.y + target.h <= enemyPos.y + enemyPos.h && target.y + target.h >= enemyPos.y)) {
+    apply_damage(&enemies->head, dmg);
+  }
+
+  apply_melee_damage(p, enemies->next, dmg);
+}
+
 //apply damage on a character and begin the invincibility frames
 void apply_damage (character_t *p, int dmg) {
   if (get_i_frames_invincible(p->iFrames)) {
@@ -46,13 +78,8 @@ projectile_list_t shooting (bool mouse_btn, character_t p, intpoint_t mouse_pos,
     case Rifle:
 
       //sprite position
-      if (p.type == Player) {
-        tempSprite.x = 128;
-        tempSprite.y = 64;
-      } else {
-        tempSprite.x = 144;
-        tempSprite.y = 64;
-      }
+      tempSprite.x = 128;
+      tempSprite.y = 64;
       tempSprite.w = BULLET_WIDTH;
       tempSprite.h = BULLET_HEIGHT;
 
@@ -138,7 +165,22 @@ projectile_list_t update_projectiles (projectile_list_t projectiles, block_t blo
   if (!playerShooting) {
     //ennemy shooting
     if (get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles))) >= player->hitbox.x && get_floatpoint_x(get_projectile_real_position(projectile_list_head(projectiles) ))<= player->hitbox.x + player->hitbox.w && get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) >= player->hitbox.y && get_floatpoint_y(get_projectile_real_position(projectile_list_head(projectiles))) <= player->hitbox.y + player->hitbox.h) {
-      apply_damage(player, 1);
+
+      short int bulletType = get_projectile_bullet_type(projectiles->head);
+      switch (bulletType) {
+        case Bullet:
+        case Buckshot:
+          apply_damage(player, BULLET_DAMAGE);
+          break;
+
+        case Missile:
+          apply_damage(player, MISSILE_DAMAGE);
+          break;
+
+        default:
+          break;
+      }
+
       projectile_list_t next = projectile_list_copy(projectile_list_rest(projectiles));
       projectile_list_free(projectiles);
       return update_projectiles(next, blocks, player, enemies, mouse_pos, playerShooting);
@@ -204,7 +246,20 @@ void bullet_collision (character_list_t enemies, projectile_t p, bool *destroy) 
   if (get_floatpoint_x(get_projectile_real_position(p)) >= enemies->head.hitbox.x && get_floatpoint_x(get_projectile_real_position(p)) <= enemies->head.hitbox.x + enemies->head.hitbox.w && get_floatpoint_y(get_projectile_real_position(p)) >= enemies->head.hitbox.y && get_floatpoint_y(get_projectile_real_position(p)) <= enemies->head.hitbox.y + enemies->head.hitbox.h && enemies->head.hp > 0) {
     //if there is a collision, we stop searching, we decrease enemy life and returns the updated list
     *destroy = true;
-    apply_damage(&enemies->head, 1);
+    short int bulletType = get_projectile_bullet_type(p);
+    switch (bulletType) {
+      case Bullet:
+      case Buckshot:
+        apply_damage(&enemies->head, BULLET_DAMAGE);
+        break;
+
+      case Missile:
+        apply_damage(&enemies->head, MISSILE_DAMAGE);
+        break;
+
+      default:
+        break;
+    }
     return;
   }
 
@@ -230,6 +285,10 @@ void update_character (character_t *p, character_list_t *enemies, block_t blocks
 
   set_character_hitbox(p, temp);
 
+  if (get_character_state(*p) == Jumping && p->onGround) {
+    set_character_state(p, Walking);
+  }
+
   if (get_i_frames_invincible(p->iFrames)) {
     if (SDL_GetTicks() >= get_i_frames_delay(p->iFrames) + DELAY_INVINCIBILITY) {
       set_i_frames_invincible(&p->iFrames, false);
@@ -237,6 +296,17 @@ void update_character (character_t *p, character_list_t *enemies, block_t blocks
       if (SDL_GetTicks() >= get_i_frames_display_delay(p->iFrames) + DELAY_BLINK) {
         set_i_frames_display(&p->iFrames, !get_i_frames_display(p->iFrames));
         set_i_frames_display_delay(&p->iFrames, SDL_GetTicks());
+      }
+    }
+  }
+
+  if (get_character_state(*p) == Attacking) {
+    if (SDL_GetTicks() >= p->atkDelay + DELAY_MELEE) {
+      set_character_state(p, Walking);
+    } else {
+      if (SDL_GetTicks() >= p->atkDelay + (DELAY_MELEE / 2) && p->atkState == true) {
+        apply_melee_damage(*p, *enemies, MELEE_DAMAGE);
+        p->atkState = false;
       }
     }
   }
@@ -277,7 +347,9 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
     e.projectiles = shooting(true, e, set_intpoint(get_character_hitbox(*p).x + (IMG_WIDTH / 2), get_character_hitbox(*p).y + (IMG_HEIGHT / 2)), musicBox);
     e.shootDelay = SDL_GetTicks();
   }
-  e.projectiles = update_projectiles(projectile_list_copy(e.projectiles), blocks, p, c, set_intpoint((int)floor(get_floatpoint_x(get_character_real_position(*p))), (int)floor(get_floatpoint_y(get_character_real_position(*p)))), false);
+  projectile_list_t tmpProj = projectile_list_copy(e.projectiles);
+  projectile_list_free(e.projectiles);
+  e.projectiles = update_projectiles(tmpProj, blocks, p, c, set_intpoint((int)floor(get_floatpoint_x(get_character_real_position(*p))), (int)floor(get_floatpoint_y(get_character_real_position(*p)))), false);
   //character_gravity(&e);
   character_apply_velocity(&e, blocks);
 

@@ -37,6 +37,12 @@
 
 #define DELAY_BLINK 100
 
+#define DELAY_MELEE 400
+
+#define BULLET_DAMAGE 1
+#define MELEE_DAMAGE 3
+#define MISSILE_DAMAGE 10
+
 /**************/
 /* STRUCTURES */
 /**************/
@@ -79,6 +85,8 @@ typedef struct Character {
 
   int stepDelay; //used to delay between each step of the walking animation
   int shootDelay; //used to delay between each shot
+  int atkDelay; //used to delay each attack
+  bool atkState; //state of the melee attack
 
   floatpoint_t realPos; //real position
   SDL_Rect hitbox; //hitbox
@@ -102,6 +110,12 @@ struct Character_List {
 /*************/
 /* FUNCTIONS */
 /*************/
+
+//apply the melee damage
+void apply_melee_damage (character_t p, character_list_t enemies, int dmg);
+
+//apply damage on a character and begin the invincibility frames
+void apply_damage (character_t *p, int dmg);
 
 //create a new projectile and add it in the list
 projectile_list_t shooting (bool mouse_btn, character_t p, intpoint_t target, musicbox_t musicBox);

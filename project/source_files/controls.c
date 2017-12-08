@@ -99,61 +99,53 @@ void keyboard_control (game_t *game) {
   /* KEYDOWN Controls */
 
   //'q' key
-  if (game->keys[KeyQ] == true) {
-    if(get_character_state(game->player) != Crouching) {
-      set_character_velocity(&game->player, -1 * CHARACTER_SPEED, game->player.vel.y); //set a left velocity
-      //set_character_velocity(&game->enemies->head, -1 * CHARACTER_SPEED, game->enemies->head.vel.y); //set a left velocity
-    }
+  if (game->keys[KeyQ] == true && get_character_state(game->player) != Crouching && get_character_state(game->player) != Attacking) {
+    set_character_velocity(&game->player, -1 * CHARACTER_SPEED, game->player.vel.y); //set a left velocity
   }
 
   //'d' key
-  if (game->keys[KeyD] == true) {
-    if(get_character_state(game->player) != Crouching) {
-      set_character_velocity(&game->player, 1 * CHARACTER_SPEED, game->player.vel.y); //set a left velocity
-      //set_character_velocity(&game->enemies->head, 1 * CHARACTER_SPEED, game->enemies->head.vel.y); //set a left velocity
-    }
+  if (game->keys[KeyD] == true && get_character_state(game->player) != Crouching && get_character_state(game->player) != Attacking) {
+    set_character_velocity(&game->player, 1 * CHARACTER_SPEED, game->player.vel.y); //set a left velocity
   }
 
   //'space' key
-  if (game->keys[KeySpace] == true) {
-    if (!(game->player.onGround)) {
-      set_character_state(&game->player, Walking);
-    } else {
-      set_character_state(&game->player, Jumping);
-      character_jumping(&game->player);
-      game->player.onGround = false;
-    }
+  if (game->keys[KeySpace] == true && get_character_state(game->player) == Walking) {
+    set_character_state(&game->player, Jumping);
+    character_jumping(&game->player);
+    game->player.onGround = false;
   }
 
   //'f' key
-  if (game->keys[KeyF] == true) {
+  if (game->keys[KeyF] == true && get_character_state(game->player) == Walking) {
+    set_vector_x(&game->player.vel, 0.0);
     set_character_state(&game->player, Attacking);
+    game->player.atkDelay = SDL_GetTicks();
+    game->player.atkState = true;
   }
 
   //'s' key
-  if (game->keys[KeyS] == true) {
+  if (game->keys[KeyS] == true && get_character_state(game->player) == Walking) {
     set_character_state(&game->player, Crouching);
-    set_character_velocity(&game->player, 0, game->player.vel.y); //set a left velocity
+    set_character_velocity(&game->player, 0.0, game->player.vel.y); //set a left velocity
 
     //debug
     if (!level_list_is_empty(level_list_rest(game->currLevel))) {
       game->currLevel = level_list_rest(game->currLevel);
       Mix_PlayMusic(game->currLevel->head.levelMusic, -1);
     }
-    set_character_weapon(&game->player, Bazooka);
   }
 
-  //'space' key
+  //'&' key
   if (game->keys[Key1] == true) {
     set_character_weapon(&game->player, Rifle);
   }
 
-  //'f' key
+  //'é' key
   if (game->keys[Key2] == true) {
     set_character_weapon(&game->player, Shotgun);
   }
 
-  //'s' key
+  //'"' key
   if (game->keys[Key3] == true) {
     set_character_weapon(&game->player, Bazooka);
   }
@@ -164,7 +156,6 @@ void keyboard_control (game_t *game) {
   if (game->keys[KeyQ] == false) {
     if (get_character_velocity(game->player).x < 0) {
       set_character_velocity(&game->player, 0, game->player.vel.y);
-      //set_character_velocity(&game->enemies->head, -1 * CHARACTER_SPEED, game->enemies->head.vel.y); //set a left velocity
     }
   }
 
@@ -172,24 +163,16 @@ void keyboard_control (game_t *game) {
   if (game->keys[KeyD] == false) {
     if (get_character_velocity(game->player).x > 0) {
       set_character_velocity(&game->player, 0, game->player.vel.y);
-      //set_character_velocity(&game->enemies->head, 1 * CHARACTER_SPEED, game->enemies->head.vel.y); //set a left velocity
     }
   }
 
   //'space' key
-  if (game->keys[KeySpace] == false) {
+  /*if (game->keys[KeySpace] == false) {
     if (get_character_state(game->player) == Jumping) {
       set_character_state(&game->player, Walking);
       set_character_velocity(&game->player, game->player.vel.x, 0);
     }
-  }
-
-  //'f' key
-  if (game->keys[KeyF] == false) {
-    if (get_character_state(game->player) == Attacking) {
-      set_character_state(&game->player, Walking);
-    }
-  }
+  }*/
 
   //'s' key
   if (game->keys[KeyS] == false) {

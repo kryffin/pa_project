@@ -9,35 +9,28 @@ rendering.c : contain the functions to display everything
 //render the melee attacks
 void render_melee (character_t p, SDL_Renderer *renderer, SDL_Texture *img) {
 
-  SDL_Rect *target = NULL;
-  target = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  target->x = get_character_hitbox(p).x;
-  target->y = get_character_hitbox(p).y;
-  target->w = get_character_hitbox(p).w;
-  target->h = get_character_hitbox(p).h;
+  SDL_Rect target = get_character_hitbox(p);
+  target.w = 32;
+  target.h = 32;
 
-  SDL_Rect *effect = NULL;
-  effect = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  effect->y = 128;
-  effect->w = 32;
-  effect->h = 64;
+  SDL_Rect effect;
+  effect.y = 192;
+  effect.w = 32;
+  effect.h = 32;
 
   if (get_character_dir(p) == Left) {
     //facing left
-    target->x -= IMG_WIDTH;
-    effect->x = 32;
+    target.x -= IMG_WIDTH;
+    effect.x = 32;
 
   } else {
     //facing right
-    target->x += IMG_WIDTH;
-    effect->x = 0;
+    target.x += IMG_WIDTH;
+    effect.x = 0;
 
   }
 
-  SDL_RenderCopy(renderer, img, effect, target);
-
-  free(target);
-  free(effect);
+  SDL_RenderCopy(renderer, img, &effect, &target);
 
   return;
 }
@@ -287,6 +280,9 @@ void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) 
 
       temp.x = 64;
       temp.y = 128;
+      if (SDL_GetTicks() >= p.atkDelay + (DELAY_MELEE / 2)) {
+        temp.x = 0;
+      }
       set_character_sprite_pos(&p, temp);
 
         break;
@@ -373,6 +369,9 @@ void render_character (character_t p, SDL_Renderer *renderer, SDL_Texture *img) 
 
       temp.x = 96;
       temp.y = 128;
+      if (SDL_GetTicks() >= p.atkDelay + (DELAY_MELEE / 2)) {
+        temp.x = 32;
+      }
       set_character_sprite_pos(&p, temp);
 
         break;
@@ -444,7 +443,7 @@ void rendering (game_t *game) {
   render_foreground_level(*game);
 
   //render the attack and process it
-  if (get_character_state(game->player) == Attacking)  {
+  if (get_character_state(game->player) == Attacking && SDL_GetTicks() >= game->player.atkDelay + (DELAY_MELEE / 2))  {
     render_melee(game->player, game->renderer, game->spriteSheet);
   }
 
