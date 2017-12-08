@@ -53,7 +53,8 @@ enum CharacterState {
   Jumping,
   nouse,
   Attacking,
-  Crouching
+  Crouching,
+  Alert
 };
 
 enum CharacterType {

@@ -99,10 +99,10 @@ character_list_t bullet_collision (character_list_t enemies, projectile_t p, boo
     //if there is a collision, we stop searching, we decrease enemy's life and returns the updated list
     *destroy = true;
     enemies->head.hp -= 1;
-    enemies->head.isHit = true;
+
     return character_list_build(enemies->head, character_list_rest(enemies));
   } else {
-    enemies->head.isHit = false;
+
   }
 
   return character_list_build(enemies->head, bullet_collision(character_list_rest(enemies), p, destroy));
@@ -138,8 +138,8 @@ void update_character (character_t *p, character_list_t *enemies, block_t blocks
 
   set_character_hitbox(p, temp);
 
-  *enemies = update_enemies(*enemies, p, blocks);
   p->projectiles = update_projectiles(p->projectiles, blocks, p, *enemies, true);
+  *enemies = update_enemies(*enemies, p, blocks);
 
 
   return;
@@ -192,6 +192,7 @@ character_list_t update_enemies (character_list_t c, character_t *p, block_t blo
   character_apply_velocity (&e, blocks);
   character_gravity(&e);
 
+
   return character_list_build(e, update_enemies(character_list_rest(c), p, blocks));
 }
 
@@ -210,14 +211,14 @@ void character_behaviour(character_t *e, character_t p, int taille, int x, int y
   int e_scr_y = get_character_screen_position(*e).y;
   int player_far = abs(p_scr_x - e_scr_x);
 
-  bool inRangeLeft = (p_scr_x < e_scr_x) && (p_scr_x + 200 - e_scr_x) > 0 && ((p_scr_y -100 - e_scr_y) < 0 && (e_scr_y - p_scr_y - 100) < 0);
-  bool inRangeRight = (p_scr_x > e_scr_x) && (p_scr_x - 200 - e_scr_x) < 0 && ((p_scr_y - 100 - e_scr_y) < 0 && (e_scr_y - p_scr_y - 100) < 0);;
+  bool inRangeLeft = (p_scr_x < e_scr_x) && (p_scr_x + 150 - e_scr_x) > 0 && ((p_scr_y -150 - e_scr_y) < 0 && (e_scr_y - p_scr_y - 150) < 0);
+  bool inRangeRight = (p_scr_x > e_scr_x) && (p_scr_x - 150 - e_scr_x) < 0 && ((p_scr_y - 150 - e_scr_y) < 0 && (e_scr_y - p_scr_y - 150) < 0);;
   bool inRange = inRangeLeft || inRangeRight;
 
 
   if (inRange){ //if the player is in range or hitten, its the alert state
     if (player_far > IMG_WIDTH){
-      set_character_state(e, Walking);
+      set_character_state(e, Attacking);
       shooting(true, e, set_intpoint(p_scr_x + (IMG_WIDTH/2), p_scr_y+10 - (IMG_HEIGHT/2)));
     } else {
       shooting(false, e, set_intpoint(p_scr_x + (IMG_WIDTH/2), p_scr_y+10 - (IMG_HEIGHT/2)));
@@ -226,12 +227,27 @@ void character_behaviour(character_t *e, character_t p, int taille, int x, int y
   } else { //not inRange check if its hit
     set_character_state(e, Walking);
     shooting(false, e, set_intpoint(p_scr_x + (IMG_WIDTH/2), p_scr_y+10 - (IMG_HEIGHT/2)));
-    if (!e->isHit){ //if hitten
-      //set_character_velocity(e, -5, 0);
-    } else { //not hitten
-      //set_character_velocity(e, 5, 0);
+    if (e->hp < 10){ //if hitten
+      set_character_state(e, Alert);
+    } else {
+      set_character_state(e, Walking);
     }
   }
+
+  if (get_character_state(*e) == Walking)
+  {
+    int velX;
+    if (player_far > 0) {
+      velX = 5;
+    } else {
+      velX = -5;
+    }
+    if (get_character_grid_position(*e).x == 0 || get_character_grid_position(*e).x > 40 - IMG_WIDTH){
+      velX *= -1;
+    }
+    set_character_velocity(e, velX, get_character_velocity(*e).y);
+  }
+
 
 }
 
