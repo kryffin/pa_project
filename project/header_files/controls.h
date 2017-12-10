@@ -11,6 +11,7 @@
 #include "2dpoint.h"
 #include "character.h"
 #include "game.h"
+#include "menu.h"
 
 /*************/
 /* CONSTANTS */

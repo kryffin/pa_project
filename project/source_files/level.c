@@ -6,6 +6,32 @@ level.c : every functions regarding the levels
 
 #include "../header_files/level.h"
 
+//free the head of a level list
+void free_level (level_list_t l) {
+  SDL_DestroyTexture(l->head.background);
+  SDL_DestroyTexture(l->head.blocks_spritesheet);
+  character_list_free(l->head.enemies);
+  Mix_FreeMusic(l->head.levelMusic);
+  free(l);
+
+  return;
+}
+
+//go to next level if enemies are all dead
+level_list_t next_level (level_list_t l) {
+
+  //if the next level isn't empty and there are no more enemies
+  if (!level_list_is_empty(level_list_rest(l)) && character_list_is_empty(l->head.enemies)) {
+
+    level_list_t tmp = level_list_rest(l);
+    free_level(l);
+
+    return tmp;
+  }
+
+  return l;
+}
+
 //set the level music
 void set_level_music (level_t *l, char *path) {
   l->levelMusic = Mix_LoadMUS(path);
@@ -18,7 +44,7 @@ void set_level_music (level_t *l, char *path) {
 }
 
 //read the txt file to complete the block array, create the enemies and place the player
-level_t init_level (char *path_blocks, char *path_background, char *path_file, char *path_music, character_t *p, character_list_t *enemies, SDL_Renderer *renderer) {
+level_t init_level (char *path_blocks, char *path_background, char *path_file, char *path_music, character_t *p, SDL_Renderer *renderer) {
 
   level_t l;
   int i = 0;
@@ -43,6 +69,8 @@ level_t init_level (char *path_blocks, char *path_background, char *path_file, c
     exit(1);
   }
   SDL_FreeSurface(temp);
+
+  l.enemies = character_list_empty();
 
   //loading the txt file
   FILE *txtFile = fopen(path_file, "r");
@@ -121,7 +149,7 @@ level_t init_level (char *path_blocks, char *path_background, char *path_file, c
 
         case 'e':
           //enemy
-          *enemies = character_list_build(set_character(10, set_floatpoint(x * BLOCK_SIZE, (y * BLOCK_SIZE) - IMG_HEIGHT), set_vector(0.0, 0.0), cSpritePos, Enemy), *enemies);
+          l.enemies = character_list_build(set_character(10, set_floatpoint(x * BLOCK_SIZE, (y * BLOCK_SIZE) - IMG_HEIGHT), set_vector(0.0, 0.0), cSpritePos, Enemy), l.enemies);
           i++;
           break;
 
@@ -187,15 +215,36 @@ level_list_t level_list_empty () {
   return NULL;
 }
 
+//copy the list of level
+level_list_t level_list_copy (level_list_t l) {
+  if (level_list_is_empty(l)) {
+    return level_list_empty();
+  }
+
+  return level_list_build(level_list_head(l), level_list_copy(level_list_rest(l)));
+}
+
 //free the entire list
 void level_list_free (level_list_t l) {
   if (level_list_is_empty(l)) {
     return;
   }
+
   level_list_free(level_list_rest(l));
-  SDL_DestroyTexture(l->head.background);
+
+  character_list_free(l->head.enemies);
   SDL_DestroyTexture(l->head.blocks_spritesheet);
-  free(l);
+  SDL_DestroyTexture(l->head.background);
+  Mix_FreeMusic(l->head.levelMusic);
+
+  if (l == NULL) {
+    printf("level_list_t already freed!\n");
+    exit(1);
+  } else {
+    free(l);
+    l = NULL;
+  }
+
   return;
 }
 

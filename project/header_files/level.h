@@ -21,6 +21,8 @@ typedef struct Level {
 
   block_t blocks[NB_BLOCKS_WIDTH][NB_BLOCKS_HEIGHT]; //all the blocks of the level
 
+  character_list_t enemies; //list of enemies
+
   SDL_Texture *blocks_spritesheet; //spritesheet of the blocks
   SDL_Texture *background; //background of the level
 
@@ -38,11 +40,17 @@ struct Level_List {
 /* FUNCTIONS */
 /*************/
 
+//free the head of a level list
+void free_level (level_list_t l);
+
+//go to next level if enemies are all dead
+level_list_t next_level (level_list_t l);
+
 //set the level music
 void set_level_music (level_t *l, char *path);
 
 //read the txt file to complete the block array, create the enemies and place the player
-level_t init_level (char *blocks, char *path_background, char *path_file, char *path_music, character_t *p, character_list_t *enemies, SDL_Renderer *renderer);
+level_t init_level (char *blocks, char *path_background, char *path_file, char *path_music, character_t *p, SDL_Renderer *renderer);
 
 /* LIST */
 
@@ -60,6 +68,9 @@ bool level_list_is_empty (level_list_t l);
 
 //returns an empty list
 level_list_t level_list_empty ();
+
+//copy the list of level
+level_list_t level_list_copy (level_list_t l);
 
 //free the entire list
 void level_list_free (level_list_t l);

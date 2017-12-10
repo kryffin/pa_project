@@ -43,9 +43,7 @@ int main () {
     /* updates */
 
     //player
-    update_character(&g->player, &g->enemies, g->currLevel->head.blocks, g->mouse_pos, &g->quit, g->musicBox);
-    //g->player.projectiles = update_projectiles(g->player.projectiles, g->currLevel->head.blocks, &g->player, g->enemies, true);
-
+    update_character(&g->player, &g->currLevel->head.enemies, g->currLevel->head.blocks, g->mouse_pos, &g->quit, g->musicBox);
 
     if (SDL_GetTicks() >= g->player.stepDelay + DELAY_STEP) {
       character_update_step(&g->player);
@@ -58,13 +56,21 @@ int main () {
       g->player.onGround = true;
     }
 
+    g->currLevel = next_level(g->currLevel);
+
     /* rendering */
 
     rendering(g);
 
-    //game over screen
-    if (!is_alive(g->player)) {
-      game_over(*g);
+    if (g->openMenu || !is_alive(g->player)) {
+      
+      g->openMenu = false;
+
+      if (!is_alive(g->player)) {
+        //game over screen
+        game_over(*g);
+      }
+
       reset_game(g);
       menu(g);
     }

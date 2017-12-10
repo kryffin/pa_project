@@ -12,12 +12,12 @@ void menu (game_t *g) {
   switch (menuOption) {
 
     case 1:
-      g->currLevel = level_list_build(init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND_LEVEL_1, PATH_TXT_LEVEL_1, PATH_LEVEL1_MUSIC, &g->player, &g->enemies, g->renderer), level_list_build( init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND_LEVEL_2, PATH_TXT_LEVEL_2, PATH_LEVEL2_MUSIC, &g->player, &g->enemies, g->renderer), level_list_build( init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND_LEVEL_3, PATH_TXT_LEVEL_3, PATH_LEVEL3_MUSIC, &g->player, &g->enemies, g->renderer), level_list_empty())));
+      g->currLevel = level_list_build(init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND_LEVEL_1, PATH_TXT_LEVEL_1, PATH_LEVEL1_MUSIC, &g->player, g->renderer), level_list_build(init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND_LEVEL_2, PATH_TXT_LEVEL_2, PATH_LEVEL2_MUSIC, &g->player, g->renderer), level_list_build(init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND_LEVEL_3, PATH_TXT_LEVEL_3, PATH_LEVEL3_MUSIC, &g->player, g->renderer), level_list_empty())));
       Mix_PlayMusic(g->currLevel->head.levelMusic, -1);
       break;
 
     case 2:
-      g->currLevel = level_list_build(init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND_ARENA, PATH_TXT_ARENA, PATH_ARENA_MUSIC, &g->player, &g->enemies, g->renderer), level_list_empty());
+      g->currLevel = level_list_build(init_level(PATH_BLOCKS_SHEET, PATH_BACKGROUND_ARENA, PATH_TXT_ARENA, PATH_ARENA_MUSIC, &g->player, g->renderer), level_list_empty());
       Mix_PlayMusic(g->currLevel->head.levelMusic, -1);
       break;
 

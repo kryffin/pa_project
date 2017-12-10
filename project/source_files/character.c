@@ -530,7 +530,7 @@ character_list_t character_list_copy (character_list_t c) {
   return character_list_build(character_list_head(c), character_list_copy(character_list_rest(c)));
 }
 
-//free the list of character as well as their projectiles
+//free the list of character
 void character_list_free (character_list_t c) {
   if (character_list_is_empty(c)) {
     return;

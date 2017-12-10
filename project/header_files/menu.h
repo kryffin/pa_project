@@ -10,7 +10,6 @@
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include "2dpoint.h"
-#include "controls.h"
 #include "game.h"
 #include "rendering.h"
 

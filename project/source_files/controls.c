@@ -47,7 +47,7 @@ void update_controls (game_t *game) {
     if (game->event->type == SDL_KEYDOWN) {
 
       if (game->event->key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
-        game->quit = true;
+        game->openMenu = true;
       }
 
       if (game->event->key.keysym.scancode == SDL_SCANCODE_A) {
@@ -127,12 +127,6 @@ void keyboard_control (game_t *game) {
   if (game->keys[KeyS] == true && get_character_state(game->player) == Walking) {
     set_character_state(&game->player, Crouching);
     set_character_velocity(&game->player, 0.0, game->player.vel.y); //set a left velocity
-
-    //debug
-    if (!level_list_is_empty(level_list_rest(game->currLevel))) {
-      game->currLevel = level_list_rest(game->currLevel);
-      Mix_PlayMusic(game->currLevel->head.levelMusic, -1);
-    }
   }
 
   //'&' key

@@ -56,11 +56,12 @@ typedef struct Game {
   SDL_Color *colorPalette; //palette of 15 colors
 
   character_t player; //player
-  character_list_t enemies; //list of enemies
 
   SDL_Texture *spriteSheet; //sprite sheet
 
   bool quit; //variable running the main loop and quitting the game if desired
+
+  bool openMenu; //if we want to leave the game and open the menu
 
   level_list_t currLevel; //current level in which we are playing, hopefully a list one day
 

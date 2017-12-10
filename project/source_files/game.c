@@ -83,9 +83,9 @@ void create_game (game_t *g) {
   SDL_Rect desRec = {0, 0, IMG_WIDTH, IMG_HEIGHT};
   g->player = set_character(PLAYER_BASE_HP, basePosition, baseVelocity, desRec, Player);
 
-  g->enemies = character_list_empty();
-
   g->quit = false;
+
+  g->openMenu = false;
 
   reset_keys(g);
 
@@ -104,15 +104,14 @@ void create_game (game_t *g) {
   return;
 }
 
-//reset the player and enemies of the game
+//reset the player of the game
 void reset_game(game_t *game) {
   floatpoint_t basePosition = set_floatpoint(0.0, 0.0);
   vector_t baseVelocity = set_vector(0.0, 0.0);
   SDL_Rect desRec = {0, 0, IMG_WIDTH, IMG_HEIGHT};
   projectile_list_free(game->player.projectiles);
+  level_list_free(game->currLevel);
   game->player = set_character(PLAYER_BASE_HP, basePosition, baseVelocity, desRec, Player);
-  character_list_free(game->enemies);
-  game->enemies = character_list_empty();
 
   reset_keys(game);
 
@@ -217,16 +216,15 @@ void init_palette2 (game_t *game) {
 //free a game
 void free_game (game_t *g) {
   free(g->manager);
+  level_list_free(g->currLevel);
+  SDL_DestroyTexture(g->spriteSheet);
+  SDL_DestroyTexture(g->cursor);
   SDL_DestroyRenderer(g->renderer);
   SDL_DestroyWindow(g->window);
-  SDL_DestroyTexture(g->cursor);
   free(g->event);
   TTF_CloseFont(g->font);
   free(g->colorPalette);
   projectile_list_free(g->player.projectiles);
-  character_list_free(g->enemies);
-  SDL_DestroyTexture(g->spriteSheet);
-  level_list_free(g->currLevel);
   Mix_FreeMusic(g->menuMusic);
   free_music_box(&g->musicBox);
   free(g);

@@ -425,7 +425,7 @@ void rendering (game_t *game) {
 
   //render the enemy projectile
   character_list_t c;
-  c = game->enemies;
+  c = game->currLevel->head.enemies;
   while (!character_list_is_empty(c)) {
     render_character(character_list_head(c), game->renderer, game->spriteSheet);
     render_projectiles(character_list_head(c).projectiles, game->renderer, game->spriteSheet);
