@@ -6,6 +6,92 @@ rendering.c : contain the functions to display everything
 
 #include "../header_files/rendering.h"
 
+//display a transition between levels
+void next_level_transition (game_t *game) {
+  SDL_Surface *textSurface = NULL;
+  SDL_Texture *textTexture = NULL;
+  SDL_Rect textPos;
+
+  char *string = NULL;
+  string = malloc(6 * sizeof(char));
+  sprintf(string, "- 3 -");
+
+  textSurface = TTF_RenderText_Solid(game->font, string, game->colorPalette[1]);
+
+  textPos.x = (SCREEN_WIDTH / 2) - (textSurface->clip_rect.w / 2);
+  textPos.y = (textSurface->clip_rect.h / 2) + (SCREEN_HEIGHT / 2);
+
+  SDL_RenderClear(game->renderer);
+
+  textTexture = SDL_CreateTextureFromSurface(game->renderer, textSurface);
+  SDL_QueryTexture(textTexture, NULL, NULL, &textPos.w, &textPos.h);
+  SDL_RenderCopy(game->renderer, textTexture, NULL, &textPos);
+  SDL_FreeSurface(textSurface);
+
+  SDL_RenderPresent(game->renderer);
+
+  SDL_Delay(1000);
+
+  sprintf(string, "- 2 -");
+
+  textSurface = TTF_RenderText_Solid(game->font, string, game->colorPalette[1]);
+
+  textPos.x = (SCREEN_WIDTH / 2) - (textSurface->clip_rect.w / 2);
+  textPos.y = (textSurface->clip_rect.h / 2) + (SCREEN_HEIGHT / 2);
+
+  SDL_RenderClear(game->renderer);
+
+  textTexture = SDL_CreateTextureFromSurface(game->renderer, textSurface);
+  SDL_QueryTexture(textTexture, NULL, NULL, &textPos.w, &textPos.h);
+  SDL_RenderCopy(game->renderer, textTexture, NULL, &textPos);
+  SDL_FreeSurface(textSurface);
+
+  SDL_RenderPresent(game->renderer);
+
+  SDL_Delay(1000);
+
+  sprintf(string, "- 1 -");
+
+  textSurface = TTF_RenderText_Solid(game->font, string, game->colorPalette[1]);
+
+  textPos.x = (SCREEN_WIDTH / 2) - (textSurface->clip_rect.w / 2);
+  textPos.y = (textSurface->clip_rect.h / 2) + (SCREEN_HEIGHT / 2);
+
+  SDL_RenderClear(game->renderer);
+
+  textTexture = SDL_CreateTextureFromSurface(game->renderer, textSurface);
+  SDL_QueryTexture(textTexture, NULL, NULL, &textPos.w, &textPos.h);
+  SDL_RenderCopy(game->renderer, textTexture, NULL, &textPos);
+  SDL_FreeSurface(textSurface);
+
+  SDL_RenderPresent(game->renderer);
+
+  SDL_Delay(1000);
+
+  sprintf(string, "Go");
+
+  textSurface = TTF_RenderText_Solid(game->font, string, game->colorPalette[1]);
+
+  textPos.x = (SCREEN_WIDTH / 2) - (textSurface->clip_rect.w / 2);
+  textPos.y = (textSurface->clip_rect.h / 2) + (SCREEN_HEIGHT / 2);
+
+  SDL_RenderClear(game->renderer);
+
+  textTexture = SDL_CreateTextureFromSurface(game->renderer, textSurface);
+  SDL_QueryTexture(textTexture, NULL, NULL, &textPos.w, &textPos.h);
+  SDL_RenderCopy(game->renderer, textTexture, NULL, &textPos);
+  SDL_FreeSurface(textSurface);
+
+  SDL_RenderPresent(game->renderer);
+
+  SDL_Delay(500);
+
+  SDL_DestroyTexture(textTexture);
+  free(string);
+
+  return;
+}
+
 //render the melee attacks
 void render_melee (character_t p, SDL_Renderer *renderer, SDL_Texture *img) {
 

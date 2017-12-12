@@ -103,7 +103,7 @@ int main_menu_display (game_t *game) {
   SDL_Surface *temp;
 
   SDL_Texture *tempT = NULL;
-  SDL_Texture *background;
+  SDL_Texture *background = NULL;
 
   temp = IMG_Load(PATH_BACKGROUND);
   if (temp == NULL) {

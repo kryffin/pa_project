@@ -18,7 +18,7 @@ void free_level (level_list_t l) {
 }
 
 //go to next level if enemies are all dead
-level_list_t next_level (level_list_t l) {
+level_list_t next_level (level_list_t l, int *flag) {
 
   //if the next level isn't empty and there are no more enemies
   if (!level_list_is_empty(level_list_rest(l)) && character_list_is_empty(l->head.enemies)) {
@@ -26,8 +26,12 @@ level_list_t next_level (level_list_t l) {
     level_list_t tmp = level_list_rest(l);
     free_level(l);
 
+    *flag = 1;
+
     return tmp;
   }
+
+  *flag = 0;
 
   return l;
 }

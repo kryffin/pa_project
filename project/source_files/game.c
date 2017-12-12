@@ -35,8 +35,8 @@ void create_game (game_t *g) {
     printf("Error during renderer creation : %s\n", SDL_GetError());
     exit(1);
   }
-  //set the draw color of the renderer to white
-  SDL_SetRenderDrawColor(g->renderer, 255, 255, 255, 255);
+  //set the draw color of the renderer to black
+  SDL_SetRenderDrawColor(g->renderer, 0, 0, 0, 255);
 
   //hide the computer cursor to only show the game's
   SDL_ShowCursor(SDL_DISABLE);

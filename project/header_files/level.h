@@ -44,7 +44,7 @@ struct Level_List {
 void free_level (level_list_t l);
 
 //go to next level if enemies are all dead
-level_list_t next_level (level_list_t l);
+level_list_t next_level (level_list_t l, int *flag);
 
 //set the level music
 void set_level_music (level_t *l, char *path);

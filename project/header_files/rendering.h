@@ -17,6 +17,9 @@
 /* FUNCTIONS */
 /*************/
 
+//display a transition between levels
+void next_level_transition (game_t *game);
+
 //render the melee attacks
 void character_melee (character_t p, SDL_Renderer *renderer, SDL_Texture *img);
 

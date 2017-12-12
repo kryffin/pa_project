@@ -12,6 +12,8 @@ int main () {
   game_t *g = malloc(sizeof(game_t));
   create_game(g);
 
+  int flag;
+
   //clear the renderer's render
   SDL_RenderClear(g->renderer);
 
@@ -56,14 +58,18 @@ int main () {
       g->player.onGround = true;
     }
 
-    g->currLevel = next_level(g->currLevel);
+    g->currLevel = next_level(g->currLevel, &flag);
+    if (flag) {
+      flag = 0;
+      next_level_transition(g);
+    }
 
     /* rendering */
 
     rendering(g);
 
     if (g->openMenu || !is_alive(g->player)) {
-      
+
       g->openMenu = false;
 
       if (!is_alive(g->player)) {
