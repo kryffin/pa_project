@@ -215,19 +215,17 @@ void init_palette2 (game_t *game) {
 
 //free a game
 void free_game (game_t *g) {
-  free(g->manager);
-  level_list_free(g->currLevel);
-  SDL_DestroyTexture(g->spriteSheet);
-  SDL_DestroyTexture(g->cursor);
-  SDL_DestroyRenderer(g->renderer);
-  SDL_DestroyWindow(g->window);
-  free(g->event);
-  TTF_CloseFont(g->font);
-  free(g->colorPalette);
-  projectile_list_free(g->player.projectiles);
-  Mix_FreeMusic(g->menuMusic);
-  free_music_box(&g->musicBox);
-  free(g);
+  if (g->manager != NULL) free(g->manager);
+  if (g->spriteSheet != NULL) SDL_DestroyTexture(g->spriteSheet);
+  if (g->cursor != NULL) SDL_DestroyTexture(g->cursor);
+  if (g->renderer != NULL) SDL_DestroyRenderer(g->renderer);
+  if (g->window != NULL) SDL_DestroyWindow(g->window);
+  if (g->event != NULL) free(g->event);
+  if (g->font != NULL) TTF_CloseFont(g->font);
+  if (g->colorPalette != NULL) free(g->colorPalette);
+  if (g->menuMusic != NULL) Mix_FreeMusic(g->menuMusic);
+  if (&g->musicBox != NULL) free_music_box(&g->musicBox);
+  if (g != NULL) free(g);
 
   return;
 }
